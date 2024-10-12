@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { json } from "@remix-run/node";
-
 
 export default function CreateID() {
   const [username, setUsername] = useState("");
@@ -9,7 +7,6 @@ export default function CreateID() {
   const [error, setError] = useState(""); 
   const [fieldError, setFieldError] = useState("");
     
-
   let signIn = (username: string, password: string,comfirmPassword:string): boolean => {
     if ((!username || !password || !comfirmPassword) && (password !== comfirmPassword)) {
         setError("Some fields are required"); 
@@ -37,7 +34,7 @@ export default function CreateID() {
     <>
       <div className="flex flex-col space-y-4 p-5 justify-center align-middle min-h-screen">
         <h1 className="text-center font-bold text-3xl">Easy service</h1>
-        <h2 className="text-center text-xl">Create ID</h2>
+        <h2 className="text-center text-xl">Create ID Page</h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
         {fieldError && <p className="text-red-500 text-center">{fieldError}</p>}       
 
@@ -46,7 +43,7 @@ export default function CreateID() {
           <input
             value={username}
             name="username"
-            className="bg-slate-500 shrink border-white border-2 max-w-96 "
+            className="bg-slate-500  border-white border-2 max-w-96 "
             onChange={(e) => setUsername(e.target.value)}
             required
           />
