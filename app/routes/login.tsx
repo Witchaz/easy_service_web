@@ -3,11 +3,19 @@ import NavBar from "app/components/_navBar";
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); 
 
   let login = (username: string, password: string): boolean => {
     if (username === "admin" && password === "1234") {
       return true;
     }
+
+    else if (!username || !password) {
+      setError("Some fields are required");
+      return false;
+    }
+    
+    setError("");
     return false;
     // return username === "admin" && password === "1234" ? true : false;
   };
@@ -17,6 +25,7 @@ export default function Login() {
       <div className="flex flex-col space-y-4 p-5 justify-center align-middle min-h-screen">
         <h1 className="text-center font-bold text-3xl">Easy service</h1>
         <h2 className="text-center text-xl">Login Page</h2>
+        {error && <p className="text-red-500 text-center">{error}</p>}
         <div className="grid grid-cols-[120px_auto] justify-center gap-2">
           <h3>Username :</h3>
           <input
@@ -43,6 +52,10 @@ export default function Login() {
           >
             Login
           </button>
+        </div>
+        <div className="flex justify-center">
+          Don't have an account? <a href="/create_id">
+            <div style={{color:'red'}}>create account</div></a>
         </div>
       </div>
     </>
