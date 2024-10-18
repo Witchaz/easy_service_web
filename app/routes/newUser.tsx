@@ -111,16 +111,13 @@ export default function newUser() {
           </Form>
         </div>
         <div className="flex justify-center">
-          <button type="button"
-            className="shrink border-white border-2 hover:bg-slate-400 p-2 rounded-lg mr-8"
-            //onClick กลับไปหน้ารายชื่อลูกค้า
-          >
-            cancel
-          </button>
+          <a href = '/customerList'>
+            <button type="button" className="bg-red-600 text-white shrink border-white border-2 hover:bg-red-800 p-2 rounded-lg mr-8">
+              cancel
+            </button>
+          </a>
           <button type="submit"
-            className="shrink border-white border-2 hover:bg-slate-800 p-2 rounded-lg ml-8"
-            
-          >
+            className="bg-lime-500 text-white shrink border-white border-2 hover:bg-lime-600 p-2 rounded-lg ml-8">
             Add
           </button>
         </div>
