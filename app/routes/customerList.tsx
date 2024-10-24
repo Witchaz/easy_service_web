@@ -131,7 +131,7 @@ export default function CustomerList() {
             </div>
 
           <div className="flex justify-center space-x-4 mt-8">
-            <button className="bg-yellow-400 text-white py-2 px-6 rounded-lg hover:bg-yellow-500"
+            <button className="bg-yellow-400 text-white py-2 px-6 rounded-lg hover:bg-yellow-500 mr-8"
               onClick={() => alert(`Selected: ${selectedCustomer}`)}>Select</button>
               
             <a href="/newUser">
