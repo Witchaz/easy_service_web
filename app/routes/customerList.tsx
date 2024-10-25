@@ -78,7 +78,7 @@ export default function CustomerList() {
                 aria-label="Search customers"
                 id="q"
                 name="q"
-                placeholder="Search by name, email, or others..."
+                placeholder="Search by name"
                 className="border border-gray-300 rounded-lg p-2 w-1/3"
               />
             </Form>

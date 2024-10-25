@@ -1,5 +1,5 @@
 import { useState } from "react";
-import NavBar from "app/components/_navBar";
+
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -21,7 +21,6 @@ export default function Login() {
   };
   return (
     <>
-      <NavBar />
       <div className="flex flex-col space-y-4 p-5 justify-center align-middle min-h-screen">
         <h1 className="text-center font-bold text-3xl">Easy service</h1>
         <h2 className="text-center text-xl">Login Page</h2>
