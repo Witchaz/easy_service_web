@@ -2,6 +2,7 @@ import { json , LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useLoaderData, useSubmit} from "@remix-run/react";
 import { useEffect, useState } from "react";
 import NavBar from "app/components/_navBar";
+import { useNavigate } from "react-router-dom"; 
 
 
 const ITEMS_PER_PAGE = 6; 
@@ -54,6 +55,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function CustomerList() {
   const { customers, total, q, page } = useLoaderData<LoaderData>(); 
   const submit = useSubmit();
+  const navigate = useNavigate();
   
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
 
@@ -65,11 +67,19 @@ export default function CustomerList() {
   }, [q]);
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+  
+  const handleSelect = () => {
+    if (selectedCustomer) {
+      navigate('/workDescription');
+    } else {
+      alert("กรุณาเลือกผู้ใช้ก่อน");
+    }
+  };
   return (
     <>
       <NavBar />
         <div className="min-h-screen p-8 bg-gray-50">
-          <h1 className="text-center text-3xl font-bold mb-8">Customer</h1>
+          <h1 className="text-center text-3xl font-bold  text-lime-600 mb-8">ข้อมูลลูกค้า</h1>
           
           <div className="bg-white p-4 shadow-md rounded-lg">
             <Form id="search-form" onChange={(event) => submit(event.currentTarget)} role="search">
@@ -131,8 +141,9 @@ export default function CustomerList() {
             </div>
 
           <div className="flex justify-center space-x-4 mt-8">
-            <button className="bg-yellow-400 text-white py-2 px-6 rounded-lg hover:bg-yellow-500 mr-8"
-              onClick={() => alert(`Selected: ${selectedCustomer}`)}>Select</button>
+            <button className="bg-yellow-400 text-white py-2 px-6 rounded-lg hover:bg-yellow-500" onClick={handleSelect}>
+              Select
+            </button>
               
             <a href="/newUser">
               <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600">ADD</button>
