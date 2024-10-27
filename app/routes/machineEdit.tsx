@@ -31,7 +31,7 @@ export default function MachineEdit() {
 
     const handleSubmit = (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-        // console.log('Updated Data:', formData);
+       
         const newErrors = {
             serialNumber: !formData.serialNumber,
             rated: !formData.rated,

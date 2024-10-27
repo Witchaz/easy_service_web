@@ -1,95 +1,93 @@
+import { useState } from "react";
 import NavBar from "app/components/_navBar";
 import { useNavigate } from "react-router-dom";
 
-interface Machine {
-    id: number;
-    serialNumber: string;
-    model: string;
-    warranty: string;
-    rated: string;
-}
+export default function Work() {
 
+    const [formData] = useState({
+        customerName: "Kathryn Murphy",
+        address: "15/45 ..., Bangkok, TH",
+        province: "Bangkok",
+        mailDate: "2004-02-01",
+        details: [
+            { id: 1, serialNumber: "2538A7", model: "Derivistiya" },
+            { id: 2, serialNumber: "BR120/L55A1", model: "Leopard" },
+            { id: 3, serialNumber: "MG25SA2", model: "Merkavar" },
+        ],
+        engineer: "-",
+        additionalCost: 0,
+        status: 0,
+    });
 
-const getMachines = () => {
-    const machines = [
-        {
-        id: 1,
-        serialNumber: "2538A7",
-        model: "Derivistiya",
-        warranty: "2021-09-20 10:30 AM",
-        rated: "4 Cubicmetre",
-        },
-        {
-        id: 2,
-        serialNumber: "BR120/L55A1",
-        model: "Leopard",
-        warranty: "2021-09-20 10:30 AM",
-        rated: "12 Cubicmetre",
-        },
-        {
-        id: 3,
-        serialNumber: "MG25SA2",
-        model: "Merkavar",
-        warranty: "2021-09-20 10:30 AM",
-        rated: "10 Cubicmetre",
-        },
-    ];
-    return machines;
-}
-
-export default function Work() { 
-    const machines = getMachines();
     const navigate = useNavigate();
 
-    const handleAdd = () => {
-        navigate("/machineDetails");
-    }
+    const handleBack = () => {
+        navigate("/customerList");
+    };
 
-    const handleEdit = (machine: Machine) => {  
-        navigate("/machineEdit", { state: machine }); // ส่ง machine โดยตรง
-    }
+    const handleEditDetails = () => {
+        navigate("/machineList");
+    };
+
+    const handleEditAddress = () => {
+        navigate("/workDescription", { state: { work: formData, from: "/work" } });
+    };
 
     return (
         <>
             <NavBar />
-                <div className="flex flex-col items-center min-h-screen bg-gray-100">
-                    <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
-                        จำนวนเครื่องที่ต้องการซ่อม
-                    </h2>
-                    <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
-        
-                        <div className="max-h-96 overflow-y-auto">
-                            { machines.map((machine) => (
-                                <div key={machine.id} className="bg-gray-50 p-4 mb-4 rounded-md flex justify-between items-center">
-                                    <div>
-                                        <h3 className="font-semibold mb-1">รายละเอียดเครื่องซ่อมลำดับที่ {machine.id}</h3>
-                                        <p>Serial Number: {machine.serialNumber}</p>
-                                        <p>Model / Type: {machine.model}</p>
-                                        <p>Rated: {machine.rated}</p>
-                                        <p>Warranty: {machine.warranty}</p>
-                                    </div>
-                                    <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
-                                        onClick={() => handleEdit(machine)}>
-                                        Edit Details
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
+            <div className="flex flex-col items-center min-h-screen bg-gray-100">
+                <h1 className="text-center text-3xl font-semibold text-lime-600 mt-8 mb-6">
+                    หน้าเพิ่มงาน
+                </h1>
+                
+                <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-4xl max-h-[550px] overflow-y-auto mb-6">
+                    <div className="border-b border-gray-300 py-4">
+                        <p><strong>สถานที่ซ่อม:</strong> {formData.address}</p>
 
-                        <div className="flex justify-between mt-8">
-                            <button className="bg-red-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-800">
-                                back
+                        {formData.details.length > 0 ? (
+                            formData.details.slice(0, 3).map((detail, index) => (
+                                <p key={detail.id}>
+                                    <strong>รายละเอียดเครื่องซ่อมลำดับที่ {index + 1} :</strong> Model: {detail.model}, Serial Number: {detail.serialNumber}
+                                </p>
+                            ))
+                        ) : (
+                            <p>รายละเอียด : -</p>
+                        )}
+                        {formData.details.length > 2 && <p>...</p>}
+
+                        <p><strong>ช่างผู้รับผิดชอบ :</strong> {formData.engineer}</p>
+                        <p><strong>ค่าใช้จ่ายเพิ่มเติม :</strong> {formData.additionalCost}</p>
+                        <p><strong>สถานะการทำงาน :</strong> {formData.status}</p>
+
+                        <div className="flex space-x-4 mt-4">
+                            <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
+                                onClick={handleEditDetails}>
+                                Edit Details
                             </button>
-                            <button className="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-600" onClick={handleAdd}>
-                                add
+                            <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
+                                onClick={handleEditAddress}>
+                                Edit Address
                             </button>
-                            <button className="bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-lime-600">
-                                next
+                            <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg">
+                                Edit Cost
+                            </button>
+                            <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg">
+                                Edit Engineer
                             </button>
                         </div>
-                    
                     </div>
                 </div>
+
+                <div className="flex justify-between w-full max-w-4xl">
+                    <button className="bg-black text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-800" onClick={handleBack}>
+                        Back
+                    </button>
+                    <button className="bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg">
+                        Next
+                    </button>
+                </div>
+            </div>
         </>
-    )
+    );
 }
