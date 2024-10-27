@@ -1,4 +1,14 @@
 import NavBar from "app/components/_navBar";
+import { useNavigate } from "react-router-dom";
+
+interface Machine {
+    id: number;
+    serialNumber: string;
+    model: string;
+    warranty: string;
+    rated: string;
+}
+
 
 const getMachines = () => {
     const machines = [
@@ -29,6 +39,16 @@ const getMachines = () => {
 
 export default function Work() { 
     const machines = getMachines();
+    const navigate = useNavigate();
+
+    const handleAdd = () => {
+        navigate("/machineDetails");
+    }
+
+    const handleEdit = (machine: Machine) => {  
+        navigate("/machineEdit", { state: machine }); // ส่ง machine โดยตรง
+    }
+
     return (
         <>
             <NavBar />
@@ -45,10 +65,11 @@ export default function Work() {
                                         <h3 className="font-semibold mb-1">รายละเอียดเครื่องซ่อมลำดับที่ {machine.id}</h3>
                                         <p>Serial Number: {machine.serialNumber}</p>
                                         <p>Model / Type: {machine.model}</p>
-                                        <p>Warranty: {machine.warranty}</p>
                                         <p>Rated: {machine.rated}</p>
+                                        <p>Warranty: {machine.warranty}</p>
                                     </div>
-                                    <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg">
+                                    <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
+                                        onClick={() => handleEdit(machine)}>
                                         Edit Details
                                     </button>
                                 </div>
@@ -59,7 +80,7 @@ export default function Work() {
                             <button className="bg-red-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-800">
                                 back
                             </button>
-                            <button className="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-600">
+                            <button className="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-600" onClick={handleAdd}>
                                 add
                             </button>
                             <button className="bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-lime-600">

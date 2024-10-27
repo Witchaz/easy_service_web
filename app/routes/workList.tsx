@@ -48,8 +48,6 @@ export default function WorkList() {
             <NavBar />
                 <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
                 <h1 className="text-3xl font-bold text-lime-600 mb-8">Work</h1>
-
-                
                 <div className="w-full max-w-2xl bg-white shadow-lg rounded-lg p-4">
                     <div className="h-96 overflow-y-auto pr-2">
                     {works.map((work, index) => (

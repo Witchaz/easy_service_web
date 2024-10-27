@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom"; 
+import NavBar from "app/components/_navBar";
 
 export default function WorkDescription() {
     const navigate = useNavigate();
@@ -39,6 +40,8 @@ export default function WorkDescription() {
     };
 
     return (
+        <>
+        <NavBar />
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <div className="bg-white p-10 rounded-lg shadow-md w-full max-w-lg">
             <h2 className="text-center text-2xl font-semibold text-lime-600 mb-6">สถานที่ซ่อม</h2>
@@ -102,5 +105,6 @@ export default function WorkDescription() {
         </form>
         </div>
         </div>
+        </>
     );
 }
