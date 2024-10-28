@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import NavBar from "app/components/_navBar";
 
@@ -20,17 +20,6 @@ interface FormData {
     details: Machine[];
 }
 
-interface FormDataLast {
-    customerNameL: string;
-    addressL: string;
-    provinceL: string;
-    mailDateL: string;
-    engineerL: string;
-    additionalCostL: number;
-    statusL: string;
-    detailsL: Machine[];
-}
-
 export default function MachineList() {
     const location = useLocation();
     const navigate = useNavigate();
@@ -46,18 +35,23 @@ export default function MachineList() {
         details,
     } = location.state || {};
 
-    const {
-        customerNameL,
-        addressL,
-        provinceL,
-        mailDateL,
-        engineerL,
-        additionalCostL,
-        statusL,
-        detailsL,
-    } = location.state.work || {};
+    // Load initial data from sessionStorage if available
+    useEffect(() => {
+        const initialData = sessionStorage.getItem("initialFormData");
+        if (!initialData) {
+            sessionStorage.setItem("initialFormData", JSON.stringify({
+                customerName,
+                address,
+                province,
+                mailDate,
+                engineer,
+                additionalCost,
+                status,
+                details: details || [],
+            }));
+        }
+    }, [customerName, address, province, mailDate, engineer, additionalCost, status, details]);
 
-    // formData สำหรับข้อมูลที่สามารถเปลี่ยนแปลงได้
     const [formData, setFormData] = useState<FormData>({
         customerName,
         address,
@@ -69,34 +63,26 @@ export default function MachineList() {
         details: details || [],
     });
 
-    
-    const formDataLast = useRef<FormDataLast>({
-        customerNameL,
-        addressL,
-        provinceL,
-        mailDateL,
-        engineerL,
-        additionalCostL,
-        statusL,
-        detailsL: details || [],
-    });
-
     const handleAdd = () => {
-        navigate("/machineDetails", { state: { formData, formDataLast: formDataLast.current } });
+        navigate("/machineDetails", { state: { formData } });
     };
 
     const handleEdit = (index: number) => {
-        navigate("/machineEdit", { state: { machines: formData.details, index, formData, formDataLast: formDataLast.current } });
+        navigate("/machineEdit", { state: { machines: formData.details, index, formData } });
     };
 
     const handleSave = () => {
-        // ส่งข้อมูลทั้งหมดกลับไปยัง Work
+        // ส่งข้อมูลที่อัปเดตกลับไปยัง Work
         navigate("/work", { state: { ...formData } });
+        sessionStorage.removeItem("initialFormData"); // ลบค่าเริ่มต้นเมื่อมีการบันทึก
     };
 
     const handleBack = () => {
-        // ส่งข้อมูลที่ไม่เปลี่ยนแปลงกลับไปที่ Work
-        navigate("/work", { state: { ...formDataLast.current } });
+        // ดึงข้อมูลเริ่มต้นจาก sessionStorage เมื่อกด Back
+        const initialFormData = sessionStorage.getItem("initialFormData");
+        if (initialFormData) {
+            navigate("/work", { state: JSON.parse(initialFormData) });
+        }
     };
 
     return (

@@ -14,7 +14,8 @@ export default function WorkDescription() {
         mailDate = "",
         engineer = "",
         additionalCost = 0,
-        status = ""
+        status = "",
+         details = [],
     } = work || {}; 
 
     const [formData, setFormData] = useState({
@@ -25,6 +26,7 @@ export default function WorkDescription() {
         engineer,
         additionalCost,
         status,
+        details,
     });
 
     const [errors, setErrors] = useState({

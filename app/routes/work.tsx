@@ -1,22 +1,22 @@
 import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState } from "react";
 import NavBar from "app/components/_navBar";
-import { useNavigate,useLocation  } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Work() {
     const location = useLocation();
+    const navigate = useNavigate();
 
-    
+    const {
+        customerName,
+        address,
+        province,
+        mailDate,
+        details = [],
+        engineer = "",
+        additionalCost = 0,
+        status = "",
+    } = location.state || {};
 
-    const { customerName,
-            address,
-            province,
-            mailDate,
-            details = [],
-            engineer= "",
-            additionalCost=0,
-        status = "" } = location.state || {};
-    
-    
     const locationDetails = location.state?.details || details;
 
     const [formData] = useState({
@@ -24,13 +24,11 @@ export default function Work() {
         address: address,
         province: province,
         mailDate: mailDate,
-        details: locationDetails.map((detail: { id: any; }, index: number) => ({...detail,id: detail.id || index + 1,  })),
+        details: locationDetails.map((detail: { id: any; }, index: number) => ({...detail, id: detail.id || index + 1})),
         engineer: engineer,
         additionalCost: additionalCost,
         status: status,
     });
-
-    const navigate = useNavigate();
 
     const handleBack = () => {
         navigate("/customerList");
@@ -42,6 +40,11 @@ export default function Work() {
 
     const handleEditAddress = () => {
         navigate("/workDescription", { state: { work: formData, from: "/work" } });
+    };
+
+    const handleEditEngineer = () => {
+        
+        navigate("/selectEngineer", { state: { work:formData } });
     };
 
     return (
@@ -83,7 +86,8 @@ export default function Work() {
                             <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg">
                                 Edit Cost
                             </button>
-                            <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg">
+                            <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
+                                onClick={handleEditEngineer}>
                                 Edit Engineer
                             </button>
                         </div>
