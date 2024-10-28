@@ -1,22 +1,33 @@
-import { useState } from "react";
+import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState } from "react";
 import NavBar from "app/components/_navBar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation  } from "react-router-dom";
 
 export default function Work() {
+    const location = useLocation();
+
+    
+
+    const { customerName,
+            address,
+            province,
+            mailDate,
+            details = [],
+            engineer= "",
+            additionalCost=0,
+        status = "" } = location.state || {};
+    
+    
+    const locationDetails = location.state?.details || details;
 
     const [formData] = useState({
-        customerName: "Kathryn Murphy",
-        address: "15/45 ..., Bangkok, TH",
-        province: "Bangkok",
-        mailDate: "2004-02-01",
-        details: [
-            { id: 1, serialNumber: "2538A7", model: "Derivistiya" },
-            { id: 2, serialNumber: "BR120/L55A1", model: "Leopard" },
-            { id: 3, serialNumber: "MG25SA2", model: "Merkavar" },
-        ],
-        engineer: "-",
-        additionalCost: 0,
-        status: 0,
+        customerName: customerName,
+        address: address,
+        province: province,
+        mailDate: mailDate,
+        details: locationDetails.map((detail: { id: any; }, index: number) => ({...detail,id: detail.id || index + 1,  })),
+        engineer: engineer,
+        additionalCost: additionalCost,
+        status: status,
     });
 
     const navigate = useNavigate();
@@ -26,7 +37,7 @@ export default function Work() {
     };
 
     const handleEditDetails = () => {
-        navigate("/machineList");
+        navigate("/machineList", { state: { ...formData } });
     };
 
     const handleEditAddress = () => {
@@ -46,7 +57,7 @@ export default function Work() {
                         <p><strong>สถานที่ซ่อม:</strong> {formData.address}</p>
 
                         {formData.details.length > 0 ? (
-                            formData.details.slice(0, 3).map((detail, index) => (
+                            formData.details.slice(0, 3).map((detail: { id: Key | null | undefined; model: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; serialNumber: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }, index: number) => (
                                 <p key={detail.id}>
                                     <strong>รายละเอียดเครื่องซ่อมลำดับที่ {index + 1} :</strong> Model: {detail.model}, Serial Number: {detail.serialNumber}
                                 </p>
@@ -54,7 +65,7 @@ export default function Work() {
                         ) : (
                             <p>รายละเอียด : -</p>
                         )}
-                        {formData.details.length > 2 && <p>...</p>}
+                        {formData.details.length > 3 && <p>...</p>}
 
                         <p><strong>ช่างผู้รับผิดชอบ :</strong> {formData.engineer}</p>
                         <p><strong>ค่าใช้จ่ายเพิ่มเติม :</strong> {formData.additionalCost}</p>

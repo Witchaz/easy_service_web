@@ -1,63 +1,70 @@
-import { useLocation,useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import NavBar from "app/components/_navBar";
 
 export default function MachineEdit() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { serialNumber, model, warranty, rated } = location.state || {};
+    const { machines, index, formData, formDataLast } = location.state || {};
+    
+    const machineToEdit = machines[index];
 
-    const [formData, setFormData] = useState({
-        serialNumber,
-        model,
-        warranty,
-        rated,
+    const [formMachineData, setFormMachineData] = useState({
+        serialNumber: machineToEdit.serialNumber,
+        model: machineToEdit.model,
+        warranty: machineToEdit.warranty,
+        rated: machineToEdit.rated,
     });
 
     const [errors, setErrors] = useState({
         serialNumber: false,
         rated: false,
         model: false,
-        warranty:false,
+        warranty: false,
     });
 
     const handleChange = (e: { target: { name: any; value: any; }; }) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
+        setFormMachineData({
+            ...formMachineData,
             [name]: value,
         });
     };
 
     const handleSubmit = (e: { preventDefault: () => void; }) => {
         e.preventDefault();
-       
+
         const newErrors = {
-            serialNumber: !formData.serialNumber,
-            rated: !formData.rated,
-            model: !formData.model,
-            warranty: !formData.warranty
+            serialNumber: !formMachineData.serialNumber,
+            rated: !formMachineData.rated,
+            model: !formMachineData.model,
+            warranty: !formMachineData.warranty
         };
 
         setErrors(newErrors);
         if (!newErrors.serialNumber && !newErrors.rated && !newErrors.model && !newErrors.warranty) {
-            //add เครื่องตรงนี้
-            navigate("/work"); 
+            const updatedMachines = machines.map((machine: any, i: any) => 
+                i === index ? { ...machine, ...formMachineData } : machine
+            );
+
+            navigate("/machineList", {
+                state: { ...formData, details: updatedMachines, formDataLast } 
+            }); 
         }
     };
 
     const handleBack = () => {
-        navigate("/work");
-    }
+        navigate("/machineList", { state: { ...formData, details: machines, formDataLast } });
+    };
 
     const handleDelete = () => {
-        //ลบเครื่อง
-        navigate("/work");
-    }
+        const updatedMachines = machines.filter((_: any, i: any) => i !== index);
+        navigate("/machineList", { state: { ...formData, details: updatedMachines, formDataLast } });
+    };
 
     return (
         <>
-        <NavBar />
+            <NavBar />
             <div className="flex flex-col items-center min-h-screen bg-gray-100">
                 <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
                     แก้ไขรายละเอียดที่จะซ่อม
@@ -69,7 +76,7 @@ export default function MachineEdit() {
                             <input 
                                 type="text" 
                                 name="serialNumber"
-                                value={formData.serialNumber}
+                                value={formMachineData.serialNumber}
                                 onChange={handleChange}
                                 className="border rounded w-full py-2 px-3"
                             />
@@ -81,7 +88,7 @@ export default function MachineEdit() {
                             <input 
                                 type="text" 
                                 name="model"
-                                value={formData.model}
+                                value={formMachineData.model}
                                 onChange={handleChange}
                                 className="border rounded w-full py-2 px-3"
                             />
@@ -93,7 +100,7 @@ export default function MachineEdit() {
                             <input 
                                 type="text" 
                                 name="rated"
-                                value={formData.rated}
+                                value={formMachineData.rated}
                                 onChange={handleChange}
                                 className="border rounded w-full py-2 px-3"
                             />
@@ -105,7 +112,7 @@ export default function MachineEdit() {
                             <input 
                                 type="text" 
                                 name="warranty"
-                                value={formData.warranty}
+                                value={formMachineData.warranty}
                                 onChange={handleChange}
                                 className="border rounded w-full py-2 px-3"
                             />
@@ -113,7 +120,6 @@ export default function MachineEdit() {
                         </div>
                         
                         <div className="mt-6 flex justify-between">
-                
                             <button type="button" className="bg-black text-white shrink border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
                                 onClick={handleBack}>
                                 Back
@@ -124,13 +130,10 @@ export default function MachineEdit() {
                                 Delete
                             </button>
 
-                            <button type="submit" className="bg-lime-500 text-white shrink border-white border-2 hover:bg-lime-600 p-2 rounded-lg"
-                                onClick={handleSubmit}>
+                            <button type="submit" className="bg-lime-500 text-white shrink border-white border-2 hover:bg-lime-600 p-2 rounded-lg">
                                 Confirm
                             </button>
-
                         </div>
-                        
                     </form>
                 </div>
             </div>

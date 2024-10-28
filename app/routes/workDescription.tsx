@@ -2,28 +2,26 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import NavBar from "app/components/_navBar";
 
-export default function EditDescription() {
+export default function WorkDescription() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { work } = location.state || {};
 
     const {
-        customerName = "",
+        customerName = location.state?.customerName || "",
         address = "",
         province = "",
         mailDate = "",
-        details = [],
         engineer = "",
         additionalCost = 0,
-        status = 0,
-    } = location.state?.work || {};
-
+        status = ""
+    } = work || {}; 
 
     const [formData, setFormData] = useState({
         customerName,
         address,
         province,
         mailDate,
-        details,
         engineer,
         additionalCost,
         status,
@@ -54,13 +52,13 @@ export default function EditDescription() {
 
         setErrors(newErrors);
         if (!newErrors.address && !newErrors.province && !newErrors.mailDate) {
-            navigate("/work"); 
+            navigate("/work", { state: { ...formData } });
         }
     };
 
     const handleCancel = () => {
         const previousPage = location.state?.from || "/customerList";
-        navigate(previousPage);
+        navigate(previousPage, { state: { ...formData } });
     };
 
     return (

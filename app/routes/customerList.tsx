@@ -70,7 +70,7 @@ export default function CustomerList() {
   
   const handleSelect = () => {
     if (selectedCustomer) {
-      navigate('/workDescription');
+      navigate('/workDescription', { state: { customerName: selectedCustomer } });
     } else {
       alert("กรุณาเลือกผู้ใช้ก่อน");
     }
