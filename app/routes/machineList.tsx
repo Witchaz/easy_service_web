@@ -15,7 +15,7 @@ interface FormData {
     province: string;
     mailDate: string;
     engineer: string;
-    additionalCost: number;
+    additionalExpenses: [];
     status: string;
     details: Machine[];
 }
@@ -30,12 +30,12 @@ export default function MachineList() {
         province,
         mailDate,
         engineer,
-        additionalCost,
+        additionalExpenses,
         status,
         details,
     } = location.state || {};
 
-    // Load initial data from sessionStorage if available
+   
     useEffect(() => {
         const initialData = sessionStorage.getItem("initialFormData");
         if (!initialData) {
@@ -45,12 +45,12 @@ export default function MachineList() {
                 province,
                 mailDate,
                 engineer,
-                additionalCost,
+                additionalExpenses,
                 status,
                 details: details || [],
             }));
         }
-    }, [customerName, address, province, mailDate, engineer, additionalCost, status, details]);
+    }, [customerName, address, province, mailDate, engineer, additionalExpenses, status, details]);
 
     const [formData, setFormData] = useState<FormData>({
         customerName,
@@ -58,7 +58,7 @@ export default function MachineList() {
         province,
         mailDate,
         engineer,
-        additionalCost,
+        additionalExpenses,
         status,
         details: details || [],
     });
@@ -72,13 +72,12 @@ export default function MachineList() {
     };
 
     const handleSave = () => {
-        // ส่งข้อมูลที่อัปเดตกลับไปยัง Work
+        
         navigate("/work", { state: { ...formData } });
-        sessionStorage.removeItem("initialFormData"); // ลบค่าเริ่มต้นเมื่อมีการบันทึก
+        sessionStorage.removeItem("initialFormData"); 
     };
 
     const handleBack = () => {
-        // ดึงข้อมูลเริ่มต้นจาก sessionStorage เมื่อกด Back
         const initialFormData = sessionStorage.getItem("initialFormData");
         if (initialFormData) {
             navigate("/work", { state: JSON.parse(initialFormData) });

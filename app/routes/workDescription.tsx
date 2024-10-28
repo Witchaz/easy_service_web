@@ -13,7 +13,7 @@ export default function WorkDescription() {
         province = "",
         mailDate = "",
         engineer = "",
-        additionalCost = 0,
+        additionalExpenses = [],
         status = "",
          details = [],
     } = work || {}; 
@@ -24,9 +24,9 @@ export default function WorkDescription() {
         province,
         mailDate,
         engineer,
-        additionalCost,
+        additionalExpenses,
         status,
-        details,
+        details
     });
 
     const [errors, setErrors] = useState({

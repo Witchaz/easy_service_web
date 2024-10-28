@@ -64,9 +64,9 @@ export default function SelectEngineer() {
         province = "",
         mailDate = "",
         engineer = "",
-        additionalCost = 0,
+        additionalCost = [],
         status = "",
-        details=[],
+        details = [],
     } = work || {}; 
 
     const [formData, setFormData] = useState({
@@ -170,8 +170,8 @@ export default function SelectEngineer() {
                         </div>
                     </div>
 
-                    <div className="flex justify-center space-x-4 mt-8">
-                        <button className="bg-yellow-400 text-white py-2 px-6 rounded-lg hover:bg-yellow-500" onClick={handleBack}>
+                    <div className="flex justify-center space-x-20 mt-8">
+                        <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-800" onClick={handleBack}>
                             Back
                         </button>
                         <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelect}>Select</button>

@@ -1,4 +1,4 @@
-import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useState } from "react";
+import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useState } from "react";
 import NavBar from "app/components/_navBar";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -6,6 +6,7 @@ export default function Work() {
     const location = useLocation();
     const navigate = useNavigate();
 
+    
     const {
         customerName,
         address,
@@ -13,22 +14,30 @@ export default function Work() {
         mailDate,
         details = [],
         engineer = "",
-        additionalCost = 0,
+        additionalExpenses = [], 
         status = "",
     } = location.state || {};
 
-    const locationDetails = location.state?.details || details;
-
     const [formData] = useState({
-        customerName: customerName,
-        address: address,
-        province: province,
-        mailDate: mailDate,
-        details: locationDetails.map((detail: { id: any; }, index: number) => ({...detail, id: detail.id || index + 1})),
-        engineer: engineer,
-        additionalCost: additionalCost,
-        status: status,
+        customerName,
+        address,
+        province,
+        mailDate,
+        details: details.map((detail: { id: any }, index: number) => ({
+            ...detail,
+            id: detail.id || index + 1,
+        })),
+        engineer,
+        additionalExpenses,  
+        status,
     });
+
+    const totalCost = formData.additionalExpenses.reduce((sum: any, expense: { cost: any; }) => sum + (expense.cost || 0), 0);
+
+  
+    useEffect(() => {
+        sessionStorage.setItem("initialFormData", JSON.stringify(formData));
+    }, []);
 
     const handleBack = () => {
         navigate("/customerList");
@@ -43,8 +52,11 @@ export default function Work() {
     };
 
     const handleEditEngineer = () => {
-        
-        navigate("/selectEngineer", { state: { work:formData } });
+        navigate("/selectEngineer", { state: { work: formData } });
+    };
+
+    const handleEditCost = () => {
+        navigate("/expensesList", { state: { ...formData } });
     };
 
     return (
@@ -71,7 +83,9 @@ export default function Work() {
                         {formData.details.length > 3 && <p>...</p>}
 
                         <p><strong>ช่างผู้รับผิดชอบ :</strong> {formData.engineer}</p>
-                        <p><strong>ค่าใช้จ่ายเพิ่มเติม :</strong> {formData.additionalCost}</p>
+                        <p><strong>ค่าใช้จ่ายเพิ่มเติม : ฿{totalCost.toFixed(2)}</strong> 
+                            
+                        </p>
                         <p><strong>สถานะการทำงาน :</strong> {formData.status}</p>
 
                         <div className="flex space-x-4 mt-4">
@@ -83,7 +97,8 @@ export default function Work() {
                                 onClick={handleEditAddress}>
                                 Edit Address
                             </button>
-                            <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg">
+                            <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
+                                onClick={handleEditCost}>
                                 Edit Cost
                             </button>
                             <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
