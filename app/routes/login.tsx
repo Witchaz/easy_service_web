@@ -1,24 +1,47 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); 
+  const navigate = useNavigate();
 
-  let login = (username: string, password: string): boolean => {
-    if (username === "admin" && password === "1234") {
-      return true;
-    }
-
-    else if (!username || !password) {
+  const login = async (username: string, password: string): Promise<void> => {
+    if (!username || !password) {
       setError("Some fields are required");
-      return false;
+      return;
     }
-    
-    setError("");
-    return false;
-    // return username === "admin" && password === "1234" ? true : false;
+
+    const url = 'https://easy-service.prakasitj.com/user/login/';
+    const options = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    };
+
+    try {
+      const response = await fetch(url, options);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data);
+        if (data.payload) {
+          setError(""); 
+          alert("Login successful!");
+          navigate("/customerList");
+        } else {
+          setError("Invalid username or password");
+        }
+      } else {
+        setError("Login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error(error);
+      setError("An error occurred. Please try again.");
+    }
   };
+
   return (
     <>
       <div className="flex flex-col space-y-4 p-5 justify-center align-middle min-h-screen">
@@ -53,8 +76,10 @@ export default function Login() {
           </button>
         </div>
         <div className="flex justify-center">
-          Don't have an account? <a href="/create_id">
-            <div style={{color:'red'}}>create account</div></a>
+          Don't have an account? 
+          <a href="/create_id">
+            <div style={{ color: 'red', marginLeft: '4px' }}>create account</div>
+          </a>
         </div>
       </div>
     </>
