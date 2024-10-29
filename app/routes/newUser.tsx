@@ -78,7 +78,7 @@ export default function EditCustomer() {
         <>
             <NavBar />
             <div className="flex flex-col items-center min-h-screen bg-gray-100">
-                <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">แก้ไขข้อมูลลูกค้า</h2>
+                <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">เพิ่มข้อมูลลูกค้า</h2>
                 <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
                     <div className="mb-4">
                         <label>Name/Company *</label>
