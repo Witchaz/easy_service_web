@@ -20,7 +20,7 @@ interface FormData {
     details: Machine[];
 }
 
-export default function MachineList() {
+export default function MachineConfirm() {
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -63,24 +63,11 @@ export default function MachineList() {
         details: details || [],
     });
 
-    const handleAdd = () => {
-        navigate("/machineDetails", { state: { formData } });
-    };
-
-    const handleEdit = (index: number) => {
-        navigate("/machineEdit", { state: { machines: formData.details, index, formData } });
-    };
-
-    const handleSave = () => {
-        
-        navigate("/work", { state: { ...formData } });
-        sessionStorage.removeItem("initialFormData"); 
-    };
 
     const handleBack = () => {
         const initialFormData = sessionStorage.getItem("initialFormData");
         if (initialFormData) {
-            navigate("/work", { state: JSON.parse(initialFormData) });
+            navigate("/workConfirm", { state: JSON.parse(initialFormData) });
         }
     };
 
@@ -102,10 +89,6 @@ export default function MachineList() {
                                     <p>Rated: {machine.rated}</p>
                                     <p>Warranty: {machine.warranty}</p>
                                 </div>
-                                <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
-                                    onClick={() => handleEdit(index)}>
-                                    Edit Details
-                                </button>
                             </div>
                         ))}
                     </div>
@@ -113,12 +96,6 @@ export default function MachineList() {
                     <div className="flex justify-between mt-8">
                         <button className="bg-black text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-800" onClick={handleBack}>
                             Back
-                        </button>
-                        <button className="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-600" onClick={handleAdd}>
-                            Add
-                        </button>
-                        <button className="bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-lime-600" onClick={handleSave}>
-                            Save
                         </button>
                     </div>
                 </div>

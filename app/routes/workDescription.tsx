@@ -14,7 +14,7 @@ export default function WorkDescription() {
         mailDate = "",
         engineer = "",
         additionalExpenses = [],
-        status = "",
+        status = 0,
          details = [],
     } = work || {}; 
 

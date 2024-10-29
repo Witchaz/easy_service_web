@@ -64,8 +64,8 @@ export default function SelectEngineer() {
         province = "",
         mailDate = "",
         engineer = "",
-        additionalCost = [],
-        status = "",
+        additionalExpenses = [],
+        status = 0,
         details = [],
     } = work || {}; 
 
@@ -75,7 +75,7 @@ export default function SelectEngineer() {
         province,
         mailDate,
         engineer,
-        additionalCost,
+        additionalExpenses,
         status,
         details,
        
