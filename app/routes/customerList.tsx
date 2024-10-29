@@ -65,12 +65,25 @@ export default function CustomerList() {
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   const handleSelect = () => {
-    if (selectedCustomer) {
-      navigate("/workDescription", { state: { customerId: selectedCustomer } });
+  if (selectedCustomer) {
+    const selectedCustomerName = customers.find(cust => cust.id === selectedCustomer)?.name;
+    if (selectedCustomerName) {
+      navigate("/workDescription", { state: { customerName: selectedCustomerName } });
     } else {
-      alert("กรุณาเลือกผู้ใช้ก่อน");
+      alert("ชื่อผู้ใช้ที่เลือกไม่พบ");
     }
-  };
+  } else {
+    alert("กรุณาเลือกผู้ใช้ก่อน");
+  }
+};
+
+  const handleSelectEdit = () => {
+  if (selectedCustomer) {
+    navigate("/customerEdit", { state: { customerId: selectedCustomer } });
+  } else {
+    alert("กรุณาเลือกผู้ใช้ก่อน");
+  }
+};
 
   return (
     <>
@@ -150,13 +163,18 @@ export default function CustomerList() {
           </div>
 
           <div className="flex justify-center space-x-4 mt-8">
-            <button className="bg-yellow-400 text-white py-2 px-6 rounded-lg hover:bg-yellow-500" onClick={handleSelect}>
-              Select
-            </button>
-
             <a href="/newUser">
               <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600">ADD</button>
             </a>
+
+            <button className="bg-yellow-400 text-white py-2 px-6 rounded-lg hover:bg-yellow-500" onClick={handleSelect}>
+              Select
+            </button>
+            
+            <button className="bg-yellow-400 text-white py-2 px-6 rounded-lg hover:bg-yellow-500" onClick={handleSelectEdit}>
+              Select Edit
+            </button>
+            
           </div>
         </div>
       </div>

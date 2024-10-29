@@ -12,7 +12,7 @@ export default function MachineEdit() {
     const [formMachineData, setFormMachineData] = useState({
         serialNumber: machineToEdit.serialNumber,
         model: machineToEdit.model,
-        warranty: machineToEdit.warranty,
+        warranty: machineToEdit.warranty,  // boolean type
         rated: machineToEdit.rated,
     });
 
@@ -20,29 +20,27 @@ export default function MachineEdit() {
         serialNumber: false,
         rated: false,
         model: false,
-        warranty: false,
     });
 
-    const handleChange = (e: { target: { name: any; value: any; }; }) => {
-        const { name, value } = e.target;
+    const handleChange = (e: { target: { name: any; value: any; checked: any; type: any } }) => {
+        const { name, value, checked, type } = e.target;
         setFormMachineData({
             ...formMachineData,
-            [name]: value,
+            [name]: type === "checkbox" ? checked : value,
         });
     };
 
-    const handleSubmit = (e: { preventDefault: () => void; }) => {
+    const handleSubmit = (e: { preventDefault: () => void }) => {
         e.preventDefault();
 
         const newErrors = {
             serialNumber: !formMachineData.serialNumber,
             rated: !formMachineData.rated,
             model: !formMachineData.model,
-            warranty: !formMachineData.warranty
         };
 
         setErrors(newErrors);
-        if (!newErrors.serialNumber && !newErrors.rated && !newErrors.model && !newErrors.warranty) {
+        if (!newErrors.serialNumber && !newErrors.rated && !newErrors.model) {
             const updatedMachines = machines.map((machine: any, i: any) => 
                 i === index ? { ...machine, ...formMachineData } : machine
             );
@@ -80,7 +78,7 @@ export default function MachineEdit() {
                                 onChange={handleChange}
                                 className="border rounded w-full py-2 px-3"
                             />
-                            {errors.serialNumber && <p className="text-red-500 text-sm">Please enter the serialNumber.</p>}
+                            {errors.serialNumber && <p className="text-red-500 text-sm">Please enter the serial number.</p>}
                         </div>
 
                         <div className="mb-4">
@@ -92,7 +90,7 @@ export default function MachineEdit() {
                                 onChange={handleChange}
                                 className="border rounded w-full py-2 px-3"
                             />
-                            {errors.model && <p className="text-red-500 text-sm">Please enter the Model/Type.</p>}
+                            {errors.model && <p className="text-red-500 text-sm">Please enter the model/type.</p>}
                         </div>
 
                         <div className="mb-4">
@@ -104,19 +102,19 @@ export default function MachineEdit() {
                                 onChange={handleChange}
                                 className="border rounded w-full py-2 px-3"
                             />
-                            {errors.rated && <p className="text-red-500 text-sm">Please enter the rated.</p>}
+                            {errors.rated && <p className="text-red-500 text-sm">Please enter the rated value.</p>}
                         </div>
 
                         <div className="mb-4">
                             <label className="block text-sm font-semibold mb-2">Warranty</label>
                             <input 
-                                type="text" 
+                                type="checkbox" 
                                 name="warranty"
-                                value={formMachineData.warranty}
+                                checked={formMachineData.warranty}
                                 onChange={handleChange}
-                                className="border rounded w-full py-2 px-3"
+                                className="appearance-none w-8 h-8 border-2 border-red-500 rounded-md checked:bg-lime-500 checked:border-lime-500 focus:outline-none mr-2"
                             />
-                            {errors.warranty && <p className="text-red-500 text-sm">Please enter the warranty.</p>}
+                            <span>{formMachineData.warranty ? "Yes" : "No"}</span>
                         </div>
                         
                         <div className="mt-6 flex justify-between">

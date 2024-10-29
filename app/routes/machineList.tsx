@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import NavBar from "app/components/_navBar";
 
 interface Machine {
     serialNumber: string;
     model: string;
-    warranty: string;
+    warranty: boolean;  // แก้ไข type ของ warranty ให้เป็น boolean
     rated: string;
 }
 
@@ -35,7 +35,6 @@ export default function MachineList() {
         details,
     } = location.state || {};
 
-   
     useEffect(() => {
         const initialData = sessionStorage.getItem("initialFormData");
         if (!initialData) {
@@ -72,7 +71,6 @@ export default function MachineList() {
     };
 
     const handleSave = () => {
-        
         navigate("/work", { state: { ...formData } });
         sessionStorage.removeItem("initialFormData"); 
     };
@@ -100,7 +98,7 @@ export default function MachineList() {
                                     <p>Serial Number: {machine.serialNumber}</p>
                                     <p>Model / Type: {machine.model}</p>
                                     <p>Rated: {machine.rated}</p>
-                                    <p>Warranty: {machine.warranty}</p>
+                                    <p>Warranty: {machine.warranty ? "Yes" : "No"}</p>  {/* ตรวจสอบค่า boolean และแสดงเป็น "Yes" หรือ "No" */}
                                 </div>
                                 <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
                                     onClick={() => handleEdit(index)}>

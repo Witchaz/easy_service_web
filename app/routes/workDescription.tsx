@@ -11,7 +11,7 @@ export default function WorkDescription() {
         customerName = location.state?.customerName || "",
         address = "",
         province = "",
-        mailDate = Date,
+        mailDate = "",
         engineer = "",
         additionalExpenses = [],
         status = 0,
@@ -32,7 +32,6 @@ export default function WorkDescription() {
     const [errors, setErrors] = useState({
         address: false,
         province: false,
-        mailDate: false,
     });
 
     const handleChange = (e: { target: { name: any; value: any; }; }) => {
@@ -49,11 +48,11 @@ export default function WorkDescription() {
         const newErrors = {
             address: !formData.address,
             province: !formData.province,
-            mailDate: !formData.mailDate,
+           
         };
 
         setErrors(newErrors);
-        if (!newErrors.address && !newErrors.province && !newErrors.mailDate) {
+        if (!newErrors.address && !newErrors.province ) {
             navigate("/work", { state: { ...formData } });
         }
     };
@@ -99,25 +98,14 @@ export default function WorkDescription() {
                             </div>
                         </div>
 
-                        <div className="mt-4">
-                            <label className="block text-gray-700">
-                                Mail Date <span className="text-red-500">*</span>
-                            </label>
-                            <input
-                                type="date"
-                                name="mailDate"
-                                value={formData.mailDate}
-                                onChange={handleChange}
-                                className={`w-full mt-1 p-2 border ${errors.mailDate ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:border-lime-500`}
-                            />
-                            {errors.mailDate && <p className="text-red-500 text-sm">Please select a mail date.</p>}
-                        </div>
+                        
 
                         <div className="mt-6 flex justify-between">
                             <button type="button" onClick={handleCancel} className="bg-red-600 text-white shrink border-white border-2 hover:bg-red-800 p-2 rounded-lg">
                                 Cancel
                             </button>
-                            <button type="submit" className="bg-lime-500 text-white shrink border-white border-2 hover:bg-lime-600 p-2 rounded-lg">
+                            <button type="submit" className="bg-lime-500 text-white shrink border-white border-2 hover:bg-lime-600 p-2 rounded-lg"
+                                onClick={handleSubmit}>
                                 Next
                             </button>
                         </div>

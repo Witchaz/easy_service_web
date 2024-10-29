@@ -6,7 +6,6 @@ export default function WorkConfirm() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    
     const {
         customerName,
         address,
@@ -15,7 +14,7 @@ export default function WorkConfirm() {
         details = [],
         engineer = "",
         additionalExpenses = [], 
-        status = 0,
+        status,
     } = location.state || {};
 
     const [formData] = useState({
@@ -34,13 +33,12 @@ export default function WorkConfirm() {
 
     const totalCost = formData.additionalExpenses.reduce((sum: any, expense: { cost: any; }) => sum + (expense.cost || 0), 0);
 
-  
     useEffect(() => {
         sessionStorage.setItem("initialFormData", JSON.stringify(formData));
     }, []);
 
     const handleBack = () => {
-        navigate("/work", {state: {...formData}});
+        navigate("/work", { state: { ...formData } });
     };
 
     const handleEditDetails = () => {
@@ -48,9 +46,16 @@ export default function WorkConfirm() {
     };
 
     const handleSave = () => {
-        //add ลง datbase ตรงนี้
+        const warrantyDetails = formData.details.filter((detail: { warranty: boolean; }) => detail.warranty === true);
+        const nonWarrantyDetails = formData.details.filter((detail: { warranty: boolean; }) => detail.warranty === false);
+
+        // เพิ่มการบันทึกข้อมูลหรือส่งข้อมูลต่อที่นี่
+        console.log("Details with warranty:", warrantyDetails);
+        console.log("Details without warranty:", nonWarrantyDetails);
+
+        alert("ได้ทำการเพิ่มงานเรียบร้อยแล้ว");
         navigate("/customerList");
-     }
+    };
 
     return (
         <>
@@ -66,7 +71,7 @@ export default function WorkConfirm() {
                         <p><strong>สถานที่ซ่อม:</strong> {formData.address}</p>
 
                         {formData.details.length > 0 ? (
-                            formData.details.slice(0, 3).map((detail: { id: Key | null | undefined; model: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; serialNumber: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }, index: number) => (
+                            formData.details.slice(0, 4).map((detail: { id: Key | null | undefined; model: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; serialNumber: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }, index: number) => (
                                 <p key={detail.id}>
                                     <strong>รายละเอียดเครื่องซ่อมลำดับที่ {index + 1} :</strong> Model: {detail.model}, Serial Number: {detail.serialNumber}
                                 </p>
@@ -74,18 +79,12 @@ export default function WorkConfirm() {
                         ) : (
                             <p>รายละเอียด : -</p>
                         )}
-                        {formData.details.length > 3 && <p>...</p>}
-
-                        <p><strong>ช่างผู้รับผิดชอบ :</strong> {formData.engineer}</p>
-                        <p><strong>ค่าใช้จ่ายเพิ่มเติม : ฿{totalCost.toFixed(2)}</strong> 
-                            
-                        </p>
-                        <p><strong>สถานะการทำงาน :</strong> {formData.status}</p>
+                        {formData.details.length > 4  && <p>...</p>}
 
                         <div className="flex space-x-4 mt-4">
                             <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
                                 onClick={handleEditDetails}>
-                                Edit Details
+                                details machine
                             </button>
                         </div>
                     </div>

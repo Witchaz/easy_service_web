@@ -5,7 +5,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 export default function Work() {
     const location = useLocation();
     const navigate = useNavigate();
-
     
     const {
         customerName,
@@ -33,7 +32,6 @@ export default function Work() {
     });
 
     const totalCost = formData.additionalExpenses.reduce((sum: any, expense: { cost: any; }) => sum + (expense.cost || 0), 0);
-
   
     useEffect(() => {
         sessionStorage.setItem("initialFormData", JSON.stringify(formData));
@@ -51,16 +49,12 @@ export default function Work() {
         navigate("/workDescription", { state: { work: formData, from: "/work" } });
     };
 
-    const handleEditEngineer = () => {
-        navigate("/selectEngineer", { state: { work: formData } });
-    };
-
-    const handleEditCost = () => {
-        navigate("/expensesList", { state: { ...formData } });
-    };
-
     const handleNext = () => {
-        navigate("/workConfirm", { state: { ...formData } });
+        if (formData.details.length < 1) {
+            alert("กรุณาเพิ่มรายละเอียดเครื่องอย่างน้อย 1 เครื่องก่อนดำเนินการต่อ");
+        } else {
+            navigate("/workConfirm", { state: { ...formData } });
+        }
     };
 
     return (
@@ -73,10 +67,11 @@ export default function Work() {
                 
                 <div className="bg-white p-6 rounded-lg shadow-lg w-[90%] max-w-4xl max-h-[550px] overflow-y-auto mb-6">
                     <div className="border-b border-gray-300 py-4">
+                        <p><strong>ชื่อลูกค้า:</strong> {formData.customerName}</p>
                         <p><strong>สถานที่ซ่อม:</strong> {formData.address}</p>
 
                         {formData.details.length > 0 ? (
-                            formData.details.slice(0, 3).map((detail: { id: Key | null | undefined; model: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; serialNumber: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }, index: number) => (
+                            formData.details.slice(0, 4).map((detail: { id: Key | null | undefined; model: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; serialNumber: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }, index: number) => (
                                 <p key={detail.id}>
                                     <strong>รายละเอียดเครื่องซ่อมลำดับที่ {index + 1} :</strong> Model: {detail.model}, Serial Number: {detail.serialNumber}
                                 </p>
@@ -84,14 +79,9 @@ export default function Work() {
                         ) : (
                             <p>รายละเอียด : -</p>
                         )}
-                        {formData.details.length > 3 && <p>...</p>}
+                        {formData.details.length > 4 && <p>...</p>}
 
-                        <p><strong>ช่างผู้รับผิดชอบ :</strong> {formData.engineer}</p>
-                        <p><strong>ค่าใช้จ่ายเพิ่มเติม : ฿{totalCost.toFixed(2)}</strong> 
-                            
-                        </p>
-                        <p><strong>สถานะการทำงาน :</strong> {formData.status}</p>
-
+                        
                         <div className="flex space-x-4 mt-4">
                             <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
                                 onClick={handleEditDetails}>
@@ -100,14 +90,6 @@ export default function Work() {
                             <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
                                 onClick={handleEditAddress}>
                                 Edit Address
-                            </button>
-                            <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
-                                onClick={handleEditCost}>
-                                Edit Cost
-                            </button>
-                            <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
-                                onClick={handleEditEngineer}>
-                                Edit Engineer
                             </button>
                         </div>
                     </div>
