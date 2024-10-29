@@ -4,33 +4,30 @@ import { useNavigate } from "react-router-dom";
 
 interface FormData {
     name: string;
-    phoneNumber: string;
+    tel: string;
     address: string;
-    customerTax: string;
+    tax_id: string;
     province: string;
-    creditLimit: number; 
-    addDate: string; 
+    credit_limit: number; 
 }
 
-export default function EditCustomer() {
+export default function NewCustomer() {
     const [formData, setFormData] = useState<FormData>({
         name: "",
-        phoneNumber: "",
+        tel: "",
         address: "",
-        customerTax: "",
+        tax_id: "",
         province: "",
-        creditLimit: 0, 
-        addDate: "", 
+        credit_limit: 0,  
     });
 
     const [errors, setErrors] = useState<Partial<FormData>>({
         name: "",
-        phoneNumber: "",
+        tel: "",
         address: "",
-        customerTax: "",
+        tax_id: "",
         province: "",
-        creditLimit: 0,
-        addDate: "",
+        credit_limit: 0,
     });
 
     const navigate = useNavigate();
@@ -38,7 +35,7 @@ export default function EditCustomer() {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
 
-        const newValue = name === "creditLimit" ? Number(value) : value;
+        const newValue = name === "credit_limit" ? Number(value) : value;
 
         setFormData({
             ...formData,
@@ -50,25 +47,43 @@ export default function EditCustomer() {
         });
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const newErrors: Partial<FormData> = {};
 
         
         if (!formData.name) newErrors.name = "Name/Company is required.";
-        if (!formData.phoneNumber) newErrors.phoneNumber = "Phone Number is required.";
+        if (!formData.tel) newErrors.tel = "Phone Number is required.";
         if (!formData.address) newErrors.address = "Address is required.";
-        if (!formData.customerTax) newErrors.customerTax = "Customer TAX is required.";
+        if (!formData.tax_id) newErrors.tax_id = "Customer TAX is required.";
         if (!formData.province) newErrors.province = "Province is required.";
         
-        if (!formData.addDate) newErrors.addDate = "Add Date is required.";
 
-      if (Object.keys(newErrors).length > 0) {
-          //addค่าลูกค้า
-             navigate("/customerList")
-        }
-    
-    };
+      if (Object.keys(newErrors).length <= 0) {
+          
+                try {
+                    const url = "https://easy-service.prakasitj.com/customers/addNewCustomer";
+                    const response = await fetch(url, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(formData),
+                    });
+                    console.log(response);
+                    if (response.ok) {
+                        alert("add new customer.");
+                        navigate("/customerList");
+                    } else {
+                        alert("Failed to add customer.");
+                    }
+                } catch (error) {
+                    console.error("Error adding customer:", error);
+                    alert("An error occurred. Please try again.");
+                }
+            }
+              
+        };
 
     const handleBack = () => {
        navigate("/customerList")
@@ -95,12 +110,12 @@ export default function EditCustomer() {
                         <label>Phone Number *</label>
                         <input
                             type="text"
-                            name="phoneNumber"
-                            value={formData.phoneNumber}
+                            name="tel"
+                            value={formData.tel}
                             onChange={handleChange}
                             className="border rounded w-full py-2 px-3"
                         />
-                        {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber}</p>}
+                        {errors.tel && <p className="text-red-500 text-sm">{errors.tel}</p>}
                     </div>
                     <div className="mb-4">
                         <label>Address *</label>
@@ -117,12 +132,12 @@ export default function EditCustomer() {
                         <label>Customer TAX *</label>
                         <input
                             type="text"
-                            name="customerTax"
-                            value={formData.customerTax}
+                            name="tax_id"
+                            value={formData.tax_id}
                             onChange={handleChange}
                             className="border rounded w-full py-2 px-3"
                         />
-                        {errors.customerTax && <p className="text-red-500 text-sm">{errors.customerTax}</p>}
+                        {errors.tax_id && <p className="text-red-500 text-sm">{errors.tax_id}</p>}
                     </div>
                     <div className="mb-4">
                         <label>Province *</label>
@@ -139,24 +154,14 @@ export default function EditCustomer() {
                         <label>Credit Limit *</label>
                         <input
                             type="number"
-                            name="creditLimit"
-                            value={formData.creditLimit}
+                            name="credit_limit"
+                            value={formData.credit_limit}
                             onChange={handleChange}
                             className="border rounded w-full py-2 px-3"
                         />
                         
                     </div>
-                    <div className="mb-4">
-                        <label>Add Date *</label>
-                        <input
-                            type="date"
-                            name="addDate"
-                            value={formData.addDate}
-                            onChange={handleChange}
-                            className="border rounded w-full py-2 px-3"
-                        />
-                        {errors.addDate && <p className="text-red-500 text-sm">{errors.addDate}</p>}
-                    </div>
+                    
                     <div className="flex justify-between">
                         <button type="button" className="bg-red-500 text-white py-2 px-4 rounded" onClick={handleBack}>
                             Back

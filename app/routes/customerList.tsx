@@ -25,38 +25,8 @@ interface LoaderData {
 }
 
 const getCustomers = async (searchTerm: string): Promise<Array<Customer>> => {
-  const customers: Customer[] = [
-    {
-      id: "C001",
-      name: "Devon Lane",
-      credit_limit: 100000,
-      address: "123 Main St, Philadelphia, USA",
-      tax_id: "123456789",
-      tel: "104-345-6789",
-      province: "Philadelphia",
-      addDate: new Date().toISOString(), // แปลงเป็น string เพื่อการเก็บข้อมูล
-    },
-    {
-      id: "C002",
-      name: "Kathryn Murphy",
-      credit_limit: 50000,
-      address: "456 Broadway Ave, Los Angeles, USA",
-      tax_id: "987654321",
-      tel: "987-654-3210",
-      province: "Los Angeles",
-      addDate: new Date().toISOString(),
-    },
-    {
-      id: "C003",
-      name: "Eleanor Pena",
-      credit_limit: 75000,
-      address: "789 Elm St, Manhattan, USA",
-      tax_id: "564738291",
-      tel: "345-678-1234",
-      province: "Manhattan",
-      addDate: new Date().toISOString(),
-    },
-  ];
+  const response = await fetch("https://easy-service.prakasitj.com/customers/getList");
+  const customers: Customer[] = await response.json();
 
   if (searchTerm) {
     return customers.filter((customer) =>
