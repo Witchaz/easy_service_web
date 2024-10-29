@@ -1,127 +1,172 @@
-import { useState } from "react";
-import { Form } from "@remix-run/react"; 
+import React, { useState } from "react";
 import NavBar from "app/components/_navBar";
-import React from "react";
+import { useNavigate } from "react-router-dom";
 
+interface FormData {
+    name: string;
+    phoneNumber: string;
+    address: string;
+    customerTax: string;
+    province: string;
+    creditLimit: number; 
+    addDate: string; 
+}
 
-export default function newUser() {
-  const [nameUser, setNameUser] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [address, setAddress] = useState("");
-  const [tax, setTax] = useState("");
-  const [province, setProvince] = useState("");
-  const [creditLimit, setCreditLimit] = useState("");
-  const [date, setDate] = useState("");
+export default function EditCustomer() {
+    const [formData, setFormData] = useState<FormData>({
+        name: "",
+        phoneNumber: "",
+        address: "",
+        customerTax: "",
+        province: "",
+        creditLimit: 0, 
+        addDate: "", 
+    });
+
+    const [errors, setErrors] = useState<Partial<FormData>>({
+        name: "",
+        phoneNumber: "",
+        address: "",
+        customerTax: "",
+        province: "",
+        creditLimit: 0,
+        addDate: "",
+    });
+
+    const navigate = useNavigate();
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+
+        const newValue = name === "creditLimit" ? Number(value) : value;
+
+        setFormData({
+            ...formData,
+            [name]: newValue,
+        });
+        setErrors({
+            ...errors,
+            [name]: "", 
+        });
+    };
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const newErrors: Partial<FormData> = {};
+
+        
+        if (!formData.name) newErrors.name = "Name/Company is required.";
+        if (!formData.phoneNumber) newErrors.phoneNumber = "Phone Number is required.";
+        if (!formData.address) newErrors.address = "Address is required.";
+        if (!formData.customerTax) newErrors.customerTax = "Customer TAX is required.";
+        if (!formData.province) newErrors.province = "Province is required.";
+        
+        if (!formData.addDate) newErrors.addDate = "Add Date is required.";
+
+      if (Object.keys(newErrors).length > 0) {
+          //addค่าลูกค้า
+             navigate("/customerList")
+        }
     
-  const [error, setError] = useState(""); 
-  const [fieldError, setFieldError] = useState("");
-    
-  let newUser = (nameUser: string, phoneNumber: string, address: string, tax: string, province: string, creditLimit: number, date: Date): boolean => {
-    //if else
-    return false
-  }
+    };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const creditLimitNumber = parseFloat(creditLimit); 
-    const dateObject = new Date(date); 
+    const handleBack = () => {
+       navigate("/customerList")
+    };
 
-    newUser(nameUser, phoneNumber, address, tax, province, creditLimitNumber, dateObject);
-  };
-
-  return (
-    <>
-      <NavBar />
-      <div className="flex flex-col space-y-4 p-5 justify-center align-middle min-h-screen">
-        <h1 className="text-center font-bold text-3xl">Easy service</h1>
-        <h2 className="text-center text-xl">New User Page</h2>
-        {error && <p className="text-red-500 text-center">{error}</p>}
-        {fieldError && <p className="text-red-500 text-center">{fieldError}</p>}       
-
-        <div className="grid grid-cols-[250px_auto] justify-center gap-2">
-          <Form>
-            <h3>Username :</h3>
-            <input
-              value={nameUser}
-              name="nameUser"
-              className="bg-slate-500 shrink border-white border-2 max-w-80 "
-              onChange={(e) => setNameUser(e.target.value)}
-              required
-            /></Form>
-          <Form>
-            <h3>phoneNumber :</h3>
-            <input
-              value={phoneNumber}
-              name="phoneNumber"
-              className="bg-slate-500 shrink border-white border-2 max-w-80"
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
-              />
-          </Form>
-          <Form>
-          <h3>Address:</h3>
-          <input
-            value={address}
-            name="address"
-            className="bg-slate-500 shrink border-white border-2 max-w-80"
-            onChange={(e) => setAddress(e.target.value)}
-            required
-            />
-          </Form>
-          <Form>
-            <h3>Tax :</h3>
-            <input
-              value={tax}
-              name="tax"
-              className="bg-slate-500 shrink border-white border-2 max-w-80 "
-              onChange={(e) => setTax(e.target.value)}
-              required
-            /></Form>
-          <Form>
-            <h3>Province :</h3>
-            <input
-              value={province}
-              name="province"
-              className="bg-slate-500 shrink border-white border-2 max-w-80"
-              onChange={(e) => setProvince(e.target.value)}
-              required
-              />
-          </Form>
-          <Form>
-          <h3>Credit Limit:</h3>
-          <input
-            value={creditLimit}
-            name="creditLimit"
-            className="bg-slate-500 shrink border-white border-2 max-w-80"
-            type="number"
-            onChange={(e) => setCreditLimit(e.target.value)}
-            required
-            />
-          </Form>
-          <Form>
-            <h3>Date:</h3>
-            <input
-              value={date}
-              name="date"
-              className="bg-slate-500 shrink border-white border-2 max-w-80"
-              type="date"
-              onChange={(e) => setDate(e.target.value)}
-              required
-              />
-          </Form>
-        </div>
-        <div className="flex justify-center">
-          <a href = '/customerList'>
-            <button type="button" className="bg-red-600 text-white shrink border-white border-2 hover:bg-red-800 p-2 rounded-lg mr-8">
-              cancel
-            </button>
-          </a>
-          <button type="submit"
-            className="bg-lime-500 text-white shrink border-white border-2 hover:bg-lime-600 p-2 rounded-lg ml-8">
-            Add
-          </button>
-        </div>
-      </div>
-    </>
-  );
+    return (
+        <>
+            <NavBar />
+            <div className="flex flex-col items-center min-h-screen bg-gray-100">
+                <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">แก้ไขข้อมูลลูกค้า</h2>
+                <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
+                    <div className="mb-4">
+                        <label>Name/Company *</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            className="border rounded w-full py-2 px-3"
+                        />
+                        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                    </div>
+                    <div className="mb-4">
+                        <label>Phone Number *</label>
+                        <input
+                            type="text"
+                            name="phoneNumber"
+                            value={formData.phoneNumber}
+                            onChange={handleChange}
+                            className="border rounded w-full py-2 px-3"
+                        />
+                        {errors.phoneNumber && <p className="text-red-500 text-sm">{errors.phoneNumber}</p>}
+                    </div>
+                    <div className="mb-4">
+                        <label>Address *</label>
+                        <input
+                            type="text"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleChange}
+                            className="border rounded w-full py-2 px-3"
+                        />
+                        {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
+                    </div>
+                    <div className="mb-4">
+                        <label>Customer TAX *</label>
+                        <input
+                            type="text"
+                            name="customerTax"
+                            value={formData.customerTax}
+                            onChange={handleChange}
+                            className="border rounded w-full py-2 px-3"
+                        />
+                        {errors.customerTax && <p className="text-red-500 text-sm">{errors.customerTax}</p>}
+                    </div>
+                    <div className="mb-4">
+                        <label>Province *</label>
+                        <input
+                            type="text"
+                            name="province"
+                            value={formData.province}
+                            onChange={handleChange}
+                            className="border rounded w-full py-2 px-3"
+                        />
+                        {errors.province && <p className="text-red-500 text-sm">{errors.province}</p>}
+                    </div>
+                    <div className="mb-4">
+                        <label>Credit Limit *</label>
+                        <input
+                            type="number"
+                            name="creditLimit"
+                            value={formData.creditLimit}
+                            onChange={handleChange}
+                            className="border rounded w-full py-2 px-3"
+                        />
+                        
+                    </div>
+                    <div className="mb-4">
+                        <label>Add Date *</label>
+                        <input
+                            type="date"
+                            name="addDate"
+                            value={formData.addDate}
+                            onChange={handleChange}
+                            className="border rounded w-full py-2 px-3"
+                        />
+                        {errors.addDate && <p className="text-red-500 text-sm">{errors.addDate}</p>}
+                    </div>
+                    <div className="flex justify-between">
+                        <button type="button" className="bg-red-500 text-white py-2 px-4 rounded" onClick={handleBack}>
+                            Back
+                        </button>
+                        <button type="submit" className="bg-lime-500 text-white py-2 px-4 rounded">
+                            Confirm
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </>
+    );
 }
