@@ -49,7 +49,7 @@ export default function WorkConfirm() {
 
     const handleSave = () => {
         //add ลง datbase ตรงนี้
-        navigate("/work");
+        navigate("/customerList");
      }
 
     return (

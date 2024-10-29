@@ -11,7 +11,7 @@ export default function WorkDescription() {
         customerName = location.state?.customerName || "",
         address = "",
         province = "",
-        mailDate = "",
+        mailDate = Date,
         engineer = "",
         additionalExpenses = [],
         status = 0,

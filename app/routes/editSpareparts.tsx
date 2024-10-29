@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; 
+import { useNavigate, useLocation } from "react-router-dom";
 import NavBar from "app/components/_navBar";
 
 interface Spareparts {
@@ -7,20 +7,20 @@ interface Spareparts {
     description: string;
     price: number;
     unit: number;
-    add_date: Date | string;
+    add_date: Date;
 }
 
-export default function AddSpareparts() {
+export default function EditSpareparts() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { formData = {}, formDataLast = {} } = location.state || {};  
+    const { sparepart } = location.state || {};
 
     const [formSparepartsData, setFormSparepartsData] = useState<Spareparts>({
-        name: "",
-        description: "",
-        price: 0,
-        unit: 0,
-        add_date: new Date(),
+        name: sparepart?.name || "",
+        description: sparepart?.description || "",
+        price: sparepart?.price || 0,
+        unit: sparepart?.unit || 0,
+        add_date: sparepart?.add_date || new Date(),
     });
 
     const [errors, setErrors] = useState({
@@ -28,7 +28,6 @@ export default function AddSpareparts() {
         description: false,
         price: false,
         unit: false,
-        add_date: false,
     });
 
     const handleChange = (e: { target: { name: string; value: any; }; }) => {
@@ -47,35 +46,29 @@ export default function AddSpareparts() {
             description: !formSparepartsData.description,
             price: formSparepartsData.price <= 0,
             unit: formSparepartsData.unit <= 0,
-            add_date: !formSparepartsData.add_date,
         };
 
         setErrors(newErrors);
-        if (!Object.values(newErrors).includes(true)) {
-            const newSparepart = {
-                ...formSparepartsData,
-                add_date: new Date(formSparepartsData.add_date),
-            };
-
-            navigate("/SparepartsList", { state: { ...formData, details: [...(formData.details || []), newSparepart], formDataLast } });
+        if (!newErrors.name && !newErrors.price && !newErrors.description && !newErrors.unit) {
+            navigate("/SparePartsList", { state: { updatedSparepart: formSparepartsData } });
         }
     };
 
     const handleBack = () => {
-        navigate("/SparepartsList");
+        navigate("/SparePartsList");
     };
 
     return (
         <>
             <NavBar />
-            <div className="flex items-center justify-center min-h-screen bg-gray-100">     
+            <div className="flex items-center justify-center min-h-screen bg-gray-100">
                 <div className="bg-white p-10 rounded-lg shadow-md w-[800px] max-w-full">
-                    <h2 className="text-center text-2xl font-semibold text-lime-600 mb-6">รายละเอียดอะไหล่</h2>
+                    <h2 className="text-center text-2xl font-semibold text-lime-600 mb-6">Edit Spare Part</h2>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4">
                             <label className="block text-sm font-semibold mb-2">Name</label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 name="name"
                                 value={formSparepartsData.name}
                                 onChange={handleChange}
@@ -86,8 +79,8 @@ export default function AddSpareparts() {
 
                         <div className="mb-4">
                             <label className="block text-sm font-semibold mb-2">Description</label>
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 name="description"
                                 value={formSparepartsData.description}
                                 onChange={handleChange}
@@ -98,8 +91,8 @@ export default function AddSpareparts() {
 
                         <div className="mb-4">
                             <label className="block text-sm font-semibold mb-2">Price</label>
-                            <input 
-                                type="number" 
+                            <input
+                                type="number"
                                 name="price"
                                 value={formSparepartsData.price}
                                 onChange={handleChange}
@@ -110,8 +103,8 @@ export default function AddSpareparts() {
 
                         <div className="mb-4">
                             <label className="block text-sm font-semibold mb-2">Unit</label>
-                            <input 
-                                type="number" 
+                            <input
+                                type="number"
                                 name="unit"
                                 value={formSparepartsData.unit}
                                 onChange={handleChange}
@@ -120,26 +113,20 @@ export default function AddSpareparts() {
                             {errors.unit && <p className="text-red-500 text-sm">Please enter a valid unit.</p>}
                         </div>
 
-                        <div className="mb-4">
-                            <label className="block text-sm font-semibold mb-2">Add Date</label>
-                            <input 
-                                type="date" 
-                                name="add_date"
-                                value={typeof formSparepartsData.add_date === 'string' ? formSparepartsData.add_date : formSparepartsData.add_date.toISOString().split('T')[0]}
-                                onChange={handleChange}
-                                className="border rounded w-full py-2 px-3"
-                            />
-                            {errors.add_date && <p className="text-red-500 text-sm">Please select a valid date.</p>}
-                        </div>
-                        
                         <div className="mt-6 flex justify-between">
-                            <button type="button" className="bg-black text-white shrink border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
-                                onClick={handleBack}>
+                            <button
+                                type="button"
+                                className="bg-black text-white border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
+                                onClick={handleBack}
+                            >
                                 Back
                             </button>
 
-                            <button type="submit" className="bg-lime-500 text-white shrink border-white border-2 hover:bg-lime-600 p-2 rounded-lg">
-                                Add
+                            <button
+                                type="submit"
+                                className="bg-lime-500 text-white border-white border-2 hover:bg-lime-600 p-2 rounded-lg"
+                            >
+                                Save Changes
                             </button>
                         </div>
                     </form>

@@ -6,68 +6,64 @@ import { useNavigate } from "react-router-dom";
 
 const ITEMS_PER_PAGE = 6;
 
-interface User {
-  id: number;
-  username: string;
-  password: string;
+interface Customer {
+  id: string;
   name: string;
-  surname: string;
+  credit_limit: number;
   address: string;
+  tax_id: string;
+  tel: string;
   province: string;
-  role: string;
-  addDate: Date | string; // อนุญาตให้เป็น Date หรือ string เพื่อการแปลงข้อมูล
+  addDate: Date | string; // สามารถเป็น Date หรือ string ได้
 }
 
 interface LoaderData {
-  users: User[];
+  customers: Customer[];
   total: number;
   q: string;
   page: number;
 }
 
-const getUsers = async (searchTerm: string): Promise<Array<User>> => {
-  const users: User[] = [
+const getCustomers = async (searchTerm: string): Promise<Array<Customer>> => {
+  const customers: Customer[] = [
     {
-      id: 1,
-      username: "devonlane",
-      password: "password123",
-      name: "Devon",
-      surname: "Lane",
+      id: "C001",
+      name: "Devon Lane",
+      credit_limit: 100000,
       address: "123 Main St, Philadelphia, USA",
+      tax_id: "123456789",
+      tel: "104-345-6789",
       province: "Philadelphia",
-      role: "Admin",
-      addDate: new Date(), // เก็บเป็น Date object
+      addDate: new Date().toISOString(), // แปลงเป็น string เพื่อการเก็บข้อมูล
     },
     {
-      id: 2,
-      username: "kmurphy",
-      password: "password123",
-      name: "Kathryn",
-      surname: "Murphy",
+      id: "C002",
+      name: "Kathryn Murphy",
+      credit_limit: 50000,
       address: "456 Broadway Ave, Los Angeles, USA",
+      tax_id: "987654321",
+      tel: "987-654-3210",
       province: "Los Angeles",
-      role: "User",
-      addDate: new Date(), // เก็บเป็น Date object
+      addDate: new Date().toISOString(),
     },
     {
-      id: 3,
-      username: "epenna",
-      password: "password123",
-      name: "Eleanor",
-      surname: "Pena",
+      id: "C003",
+      name: "Eleanor Pena",
+      credit_limit: 75000,
       address: "789 Elm St, Manhattan, USA",
+      tax_id: "564738291",
+      tel: "345-678-1234",
       province: "Manhattan",
-      role: "User",
-      addDate: new Date(), // เก็บเป็น Date object
+      addDate: new Date().toISOString(),
     },
   ];
 
   if (searchTerm) {
-    return users.filter((user) =>
-      user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    return customers.filter((customer) =>
+      customer.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
-  return users;
+  return customers;
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -75,19 +71,19 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const q = url.searchParams.get("q") || "";
   const page = parseInt(url.searchParams.get("page") || "1", 10);
 
-  const users = await getUsers(q);
+  const customers = await getCustomers(q);
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const paginatedUsers = users.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedCustomers = customers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  return json({ users: paginatedUsers, total: users.length, q, page });
+  return json({ customers: paginatedCustomers, total: customers.length, q, page });
 };
 
 export default function CustomerList() {
-  const { users, total, q, page } = useLoaderData<LoaderData>();
+  const { customers, total, q, page } = useLoaderData<LoaderData>();
   const submit = useSubmit();
   const navigate = useNavigate();
 
-  const [selectedUser, setSelectedUser] = useState<number | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
 
   useEffect(() => {
     const searchField = document.getElementById("q");
@@ -99,8 +95,8 @@ export default function CustomerList() {
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   const handleSelect = () => {
-    if (selectedUser) {
-      navigate("/workDescription", { state: { userId: selectedUser } });
+    if (selectedCustomer) {
+      navigate("/workDescription", { state: { customerId: selectedCustomer } });
     } else {
       alert("กรุณาเลือกผู้ใช้ก่อน");
     }
@@ -110,19 +106,13 @@ export default function CustomerList() {
     <>
       <NavBar />
       <div className="min-h-screen p-8 bg-gray-50">
-        <h1 className="text-center text-3xl font-bold text-lime-600 mb-8">
-          ข้อมูลผู้ใช้
-        </h1>
+        <h1 className="text-center text-3xl font-bold text-lime-600 mb-8">ข้อมูลลูกค้า</h1>
 
         <div className="bg-white p-4 shadow-md rounded-lg">
-          <Form
-            id="search-form"
-            onChange={(event) => submit(event.currentTarget)}
-            role="search"
-          >
+          <Form id="search-form" onChange={(event) => submit(event.currentTarget)} role="search">
             <input
               type="text"
-              aria-label="Search users"
+              aria-label="Search customers"
               id="q"
               name="q"
               placeholder="Search by name"
@@ -134,33 +124,37 @@ export default function CustomerList() {
             <thead className="text-gray-600">
               <tr>
                 <th className="p-2">Select</th>
-                <th className="p-2">Username</th>
+                <th className="p-2">ID</th>
                 <th className="p-2">Name</th>
-                <th className="p-2">Surname</th>
+                <th className="p-2">Credit Limit</th>
                 <th className="p-2">Address</th>
-                <th className="p-2">Role</th>
+                <th className="p-2">Tax ID</th>
+                <th className="p-2">Tel.</th>
+                <th className="p-2">Province</th>
                 <th className="p-2">Add Date</th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <tr key={user.id} className="border-t">
+              {customers.map((customer) => (
+                <tr key={customer.id} className="border-t">
                   <td className="p-2">
                     <input
                       type="radio"
-                      name="user"
-                      value={user.id}
-                      onChange={() => setSelectedUser(user.id)}
-                      checked={selectedUser === user.id}
+                      name="customer"
+                      value={customer.id}
+                      onChange={() => setSelectedCustomer(customer.id)}
+                      checked={selectedCustomer === customer.id}
                     />
                   </td>
-                  <td className="p-2">{user.username}</td>
-                  <td className="p-2">{user.name}</td>
-                  <td className="p-2">{user.surname}</td>
-                  <td className="p-2">{user.address}</td>
-                  <td className="p-2">{user.role}</td>
+                  <td className="p-2">{customer.id}</td>
+                  <td className="p-2">{customer.name}</td>
+                  <td className="p-2">${customer.credit_limit.toFixed(2)}</td>
+                  <td className="p-2">{customer.address}</td>
+                  <td className="p-2">{customer.tax_id}</td>
+                  <td className="p-2">{customer.tel}</td>
+                  <td className="p-2">{customer.province}</td>
                   <td className="p-2">
-                    {new Date(user.addDate).toLocaleDateString()}
+                    {new Date(customer.addDate).toLocaleDateString()}
                   </td>
                 </tr>
               ))}
@@ -169,24 +163,16 @@ export default function CustomerList() {
 
           <div className="flex justify-between items-center mt-4">
             <div>
-              <span>
-                Page: {page} of {totalPages}
-              </span>
+              <span>Page: {page} of {totalPages}</span>
             </div>
             <div className="flex items-center space-x-2">
               {page > 1 && (
-                <Link
-                  to={`?page=${page - 1}&q=${q}`}
-                  className="bg-gray-300 rounded-full h-8 w-8 flex items-center justify-center"
-                >
+                <Link to={`?page=${page - 1}&q=${q}`} className="bg-gray-300 rounded-full h-8 w-8 flex items-center justify-center">
                   Previous
                 </Link>
               )}
               {page < totalPages && (
-                <Link
-                  to={`?page=${page + 1}&q=${q}`}
-                  className="bg-gray-300 rounded-full h-8 w-8 flex items-center justify-center"
-                >
+                <Link to={`?page=${page + 1}&q=${q}`} className="bg-gray-300 rounded-full h-8 w-8 flex items-center justify-center">
                   Next
                 </Link>
               )}
@@ -194,17 +180,12 @@ export default function CustomerList() {
           </div>
 
           <div className="flex justify-center space-x-4 mt-8">
-            <button
-              className="bg-yellow-400 text-white py-2 px-6 rounded-lg hover:bg-yellow-500"
-              onClick={handleSelect}
-            >
+            <button className="bg-yellow-400 text-white py-2 px-6 rounded-lg hover:bg-yellow-500" onClick={handleSelect}>
               Select
             </button>
 
             <a href="/newUser">
-              <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600">
-                ADD
-              </button>
+              <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600">ADD</button>
             </a>
           </div>
         </div>

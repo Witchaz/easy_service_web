@@ -6,35 +6,33 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 const ITEMS_PER_PAGE = 6; 
 
-interface Customer {
+interface User {
+  id: number;
+  username: string;
+  password: string;
   name: string;
-  email: string;
-  location: string;
-  orders: number;
-  tel: string;
+  surname: string;
+  address: string;
+  province: string;
+  role: string;
+  addDate: Date | string;
 }
 
 interface LoaderData {
-  customers: Customer[];
+  users: User[];
   total: number;
   q: string;
   page: number;
 }
 
-const getCustomers = async (searchTerm: string): Promise<Array<Customer>> => {
-  const customers = [
-    { name: 'Devon Lane', email: 'chikeo@mail.com', location: 'Philadelphia, USA', orders: 125, tel: '104,345.00' },
-    { name: 'Kathryn Murphy', email: 'rohan_anna@mail.com', location: 'Los Angeles, USA', orders: 11, tel: '2,400.98' },
-    { name: 'Eleanor Pena', email: 'pedroharu@mail.com', location: 'Manhattan, USA', orders: 98, tel: '56,987.00' },
-    { name: 'Annette Black', email: 'eusebia234@mail.com', location: 'Toronto, CA', orders: 51, tel: '12,567.90' },
-    { name: 'Guy Hawkins', email: 'midget1245@mail.com', location: 'Pittsburgh, USA', orders: 12, tel: '4,670.44' },
-    { name: 'Floyd Miles', email: 'mottgeoff@mail.com', location: 'Montreal, CA', orders: 56, tel: '24,456.56' },
-  ];
+const getUsers = async (searchTerm: string): Promise<Array<User>> => {
+    const response = await fetch("https://easy-service.prakasitj.com/user/getUserList");
+    const users : User[] = await response.json();
 
   if (searchTerm) {
-    return customers.filter(customer => customer.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    return users.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase()));
   }
-  return customers;
+  return users;
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -42,142 +40,143 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const q = url.searchParams.get("q") || "";
   const page = parseInt(url.searchParams.get("page") || "1", 10);
   
-  const customers = await getCustomers(q); 
+  const users = await getUsers(q); 
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const paginatedCustomers = customers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedUsers = users.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   
-  return json({ customers: paginatedCustomers, total: customers.length, q, page });
+  return json({ users: paginatedUsers, total: users.length, q, page });
 };
 
 export default function SelectEngineer() {
-    const { customers, total, q, page } = useLoaderData<LoaderData>(); 
-    const submit = useSubmit();
-    const navigate = useNavigate();
-    const location = useLocation();
-    
-    
-    const { work } = location.state || {};
-    
-    const {
-        customerName = "",
-        address = "",
-        province = "",
-        mailDate = "",
-        engineer = "",
-        additionalExpenses = [],
-        status = 0,
-        details = [],
-    } = work || {}; 
+  const { users, total, q, page } = useLoaderData<LoaderData>(); 
+  const submit = useSubmit();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const { work } = location.state || {};
+  
+  const {
+      customerName = "",
+      address = "",
+      province = "",
+      mailDate = "",
+      engineer = "",
+      additionalExpenses = [],
+      status = 0,
+      details = [],
+  } = work || {}; 
 
-    const [formData, setFormData] = useState({
-        customerName,
-        address,
-        province,
-        mailDate,
-        engineer,
-        additionalExpenses,
-        status,
-        details,
-       
-    });
+  const [formData, setFormData] = useState({
+      customerName,
+      address,
+      province,
+      mailDate,
+      engineer,
+      additionalExpenses,
+      status,
+      details,
+  });
 
-    const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
-    useEffect(() => {
-        const searchField = document.getElementById("q");
-        if (searchField instanceof HTMLInputElement) {
-            searchField.value = q || "";
-        }
-    }, [q]);
+  useEffect(() => {
+    const searchField = document.getElementById("q");
+    if (searchField instanceof HTMLInputElement) {
+        searchField.value = q || "";
+    }
+  }, [q]);
 
-    const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
-    
-    const handleSelect = () => {
-        if (selectedCustomer) {
-            formData.engineer = selectedCustomer;
-            navigate('/work', { state: { ...formData } });
-        } else {
-            alert("กรุณาเลือกผู้ใช้ก่อน");
-        }
-    };
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+  
+  const handleSelect = () => {
+    if (selectedUser) {
+        formData.engineer = selectedUser;
+        navigate('/work', { state: { ...formData } });
+    } else {
+        alert("กรุณาเลือกผู้ใช้ก่อน");
+    }
+  };
 
-    const handleBack = () => {
-      
-        navigate("/work", { state: { ...formData } }); 
-    };
+  const handleBack = () => {
+    navigate("/work", { state: { ...formData } }); 
+  };
 
-    return (
-        <>
-            <NavBar />
-            <div className="min-h-screen p-8 bg-gray-50">
-                <h1 className="text-center text-3xl font-bold text-lime-600 mb-8">เลือกช่าง</h1>
-                <div className="bg-white p-4 shadow-md rounded-lg">
-                    <Form id="search-form" onChange={(event) => submit(event.currentTarget)} role="search">
-                        <input
-                            type="text"
-                            aria-label="Search customers"
-                            id="q"
-                            name="q"
-                            placeholder="Search by name"
-                            className="border border-gray-300 rounded-lg p-2 w-1/3"
-                        />
-                    </Form>
-                    
-                    <table className="table-auto w-full text-left">
-                        <thead className="text-gray-600">
-                            <tr>
-                                <th className="p-2">Select</th>
-                                <th className="p-2">Customer Name</th>
-                                <th className="p-2">Email</th>
-                                <th className="p-2">Location</th>
-                                <th className="p-2">Orders</th>
-                                <th className="p-2">Tel.</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {customers.map((customer, index) => (
-                                <tr key={index} className="border-t">
-                                    <td className="p-2">
-                                        <input
-                                            type="radio"
-                                            name="customer"
-                                            value={customer.name}
-                                            onChange={() => setSelectedCustomer(customer.name)} 
-                                            checked={selectedCustomer === customer.name} 
-                                        />
-                                    </td>
-                                    <td className="p-2">{customer.name}</td>
-                                    <td className="p-2">{customer.email}</td>
-                                    <td className="p-2">{customer.location}</td>
-                                    <td className="p-2">{customer.orders} orders</td>
-                                    <td className="p-2">${customer.tel}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+  return (
+    <>
+      <NavBar />
+      <div className="min-h-screen p-8 bg-gray-50">
+        <h1 className="text-center text-3xl font-bold text-lime-600 mb-8">เลือกช่าง</h1>
+        <div className="bg-white p-4 shadow-md rounded-lg">
+          <Form id="search-form" onChange={(event) => submit(event.currentTarget)} role="search">
+            <input
+              type="text"
+              aria-label="Search users"
+              id="q"
+              name="q"
+              placeholder="Search by name"
+              className="border border-gray-300 rounded-lg p-2 w-1/3"
+            />
+          </Form>
+          
+          <table className="table-auto w-full text-left">
+            <thead className="text-gray-600">
+              <tr>
+                <th className="p-2">Select</th>
+                <th className="p-2">Name</th>
+                <th className="p-2">Surname</th>
+                <th className="p-2">Address</th>
+                <th className="p-2">Province</th>
+                <th className="p-2">Role</th>
+                <th className="p-2">Add Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user, index) => (
+                <tr key={index} className="border-t">
+                  <td className="p-2">
+                    <input
+                      type="radio"
+                      name="user"
+                      value={user.name}
+                      onChange={() => setSelectedUser(user.name)} 
+                      checked={selectedUser === user.name} 
+                    />
+                  </td>
+                  <td className="p-2">{user.name}</td>
+                  <td className="p-2">{user.surname}</td>
+                  <td className="p-2">{user.address}</td>
+                  <td className="p-2">{user.province}</td>
+                  <td className="p-2">{user.role}</td>
+                  <td className="p-2">
+                        {new Date(user.addDate).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-                    <div className="flex justify-between items-center mt-4">
-                        <div>
-                            <span>Page: {page} of {totalPages}</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            {page > 1 && (
-                                <Link to={`?page=${page - 1}&q=${q}`} className="bg-gray-300 rounded-full h-8 w-8 flex items-center justify-center">Previous</Link>
-                            )}
-                            {page < totalPages && (
-                                <Link to={`?page=${page + 1}&q=${q}`} className="bg-gray-300 rounded-full h-8 w-8 flex items-center justify-center">Next</Link>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="flex justify-center space-x-20 mt-8">
-                        <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-800" onClick={handleBack}>
-                            Back
-                        </button>
-                        <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelect}>Select</button>
-                    </div>
-                </div>
+          <div className="flex justify-between items-center mt-4">
+            <div>
+              <span>Page: {page} of {totalPages}</span>
             </div>
-        </>
-    );
+            <div className="flex items-center space-x-2">
+              {page > 1 && (
+                <Link to={`?page=${page - 1}&q=${q}`} className="bg-gray-300 rounded-full h-8 w-8 flex items-center justify-center">Previous</Link>
+              )}
+              {page < totalPages && (
+                <Link to={`?page=${page + 1}&q=${q}`} className="bg-gray-300 rounded-full h-8 w-8 flex items-center justify-center">Next</Link>
+              )}
+            </div>
+          </div>
+
+          <div className="flex justify-center space-x-20 mt-8">
+            <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-800" onClick={handleBack}>
+              Back
+            </button>
+            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelect}>Select</button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
