@@ -25,8 +25,8 @@ export default function Login() {
       
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
-        if (data.payload) {
+        console.log(data.error);
+        if (data.error == "Error while login") {
           setError(""); 
           alert("Login successful!");
           navigate("/customerList");

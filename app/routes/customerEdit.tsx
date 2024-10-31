@@ -2,147 +2,130 @@ import React, { useEffect, useState } from "react";
 import NavBar from "app/components/_navBar";
 import { useNavigate, useLocation } from "react-router-dom";
 
-interface FormData {
+interface Customer {
+    id: string;
     name: string;
-    tel: string;
+    credit_limit: number;
     address: string;
     tax_id: string;
+    tel: string;
     province: string;
-    credit_limit: number; 
-    id: string;
+    add_date: Date;
 }
 
 export default function CustomerEdit() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { customerId } = location.state || {};  // Retrieve customerId from state
+    const { customerId } = location.state || {};
 
-    const [formData, setFormData] = useState<FormData>({
+    const [customer, setCustomer] = useState<Customer>({
+        id: customerId,
         name: "",
-        tel: "",
+        credit_limit: 0,
         address: "",
         tax_id: "",
+        tel: "",
         province: "",
-        credit_limit: 0,  
-        id: "",
+        add_date: new Date(),
     });
-
-    const [errors, setErrors] = useState<Partial<FormData>>({});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
-        // Fetch customer data by customerId
-        if (customerId) {
-            fetch(`https://easy-service.prakasitj.com/customers/getByID/${customerId}`, { method: "GET" })
-                .then(response => response.json())
-                .then(data => {
-                    setFormData({
-                        name: data.name,
-                        tel: data.tel,
-                        address: data.address,
-                        tax_id: data.tax_id,
-                        province: data.province,
-                        credit_limit: data.credit_limit,
-                        id: data.id,
-                    });
-                })
-                .catch(error => console.error("Error fetching customer data:", error));
+    const fetchCustomerData = async () => {
+        if (!customerId) {
+            console.error("Customer ID is missing. Unable to fetch data.");
+            setError("Customer ID not provided.");
+            setLoading(false);
+            return;
         }
-    }, [customerId]);
+
+        try {
+            console.log("Fetching customer data for ID:", customerId);
+            const response = await fetch(`https://easy-service.prakasitj.com/customers/getByID/${customerId}`);
+
+            if (!response.ok) {
+                console.error("Failed to fetch customer data. Status:", response.status);
+                setError("Failed to fetch customer data.");
+                setLoading(false);
+                return;
+            }
+
+            const data = await response.json();
+            console.log("API Response Data:", data);
+
+            if (!data || data.length === 0) {
+                console.error("No data returned for customer ID:", customerId);
+                setError("Customer data not found.");
+            } else {
+                setCustomer({
+                    id: data.id || customerId,
+                    name: data.name || "",
+                    credit_limit: data.credit_limit || 0,
+                    address: data.address || "",
+                    tax_id: data.tax_id || "",
+                    tel: data.tel || "",
+                    province: data.province || "",
+                    add_date: new Date(data.add_date), 
+                });
+                setError("");
+            }
+        } catch (error) {
+            console.error("Error fetching customer data:", error);
+            setError("An error occurred while fetching data.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    fetchCustomerData();
+}, [customerId]);
+
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
+        setCustomer((prev) => ({
+            ...prev,
             [name]: name === "credit_limit" ? Number(value) : value,
-        });
-        setErrors({
-            ...errors,
-            [name]: "", 
-        });
+        }));
     };
 
-    // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    //     e.preventDefault();
-    //     const newErrors: Partial<FormData> = {};
-
-    //     if (!formData.name) newErrors.name = "Name/Company is required.";
-    //     if (!formData.tel) newErrors.tel = "Phone Number is required.";
-    //     if (!formData.address) newErrors.address = "Address is required.";
-    //     if (!formData.tax_id) newErrors.tax_id = "Customer TAX is required.";
-    //     if (!formData.province) newErrors.province = "Province is required.";
-
-    //     if (Object.keys(newErrors).length === 0) {
-    //         try {
-    //             const url = `https://easy-service.prakasitj.com/customers/updateCustomer/${customerId}`;
-    //             const response = await fetch(url, {
-    //                 method: "PUT",
-    //                 headers: {
-    //                     "Content-Type": "application/json",
-    //                 },
-    //                 body: JSON.stringify(formData),
-    //             });
-    //             if (response.ok) {
-    //                 alert("Customer updated successfully.");
-    //                 navigate("/customerList");
-    //             } else {
-    //                 alert("Failed to update customer.");
-    //             }
-    //         } catch (error) {
-    //             console.error("Error updating customer:", error);
-    //             alert("An error occurred. Please try again.");
-    //         }
-    //     } else {
-    //         setErrors(newErrors);
-    //     }
-    // };
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const newErrors: Partial<FormData> = {};
+        try {
+            const response = await fetch("https://easy-service.prakasitj.com/customers/editCustomer", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(customer),
+            });
 
-        
-        if (!formData.name) newErrors.name = "Name/Company is required.";
-        if (!formData.tel) newErrors.tel = "Phone Number is required.";
-        if (!formData.address) newErrors.address = "Address is required.";
-        if (!formData.tax_id) newErrors.tax_id = "Customer TAX is required.";
-        if (!formData.province) newErrors.province = "Province is required.";
-        
-
-      if (Object.keys(newErrors).length <= 0) {
-          
-                try {//แก้
-                    const url = "https://easy-service.prakasitj.com/customers/addNewCustomer";
-                    const response = await fetch(url, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(formData),
-                    });
-                    console.log(response);
-                    if (response.ok) {
-                        alert("add new customer.");
-                        navigate("/customerList");
-                    } else {
-                        alert("Failed to add customer.");
-                    }
-                } catch (error) {
-                    console.error("Error adding customer:", error);
-                    alert("An error occurred. Please try again.");
-                }
+            if (response.ok) {
+                alert("Customer updated successfully.");
+                navigate("/customerList");
+            } else {
+                alert("Failed to update customer.");
             }
-              
-        };
-
-    const handleBack = () => {
-        navigate("/customerList");
+        } catch (error) {
+            console.error("Error updating customer:", error);
+            alert("An error occurred. Please try again.");
+        }
     };
+
+    if (loading) {
+        return <p>Loading customer data...</p>;
+    }
+
+    if (error) {
+        return <p>{error}</p>;
+    }
 
     return (
         <>
             <NavBar />
             <div className="flex flex-col items-center min-h-screen bg-gray-100">
                 <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
-                    แก้ไขข้อมูลลูกค้า ID: {formData.id}
+                    แก้ไขข้อมูลลูกค้า ID: {customer.id} {customer.name}
                 </h2>
                 <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
                     <div className="mb-4">
@@ -150,68 +133,63 @@ export default function CustomerEdit() {
                         <input
                             type="text"
                             name="name"
-                            value={formData.name}
+                            value={customer.name}
                             onChange={handleChange}
                             className="border rounded w-full py-2 px-3"
                         />
-                        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                     </div>
                     <div className="mb-4">
                         <label>Phone Number *</label>
                         <input
                             type="text"
                             name="tel"
-                            value={formData.tel}
+                            value={customer.tel}
                             onChange={handleChange}
                             className="border rounded w-full py-2 px-3"
                         />
-                        {errors.tel && <p className="text-red-500 text-sm">{errors.tel}</p>}
                     </div>
                     <div className="mb-4">
                         <label>Address *</label>
                         <input
                             type="text"
                             name="address"
-                            value={formData.address}
+                            value={customer.address}
                             onChange={handleChange}
                             className="border rounded w-full py-2 px-3"
                         />
-                        {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
                     </div>
                     <div className="mb-4">
                         <label>Customer TAX *</label>
                         <input
                             type="text"
                             name="tax_id"
-                            value={formData.tax_id}
+                            value={customer.tax_id}
                             onChange={handleChange}
                             className="border rounded w-full py-2 px-3"
                         />
-                        {errors.tax_id && <p className="text-red-500 text-sm">{errors.tax_id}</p>}
                     </div>
                     <div className="mb-4">
                         <label>Province *</label>
                         <input
                             type="text"
                             name="province"
-                            value={formData.province}
+                            value={customer.province}
                             onChange={handleChange}
                             className="border rounded w-full py-2 px-3"
                         />
-                        {errors.province && <p className="text-red-500 text-sm">{errors.province}</p>}
                     </div>
                     <div className="mb-4">
                         <label>Credit Limit *</label>
                         <input
                             type="number"
                             name="credit_limit"
-                            value={formData.credit_limit}
+                            value={customer.credit_limit}
                             onChange={handleChange}
                             className="border rounded w-full py-2 px-3"
                         />
                     </div>
                     <div className="flex justify-between">
-                        <button type="button" className="bg-red-500 text-white py-2 px-4 rounded" onClick={handleBack}>
+                        <button type="button" className="bg-red-500 text-white py-2 px-4 rounded" onClick={() => navigate("/customerList")}>
                             Back
                         </button>
                         <button type="submit" className="bg-lime-500 text-white py-2 px-4 rounded">

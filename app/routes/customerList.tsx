@@ -14,7 +14,7 @@ interface Customer {
   tax_id: string;
   tel: string;
   province: string;
-  addDate: Date | string; // สามารถเป็น Date หรือ string ได้
+  add_Date: Date | string; // สามารถเป็น Date หรือ string ได้
 }
 
 interface LoaderData {
@@ -25,7 +25,7 @@ interface LoaderData {
 }
 
 const getCustomers = async (searchTerm: string): Promise<Array<Customer>> => {
-  const response = await fetch("https://easy-service.prakasitj.com/customers/getList");
+  const response = await fetch('https://easy-service.prakasitj.com/customers/getList');
   const customers: Customer[] = await response.json();
 
   if (searchTerm) {
@@ -137,7 +137,7 @@ export default function CustomerList() {
                   <td className="p-2">{customer.tel}</td>
                   <td className="p-2">{customer.province}</td>
                   <td className="p-2">
-                    {new Date(customer.addDate).toLocaleDateString()}
+                    {new Date(customer.add_Date).toLocaleDateString()}
                   </td>
                 </tr>
               ))}
