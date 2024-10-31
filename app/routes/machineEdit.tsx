@@ -6,7 +6,7 @@ export default function MachineEdit() {
     const location = useLocation();
     const navigate = useNavigate();
     const { machines, index, formData, formDataLast } = location.state || {};
-    
+
     const machineToEdit = machines[index];
 
     const [formMachineData, setFormMachineData] = useState({
@@ -14,12 +14,14 @@ export default function MachineEdit() {
         model: machineToEdit.model,
         warranty: machineToEdit.warranty,  // boolean type
         rated: machineToEdit.rated,
+        description: machineToEdit.description || "",  // เพิ่มฟิลด์ description
     });
 
     const [errors, setErrors] = useState({
         serialNumber: false,
         rated: false,
         model: false,
+        description: false,
     });
 
     const handleChange = (e: { target: { name: any; value: any; checked: any; type: any } }) => {
@@ -37,17 +39,18 @@ export default function MachineEdit() {
             serialNumber: !formMachineData.serialNumber,
             rated: !formMachineData.rated,
             model: !formMachineData.model,
+            description: !formMachineData.description,
         };
 
         setErrors(newErrors);
-        if (!newErrors.serialNumber && !newErrors.rated && !newErrors.model) {
+        if (!newErrors.serialNumber && !newErrors.rated && !newErrors.model && !newErrors.description) {
             const updatedMachines = machines.map((machine: any, i: any) => 
                 i === index ? { ...machine, ...formMachineData } : machine
             );
 
             navigate("/machineList", {
                 state: { ...formData, details: updatedMachines, formDataLast } 
-            }); 
+            });
         }
     };
 
@@ -103,6 +106,18 @@ export default function MachineEdit() {
                                 className="border rounded w-full py-2 px-3"
                             />
                             {errors.rated && <p className="text-red-500 text-sm">Please enter the rated value.</p>}
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-semibold mb-2">Description</label>
+                            <input 
+                                type="text" 
+                                name="description"
+                                value={formMachineData.description}
+                                onChange={handleChange}
+                                className="border rounded w-full py-2 px-3"
+                            />
+                            {errors.description && <p className="text-red-500 text-sm">Please enter a description.</p>}
                         </div>
 
                         <div className="mb-4">

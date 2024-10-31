@@ -5,8 +5,9 @@ import NavBar from "app/components/_navBar";
 interface Machine {
     serialNumber: string;
     model: string;
-    warranty: boolean;  // แก้ไข type ของ warranty ให้เป็น boolean
+    warranty: boolean;
     rated: string;
+    description: string;  // เพิ่มฟิลด์ description
 }
 
 interface FormData {
@@ -72,7 +73,7 @@ export default function MachineList() {
 
     const handleSave = () => {
         navigate("/work", { state: { ...formData } });
-        sessionStorage.removeItem("initialFormData"); 
+        sessionStorage.removeItem("initialFormData");
     };
 
     const handleBack = () => {
@@ -98,7 +99,8 @@ export default function MachineList() {
                                     <p>Serial Number: {machine.serialNumber}</p>
                                     <p>Model / Type: {machine.model}</p>
                                     <p>Rated: {machine.rated}</p>
-                                    <p>Warranty: {machine.warranty ? "Yes" : "No"}</p>  {/* ตรวจสอบค่า boolean และแสดงเป็น "Yes" หรือ "No" */}
+                                    <p>Description: {machine.description}</p>  {/* เพิ่มการแสดงผล description */}
+                                    <p>Warranty: {machine.warranty ? "Yes" : "No"}</p>
                                 </div>
                                 <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
                                     onClick={() => handleEdit(index)}>

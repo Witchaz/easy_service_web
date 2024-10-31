@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useState } from "react";
 import NavBar from "app/components/_navBar";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function WorkConfirm() {
     const location = useLocation();
@@ -48,120 +48,102 @@ export default function WorkConfirm() {
     const handleSave = async () => {
         const warrantyDetails = formData.details.filter((detail: { warranty: boolean; }) => detail.warranty === true);
         const nonWarrantyDetails = formData.details.filter((detail: { warranty: boolean; }) => detail.warranty === false);
-        
+
         if (warrantyDetails.length > 0 || nonWarrantyDetails.length > 0) {
             try {
-                // 1. Get customerID by customerName using the specified URL
-                const url = `https://easy-service.prakasitj.com/customers/getIDbyName/${encodeURIComponent(formData.customerName)}`;
-                const options = { method: 'POST' };
-                
-                const response = await fetch(url, options);
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Failed to retrieve customer ID: ${errorText}`);
-                }
-                
-                const data = await response.json();
-                const customerID = data?.id;
+                // Fetch customerID
+                const urlCustomerID = `https://easy-service.prakasitj.com/customers/getIDbyName/${encodeURIComponent(formData.customerName)}`;
+                const optionsCustomerID = { method: 'GET' };
+                const responseCustomerID = await fetch(urlCustomerID, optionsCustomerID);
+                const dataCustomerID = await responseCustomerID.json();
+                const customerID = dataCustomerID[0].id;
 
-                if (!customerID) {
-                    throw new Error("Customer ID not found.");
-                }
-
-                // 2. Create new Work for warrantyDetails
+                // Create new Work for warrantyDetails
                 if (warrantyDetails.length > 0) {
-                    const workResponse = await fetch("https://easy-service.prakasitj.com/works/createNewWork", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                    const urlCreateWork = 'https://easy-service.prakasitj.com/works/createNewWork';
+                    const optionsCreateWork = {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            mail_date: formData.mailDate,
-                            service_date: null,
+                            mail_date: "2024-11-01T08:00:00Z",
                             customerID,
                             address: formData.address,
                             province: formData.province,
-                        }),
-                    });
+                        })
+                    };
+                    await fetch(urlCreateWork, optionsCreateWork);
 
-                    if (!workResponse.ok) {
-                        const errorMessage = await workResponse.text();
-                        throw new Error(`Failed to create work for warrantyDetails: ${errorMessage}`);
-                    }
+                    const urlWorkID = 'https://easy-service.prakasitj.com/works/getLastWork';
+                    const responseWorkID = await fetch(urlWorkID, { method: 'GET' });
+                    const dataWorkID = await responseWorkID.json();
+                    const workID = dataWorkID[0].id;
 
-                    const workData = await workResponse.json();
-                    const warrantyWorkID = workData?.id;
-
-                    if (!warrantyWorkID) {
-                        throw new Error("Failed to retrieve warrantyWorkID from the work creation response.");
-                    }
-
-                    // Create Request for each machine under warranty
+                    // Create Requests for each detail in warrantyDetails
                     for (const detail of warrantyDetails) {
-                        await fetch("https://easy-service.prakasitj.com/request/insertRequest", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
+                        const urlCreateRequests = 'https://easy-service.prakasitj.com/Requests/insertRequest';
+                        const optionsCreateRequests = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 model: detail.model,
-                                sn: null,
+                                sn: detail.serialNumber,
                                 rated: detail.rated,
                                 description: detail.description,
-                                warranty: detail.warranty,
-                                workID: warrantyWorkID,
-                            }),
-                        });
+                                warranty: true,
+                                workID: workID
+                            })
+                        };
+                        await fetch(urlCreateRequests, optionsCreateRequests);
                     }
                 }
 
-                // 3. Create new Work for nonWarrantyDetails
+                // Create new Work for nonWarrantyDetails
                 if (nonWarrantyDetails.length > 0) {
-                    const workResponse = await fetch("https://easy-service.prakasitj.com/works/createNewWork", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                    const urlCreateWork = 'https://easy-service.prakasitj.com/works/createNewWork';
+                    const optionsCreateWork = {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            mail_date: formData.mailDate,
-                            service_date: null,
+                            mail_date: "2024-11-01T08:00:00Z",
                             customerID,
                             address: formData.address,
                             province: formData.province,
-                        }),
-                    });
+                        })
+                    };
+                    await fetch(urlCreateWork, optionsCreateWork);
 
-                    if (!workResponse.ok) {
-                        const errorMessage = await workResponse.text();
-                        throw new Error(`Failed to create work for nonWarrantyDetails: ${errorMessage}`);
-                    }
+                    const urlWorkID = 'https://easy-service.prakasitj.com/works/getLastWork';
+                    const responseWorkID = await fetch(urlWorkID, { method: 'GET' });
+                    const dataWorkID = await responseWorkID.json();
+                    const workID = dataWorkID[0].id;
 
-                    const workData = await workResponse.json();
-                    const nonWarrantyWorkID = workData?.id;
-
-                    if (!nonWarrantyWorkID) {
-                        throw new Error("Failed to retrieve nonWarrantyWorkID from the work creation response.");
-                    }
-
-                    // Create Request for each machine not under warranty
+                    // Create Requests for each detail in nonWarrantyDetails
                     for (const detail of nonWarrantyDetails) {
-                        await fetch("https://easy-service.prakasitj.com/request/insertRequest", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
+                        const urlCreateRequests = 'https://easy-service.prakasitj.com/Requests/insertRequest';
+                        const optionsCreateRequests = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 model: detail.model,
-                                sn: null,
+                                sn: detail.serialNumber,
                                 rated: detail.rated,
                                 description: detail.description,
-                                warranty: detail.warranty,
-                                workID: nonWarrantyWorkID,
-                            }),
-                        });
+                                warranty: false,
+                                workID: workID
+                            })
+                        };
+                        await fetch(urlCreateRequests, optionsCreateRequests);
                     }
                 }
 
-                alert("ได้ทำการเพิ่มงานเรียบร้อยแล้ว");
+                // แสดงข้อความและเปลี่ยนหน้า
+                alert("ได้ทำการบันทึกงานแล้ว");
                 navigate("/customerList");
+
             } catch (error) {
-                console.error("Error creating work or requests:", error);
-                alert("เกิดข้อผิดพลาดขณะสร้างงานหรือบันทึกรายละเอียด");
+                console.error("Error creating work or fetching customer ID:", error);
+                alert("เกิดข้อผิดพลาดขณะสร้างงานหรือดึงข้อมูล ID ของลูกค้า");
             }
-        } else {
-            alert("ไม่มีรายละเอียดสำหรับการบันทึกงาน");
         }
     };
 
@@ -179,7 +161,7 @@ export default function WorkConfirm() {
                         <p><strong>สถานที่ซ่อม:</strong> {formData.address}</p>
 
                         {formData.details.length > 0 ? (
-                            formData.details.slice(0, 4).map((detail: { id: any; model: any; serialNumber: any; }, index: number) => (
+                            formData.details.slice(0, 4).map((detail: { id: Key | null | undefined; model: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; serialNumber: string | number | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | null | undefined; }, index: number) => (
                                 <p key={detail.id}>
                                     <strong>รายละเอียดเครื่องซ่อมลำดับที่ {index + 1} :</strong> Model: {detail.model}, Serial Number: {detail.serialNumber}
                                 </p>
@@ -187,7 +169,7 @@ export default function WorkConfirm() {
                         ) : (
                             <p>รายละเอียด : -</p>
                         )}
-                        {formData.details.length > 4 && <p>...</p>}
+                        {formData.details.length > 4  && <p>...</p>}
 
                         <div className="flex space-x-4 mt-4">
                             <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"

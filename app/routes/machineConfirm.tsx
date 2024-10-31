@@ -5,7 +5,7 @@ import NavBar from "app/components/_navBar";
 interface Machine {
     serialNumber: string;
     model: string;
-    warranty: string;
+    warranty: boolean;
     rated: string;
 }
 
@@ -87,7 +87,7 @@ export default function MachineConfirm() {
                                     <p>Serial Number: {machine.serialNumber}</p>
                                     <p>Model / Type: {machine.model}</p>
                                     <p>Rated: {machine.rated}</p>
-                                    <p>Warranty: {machine.warranty}</p>
+                                    <p>Warranty: {machine.warranty ? "Yes" : "No"}</p>
                                 </div>
                             </div>
                         ))}

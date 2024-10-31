@@ -6,7 +6,8 @@ interface Machine {
     serialNumber: string;
     model: string;
     rated: string;
-    warranty: boolean;  // เปลี่ยนเป็น boolean
+    warranty: boolean;  // boolean type
+    description: string; // เพิ่มฟิลด์ description
 }
 
 export default function MachineDetails() {
@@ -20,12 +21,14 @@ export default function MachineDetails() {
         model: "",
         rated: "",
         warranty: false,  // เริ่มต้นเป็น false
+        description: "",  // เพิ่มฟิลด์ description เริ่มต้นเป็น empty string
     });
 
     const [errors, setErrors] = useState({
         serialNumber: false,
         model: false,
         rated: false,
+        description: false,
     });
 
     const handleChange = (e: { target: { name: string; value: any; checked: boolean; type: string } }) => {
@@ -43,15 +46,17 @@ export default function MachineDetails() {
             serialNumber: !formMachineData.serialNumber,
             rated: !formMachineData.rated,
             model: !formMachineData.model,
+            description: !formMachineData.description,
         };
 
         setErrors(newErrors);
-        if (!newErrors.serialNumber && !newErrors.rated && !newErrors.model) {
-            const newMachine = {
+        if (!newErrors.serialNumber && !newErrors.rated && !newErrors.model && !newErrors.description) {
+            const newMachine: Machine = {
                 serialNumber: formMachineData.serialNumber,
                 model: formMachineData.model,
                 rated: formMachineData.rated,
                 warranty: formMachineData.warranty,
+                description: formMachineData.description,  // เพิ่ม description
             };
 
             navigate("/machineList", { state: { ...formData, details: [...machines, newMachine], formDataLast } });
@@ -103,6 +108,18 @@ export default function MachineDetails() {
                                 className="border rounded w-full py-2 px-3"
                             />
                             {errors.rated && <p className="text-red-500 text-sm">Please enter the rated value.</p>}
+                        </div>
+
+                        <div className="mb-4">
+                            <label className="block text-sm font-semibold mb-2">Description</label>
+                            <input 
+                                type="text" 
+                                name="description"
+                                value={formMachineData.description}
+                                onChange={handleChange}
+                                className="border rounded w-full py-2 px-3"
+                            />
+                            {errors.description && <p className="text-red-500 text-sm">Please enter a description.</p>}
                         </div>
 
                         <div className="mb-4">
