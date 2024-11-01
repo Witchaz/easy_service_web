@@ -53,29 +53,7 @@ export default function SelectEngineer() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  const { work } = location.state || {};
   
-  const {
-      customerName = "",
-      address = "",
-      province = "",
-      mailDate = "",
-      engineer = "",
-      additionalExpenses = [],
-      status = 0,
-      details = [],
-  } = work || {}; 
-
-  const [formData, setFormData] = useState({
-      customerName,
-      address,
-      province,
-      mailDate,
-      engineer,
-      additionalExpenses,
-      status,
-      details,
-  });
 
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
 
@@ -89,16 +67,11 @@ export default function SelectEngineer() {
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
   
   const handleSelect = () => {
-    if (selectedUser) {
-        formData.engineer = selectedUser;
-        navigate('/work', { state: { ...formData } });
-    } else {
-        alert("กรุณาเลือกผู้ใช้ก่อน");
-    }
+    
   };
 
   const handleBack = () => {
-    navigate("/work", { state: { ...formData } }); 
+    navigate("/workList"); 
   };
 
   return (

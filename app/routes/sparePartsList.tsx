@@ -7,36 +7,39 @@ import { useNavigate } from "react-router-dom";
 const ITEMS_PER_PAGE = 6;
 
 interface SpareParts {
-  name: string;
   id: string;
-  quantity: number;
+  name: string;
+  description: string;
   price: number;
-  unti: string;
+  unit: string;
+  add_date: string;
 }
 
 interface LoaderData {
-  SparePartss: SpareParts[];
+  SparePartsList: SpareParts[];
   total: number;
   q: string;
   page: number;
 }
 
-const getSparePartss = async (searchTerm: string): Promise<Array<SpareParts>> => {
-  const SparePartss = [
-    { name: 'Devon Lane', id: 'chikeo@mail.com', quantity: 4, price: 125, unti: '104,345.00' },
-    { name: 'Kathryn Murphy', id: 'rohan_anna@mail.com', quantity: 7, price: 11, unti: '2,400.98' },
-    { name: 'Eleanor Pena', id: 'pedroharu@mail.com', quantity: 74, price: 98, unti: '56,987.00' },
-    { name: 'Annette Black', id: 'eusebia234@mail.com', quantity: 25, price: 51, unti: '12,567.90' },
-    { name: 'Guy Hawkins', id: 'midget1245@mail.com', quantity: 23, price: 12, unti: '4,670.44' },
-    { name: 'Floyd Miles', id: 'mottgeoff@mail.com', quantity: 85, price: 56, unti: '24,456.56' },
-  ];
+const getSparePartsList = async (searchTerm: string): Promise<Array<SpareParts>> => {
+  const url = 'https://easy-service.prakasitj.com/spare_parts/getList';
+  const options = { method: 'GET' };
 
-  if (searchTerm) {
-    return SparePartss.filter((SpareParts) =>
-      SpareParts.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+  try {
+    const response = await fetch(url, options);
+    const data: SpareParts[] = await response.json();
+
+    if (searchTerm) {
+      return data.filter((sparePart) =>
+        sparePart.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    return data;
+  } catch (error) {
+    console.error("Error fetching spare parts data:", error);
+    return [];
   }
-  return SparePartss;
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -44,19 +47,19 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const q = url.searchParams.get("q") || "";
   const page = parseInt(url.searchParams.get("page") || "1", 10);
 
-  const SparePartss = await getSparePartss(q);
+  const SparePartsList = await getSparePartsList(q);
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const paginatedSparePartss = SparePartss.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedSparePartsList = SparePartsList.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  return json({ SparePartss: paginatedSparePartss, total: SparePartss.length, q, page });
+  return json({ SparePartsList: paginatedSparePartsList, total: SparePartsList.length, q, page });
 };
 
 export default function SparePartsList() {
-  const { SparePartss, total, q, page } = useLoaderData<LoaderData>();
+  const { SparePartsList, total, q, page } = useLoaderData<LoaderData>();
   const submit = useSubmit();
   const navigate = useNavigate();
 
-  const [selectedSparePart, setSelectedSparePart] = useState<SpareParts | null>(null);
+  const [selectedSparePart, setSelectedSparePart] = useState<string | null>(null);
 
   useEffect(() => {
     const searchField = document.getElementById("q");
@@ -69,7 +72,7 @@ export default function SparePartsList() {
 
   const handleSelect = () => {
     if (selectedSparePart) {
-      navigate('/editSpareparts', { state: { sparepart: selectedSparePart } });
+      navigate('/editSpareparts', { state: { sparepartId: selectedSparePart } });
     } else {
       alert("กรุณาเลือกอะไหล่ก่อน");
     }
@@ -89,7 +92,7 @@ export default function SparePartsList() {
           <Form id="search-form" onChange={(event) => submit(event.currentTarget)} role="search">
             <input
               type="text"
-              aria-label="Search SparePartss"
+              aria-label="Search SparePartsList"
               id="q"
               name="q"
               placeholder="Search by name"
@@ -101,29 +104,31 @@ export default function SparePartsList() {
             <thead className="text-gray-600">
               <tr>
                 <th className="p-2">Select</th>
-                <th className="p-2">SpareParts Name</th>
-                <th className="p-2">id</th>
-                <th className="p-2">quantity</th>
-                <th className="p-2">price</th>
-                <th className="p-2">unti</th>
+                <th className="p-2">Part Name</th>
+                <th className="p-2">ID</th>
+                <th className="p-2">Description</th>
+                <th className="p-2">Price</th>
+                <th className="p-2">Unit</th>
+                <th className="p-2">Added Date</th>
               </tr>
             </thead>
             <tbody>
-              {SparePartss.map((sparePart, index) => (
-                <tr key={index} className="border-t">
+              {SparePartsList.map((sparePart) => (
+                <tr key={sparePart.id} className="border-t">
                   <td className="p-2">
                     <input
                       type="radio"
                       name="SpareParts"
-                      onChange={() => setSelectedSparePart(sparePart)}
-                      checked={selectedSparePart?.name === sparePart.name}
+                      onChange={() => setSelectedSparePart(sparePart.id)}
+                      checked={selectedSparePart === sparePart.id}
                     />
                   </td>
                   <td className="p-2">{sparePart.name}</td>
                   <td className="p-2">{sparePart.id}</td>
-                  <td className="p-2">{sparePart.quantity}</td>
-                  <td className="p-2">{sparePart.price} price</td>
-                  <td className="p-2">${sparePart.unti}</td>
+                  <td className="p-2">{sparePart.description}</td>
+                  <td className="p-2">{sparePart.price} Baht</td>
+                  <td className="p-2">{sparePart.unit}</td>
+                  <td className="p-2">{new Date(sparePart.add_date).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -157,3 +162,4 @@ export default function SparePartsList() {
     </>
   );
 }
+

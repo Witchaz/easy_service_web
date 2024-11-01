@@ -12,7 +12,6 @@ export default function WorkConfirm() {
         province,
         mailDate,
         details = [],
-        engineer = "",
         additionalExpenses = [], 
         status,
     } = location.state || {};
@@ -26,12 +25,9 @@ export default function WorkConfirm() {
             ...detail,
             id: detail.id || index + 1,
         })),
-        engineer,
         additionalExpenses,  
         status: 0,
     });
-
-    const totalCost = formData.additionalExpenses.reduce((sum: any, expense: { cost: any; }) => sum + (expense.cost || 0), 0);
 
     useEffect(() => {
         sessionStorage.setItem("initialFormData", JSON.stringify(formData));
@@ -57,6 +53,7 @@ export default function WorkConfirm() {
                 const responseCustomerID = await fetch(urlCustomerID, optionsCustomerID);
                 const dataCustomerID = await responseCustomerID.json();
                 const customerID = dataCustomerID[0].id;
+                alert(customerID);
 
                 // Create new Work for warrantyDetails
                 if (warrantyDetails.length > 0) {

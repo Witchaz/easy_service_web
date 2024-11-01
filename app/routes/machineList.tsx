@@ -7,14 +7,14 @@ interface Machine {
     model: string;
     warranty: boolean;
     rated: string;
-    description: string;  // เพิ่มฟิลด์ description
+    description: string;
 }
 
 interface FormData {
     customerName: string;
     address: string;
     province: string;
-    mailDate: string;
+    add_date: string;  // เปลี่ยนเป็น add_date แทน mailDate
     engineer: string;
     additionalExpenses: [];
     status: number;
@@ -29,7 +29,7 @@ export default function MachineList() {
         customerName,
         address,
         province,
-        mailDate,
+        add_date, // ใช้ add_date แทน mailDate
         engineer,
         additionalExpenses,
         status,
@@ -43,20 +43,20 @@ export default function MachineList() {
                 customerName,
                 address,
                 province,
-                mailDate,
+                add_date, // เปลี่ยนเป็น add_date
                 engineer,
                 additionalExpenses,
                 status,
                 details: details || [],
             }));
         }
-    }, [customerName, address, province, mailDate, engineer, additionalExpenses, status, details]);
+    }, [customerName, address, province, add_date, engineer, additionalExpenses, status, details]);
 
     const [formData, setFormData] = useState<FormData>({
         customerName,
         address,
         province,
-        mailDate,
+        add_date, // ใช้ add_date
         engineer,
         additionalExpenses,
         status,
@@ -98,7 +98,7 @@ export default function MachineList() {
                                 <p>Serial Number: {machine.serialNumber}</p>
                                 <p>Model / Type: {machine.model}</p>
                                 <p>Rated: {machine.rated}</p>
-                                <p>Description: {machine.description}</p>  {/* เพิ่มการแสดงผล description */}
+                                <p>Description: {machine.description}</p>
                                 <p>Warranty: {machine.warranty ? "Yes" : "No"}</p>
                             </div>
                             <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
@@ -110,15 +110,15 @@ export default function MachineList() {
                     
                 </div>
                 <div className="flex justify-between mt-8 space-x-16">
-                        <button className="bg-black text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-800" onClick={handleBack}>
-                            Back
-                        </button>
-                        <button className="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-600" onClick={handleAdd}>
-                            Add
-                        </button>
-                        <button className="bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-lime-600" onClick={handleSave}>
-                            Save
-                        </button>
+                    <button className="bg-black text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-800" onClick={handleBack}>
+                        Back
+                    </button>
+                    <button className="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-600" onClick={handleAdd}>
+                        Add
+                    </button>
+                    <button className="bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-lime-600" onClick={handleSave}>
+                        Save
+                    </button>
                 </div>
             </div>
         </>

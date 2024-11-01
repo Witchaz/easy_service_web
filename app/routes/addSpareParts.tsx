@@ -1,26 +1,22 @@
 import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom"; 
 import NavBar from "app/components/_navBar";
 
 interface Spareparts {
     name: string;
     description: string;
     price: number;
-    unit: number;
-    add_date: Date | string;
+    unit: string;
 }
 
 export default function AddSpareparts() {
     const navigate = useNavigate();
-    const location = useLocation();
-    const { formData = {}, formDataLast = {} } = location.state || {};  
 
     const [formSparepartsData, setFormSparepartsData] = useState<Spareparts>({
         name: "",
         description: "",
         price: 0,
-        unit: 0,
-        add_date: new Date(),
+        unit: "",
     });
 
     const [errors, setErrors] = useState({
@@ -28,36 +24,57 @@ export default function AddSpareparts() {
         description: false,
         price: false,
         unit: false,
-        add_date: false,
+
     });
 
     const handleChange = (e: { target: { name: string; value: any; }; }) => {
         const { name, value } = e.target;
         setFormSparepartsData({
             ...formSparepartsData,
-            [name]: name === "price" || name === "unit" ? parseFloat(value) : value,
+            [name]: name === "price" ? parseFloat(value) : value,
         });
     };
 
-    const handleSubmit = (e: { preventDefault: () => void; }) => {
+    const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
 
         const newErrors = {
             name: !formSparepartsData.name,
             description: !formSparepartsData.description,
-            price: formSparepartsData.price <= 0,
-            unit: formSparepartsData.unit <= 0,
-            add_date: !formSparepartsData.add_date,
+            price: formSparepartsData.price < 0,
+            unit: !formSparepartsData.unit,
         };
 
         setErrors(newErrors);
         if (!Object.values(newErrors).includes(true)) {
-            const newSparepart = {
-                ...formSparepartsData,
-                add_date: new Date(formSparepartsData.add_date),
-            };
+            try {
+                const url = 'https://easy-service.prakasitj.com/spare_parts/insertSparePart';
+                const options = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: formSparepartsData.name,
+                        description: formSparepartsData.description,
+                        price: formSparepartsData.price,
+                        unit: formSparepartsData.unit,
+                    }),
+                };
 
-            navigate("/SparepartsList", { state: { ...formData, details: [...(formData.details || []), newSparepart], formDataLast } });
+                const response = await fetch(url, options);
+                const data = await response.json();
+
+                if (response.ok) {
+                    console.log("Spare part added successfully:", data);
+                    alert("Spare part added successfully.");
+                    navigate("/SparepartsList");
+                } else {
+                    console.error("Failed to add spare part:", data);
+                    alert("Failed to add spare part.");
+                }
+            } catch (error) {
+                console.error("Error adding spare part:", error);
+                alert("An error occurred while adding the spare part.");
+            }
         }
     };
 
@@ -105,13 +122,13 @@ export default function AddSpareparts() {
                                 onChange={handleChange}
                                 className="border rounded w-full py-2 px-3"
                             />
-                            {errors.price && <p className="text-red-500 text-sm">Please enter a valid price.</p>}
+                            {errors.price && <p className="text-red-500 text-sm">Price must be 0 or greater.</p>}
                         </div>
 
                         <div className="mb-4">
                             <label className="block text-sm font-semibold mb-2">Unit</label>
                             <input 
-                                type="number" 
+                                type="text" 
                                 name="unit"
                                 value={formSparepartsData.unit}
                                 onChange={handleChange}
@@ -119,19 +136,7 @@ export default function AddSpareparts() {
                             />
                             {errors.unit && <p className="text-red-500 text-sm">Please enter a valid unit.</p>}
                         </div>
-
-                        <div className="mb-4">
-                            <label className="block text-sm font-semibold mb-2">Add Date</label>
-                            <input 
-                                type="date" 
-                                name="add_date"
-                                value={typeof formSparepartsData.add_date === 'string' ? formSparepartsData.add_date : formSparepartsData.add_date.toISOString().split('T')[0]}
-                                onChange={handleChange}
-                                className="border rounded w-full py-2 px-3"
-                            />
-                            {errors.add_date && <p className="text-red-500 text-sm">Please select a valid date.</p>}
-                        </div>
-                        
+                     
                         <div className="mt-6 flex justify-between">
                             <button type="button" className="bg-black text-white shrink border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
                                 onClick={handleBack}>
