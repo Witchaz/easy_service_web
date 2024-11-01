@@ -146,7 +146,7 @@ export default function SelectEngineer() {
           </div>
 
           <div className="flex justify-center space-x-20 mt-8">
-            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleAdd}>
+            <button className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600" onClick={handleAdd}>
                 Add
             </button>
             <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelect}>

@@ -164,14 +164,14 @@ export default function CustomerList() {
 
           <div className="flex justify-center space-x-4 mt-8">
             <a href="/newUser">
-              <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600">ADD</button>
+              <button className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600">ADD</button>
             </a>
 
-            <button className="bg-yellow-400 text-white py-2 px-6 rounded-lg hover:bg-yellow-500" onClick={handleSelect}>
+            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelect}>
               Select
             </button>
             
-            <button className="bg-yellow-400 text-white py-2 px-6 rounded-lg hover:bg-yellow-500" onClick={handleSelectEdit}>
+            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelectEdit}>
               Select Edit
             </button>
             
