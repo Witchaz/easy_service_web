@@ -2,7 +2,7 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import NavBar from "app/components/_navBar";
-import { useNavigate, useLocation } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom"; 
 
 const ITEMS_PER_PAGE = 6; 
 
@@ -27,12 +27,12 @@ interface LoaderData {
 
 const getUsers = async (searchTerm: string): Promise<Array<User>> => {
     const response = await fetch("https://easy-service.prakasitj.com/user/getUserList");
-    const users : User[] = await response.json();
+    const users: User[] = await response.json();
 
-  if (searchTerm) {
-    return users.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase()));
-  }
-  return users;
+    if (searchTerm) {
+      return users.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase()));
+    }
+    return users;
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -51,11 +51,8 @@ export default function SelectEngineer() {
   const { users, total, q, page } = useLoaderData<LoaderData>(); 
   const submit = useSubmit();
   const navigate = useNavigate();
-  const location = useLocation();
   
-  
-
-  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   useEffect(() => {
     const searchField = document.getElementById("q");
@@ -67,15 +64,16 @@ export default function SelectEngineer() {
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
   
   const handleSelect = () => {
-    if (selectedUser) {
-        navigate('/work' );
+    if (selectedUserId) {
+      navigate(`/editEngineer/${selectedUserId}`); // ส่ง id ไปยังหน้า editEngineer
     } else {
-        alert("กรุณาเลือกผู้ใช้ก่อน");
+      alert("กรุณาเลือกผู้ใช้ก่อน");
     }
   };
-    const handleAdd = () => {
-        navigate("/addEngineer");
-    }
+  
+  const handleAdd = () => {
+    navigate("/addEngineer");
+  };
 
   return (
     <>
@@ -107,15 +105,15 @@ export default function SelectEngineer() {
               </tr>
             </thead>
             <tbody>
-              {users.map((user, index) => (
-                <tr key={index} className="border-t">
+              {users.map((user) => (
+                <tr key={user.id} className="border-t">
                   <td className="p-2">
                     <input
                       type="radio"
                       name="user"
-                      value={user.name}
-                      onChange={() => setSelectedUser(user.name)} 
-                      checked={selectedUser === user.name} 
+                      value={user.id} // ใช้ id เป็นค่า value
+                      onChange={() => setSelectedUserId(user.id)} // ตั้งค่า selectedUserId
+                      checked={selectedUserId === user.id} 
                     />
                   </td>
                   <td className="p-2">{user.name}</td>
@@ -123,9 +121,7 @@ export default function SelectEngineer() {
                   <td className="p-2">{user.address}</td>
                   <td className="p-2">{user.province}</td>
                   <td className="p-2">{user.role}</td>
-                  <td className="p-2">
-                        {new Date(user.addDate).toLocaleDateString()}
-                  </td>
+                  <td className="p-2">{new Date(user.addDate).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -152,8 +148,6 @@ export default function SelectEngineer() {
             <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelect}>
                 Select Edit
             </button>
-                      
-
           </div>
         </div>
       </div>
