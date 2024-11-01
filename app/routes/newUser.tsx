@@ -87,7 +87,9 @@ const NewCustomer: React.FC = () => {
                 alert("An error occurred. Please try again.");
             }
         }
-        alert("credit_limit >= 0.");
+        else {
+            alert("credit_limit >= 0.");
+        }
     };
 
     const handleBack = () => {

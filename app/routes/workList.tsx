@@ -54,7 +54,7 @@ export default function WorkList() {
         <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
           จำนวนงานทั้งหมด
         </h2>
-        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl">
+        <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-4xl h-[500px] overflow-y-auto">
           {works.map((work, index) => (
             <div key={work.id} className="border-b border-gray-300 py-4 mb-4 flex justify-between items-center">
               <div>

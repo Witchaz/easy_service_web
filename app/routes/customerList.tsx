@@ -1,6 +1,6 @@
+import React, { useEffect, useState } from "react";
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
-import { useEffect, useState } from "react";
 import NavBar from "app/components/_navBar";
 import { useNavigate } from "react-router-dom";
 
@@ -14,7 +14,7 @@ interface Customer {
   tax_id: string;
   tel: string;
   province: string;
-  add_Date: Date | string; // สามารถเป็น Date หรือ string ได้
+  add_date: Date | string; // ใช้ add_date ตามที่ API ส่งมา
 }
 
 interface LoaderData {
@@ -65,25 +65,25 @@ export default function CustomerList() {
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   const handleSelect = () => {
-  if (selectedCustomer) {
-    const selectedCustomerName = customers.find(cust => cust.id === selectedCustomer)?.name;
-    if (selectedCustomerName) {
-      navigate("/workDescription", { state: { customerName: selectedCustomerName } });
+    if (selectedCustomer) {
+      const selectedCustomerName = customers.find(cust => cust.id === selectedCustomer)?.name;
+      if (selectedCustomerName) {
+        navigate("/workDescription", { state: { customerName: selectedCustomerName } });
+      } else {
+        alert("ชื่อผู้ใช้ที่เลือกไม่พบ");
+      }
     } else {
-      alert("ชื่อผู้ใช้ที่เลือกไม่พบ");
+      alert("กรุณาเลือกผู้ใช้ก่อน");
     }
-  } else {
-    alert("กรุณาเลือกผู้ใช้ก่อน");
-  }
-};
+  };
 
   const handleSelectEdit = () => {
-  if (selectedCustomer) {
-    navigate("/customerEdit", { state: { customerId: selectedCustomer } });
-  } else {
-    alert("กรุณาเลือกผู้ใช้ก่อน");
-  }
-};
+    if (selectedCustomer) {
+      navigate("/customerEdit", { state: { customerId: selectedCustomer } });
+    } else {
+      alert("กรุณาเลือกผู้ใช้ก่อน");
+    }
+  };
 
   return (
     <>
@@ -137,7 +137,7 @@ export default function CustomerList() {
                   <td className="p-2">{customer.tel}</td>
                   <td className="p-2">{customer.province}</td>
                   <td className="p-2">
-                    {new Date(customer.add_Date).toLocaleDateString()}
+                    {new Date(customer.add_date).toLocaleDateString()}
                   </td>
                 </tr>
               ))}
