@@ -10,10 +10,10 @@ interface Expenses {
   amount: number;
 }
 
-export default function ExpensesList() {
+export default function adANCostList() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { workId } = location.state || {}; // Receive workId
+  const { workId } = location.state || {}; 
 
   const [expenses, setExpenses] = useState<Expenses[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -39,16 +39,16 @@ export default function ExpensesList() {
   }, [workId]);
 
   const handleBack = () => {
-    navigate("/stOneWork", { state: { workId } });
+    navigate("/adWork", { state: { workId } });
   };
 
   const handleAdd = () => {
-    navigate('/expensesDetails', { state: { workId } });
+    navigate('/adAnCostAdd', { state: { workId } });
   };
 
   const handleEdit = (index: number) => {
     const expenseId = expenses[index]?.id; // Assume each expense has an `id` property
-  navigate("/expensesEdit", { state: { expenses, index, workId, expenseId } });
+  navigate("/adANCostEdit", { state: { expenses, index, workId, expenseId } });
 };
 
 

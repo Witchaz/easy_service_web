@@ -9,7 +9,7 @@ interface Expenses {
     amount: number;
 }
 
-export default function ExpensesDetails() {
+export default function adAnCostAdd() {
     const navigate = useNavigate();
     const location = useLocation();
     const { workId } = location.state || {};
@@ -68,7 +68,7 @@ export default function ExpensesDetails() {
 
                 if (response.ok) {
                     alert("Expense added successfully!");
-                    navigate("/expensesList", { state: { workId } });
+                    navigate("/adANCostList", { state: { workId } });
                 } else {
                     alert("Failed to add expense. Please try again.");
                 }
@@ -80,7 +80,7 @@ export default function ExpensesDetails() {
     };
 
     const handleBack = () => {
-        navigate("/expensesList", { state: { workId } });
+        navigate("/adANCostList", { state: { workId } });
     };
 
     return (

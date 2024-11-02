@@ -39,17 +39,12 @@ export default function ExpensesList() {
   }, [workId]);
 
   const handleBack = () => {
-    navigate("/stOneWork", { state: { workId } });
+    navigate("/workWait", { state: { workId } });
   };
 
-  const handleAdd = () => {
-    navigate('/expensesDetails', { state: { workId } });
-  };
+  
 
-  const handleEdit = (index: number) => {
-    const expenseId = expenses[index]?.id; // Assume each expense has an `id` property
-  navigate("/expensesEdit", { state: { expenses, index, workId, expenseId } });
-};
+  
 
 
   if (error) {
@@ -72,7 +67,7 @@ export default function ExpensesList() {
 
         <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl h-[400px] overflow-y-auto">
           {expenses.map((expense, index) => (
-            <div key={index} className="bg-gray-50 p-4 mb-4 rounded-md flex justify-between items-center">
+            <div key={index} className="bg-yellow-100 p-4 mb-4 rounded-md flex justify-between items-center">
               <div>
                 <h3 className="font-semibold mb-1">รายละเอียดค่าใช้จ่ายลำดับที่ {index + 1}</h3>
                 <p>Description: {expense.description}</p>
@@ -80,10 +75,7 @@ export default function ExpensesList() {
                 <p>Amount: {expense.amount}</p>
                 <p>Cost: {expense.cost}</p>
               </div>
-              <button className="bg-lime-400 hover:bg-lime-500 text-white font-semibold px-4 py-2 rounded-lg"
-                onClick={() => handleEdit(index)}>
-                Edit Details
-              </button>
+              
             </div>
           ))}
         </div>
@@ -91,9 +83,6 @@ export default function ExpensesList() {
         <div className="flex justify-between mt-8 space-x-16">
           <button className="bg-black text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-800" onClick={handleBack}>
             Back
-          </button>
-          <button className="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-600" onClick={handleAdd}>
-            Add
           </button>
         </div>
       </div>

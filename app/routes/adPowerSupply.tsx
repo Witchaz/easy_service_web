@@ -50,12 +50,10 @@ export default function StOnePowerSupplyList() {
   }, [workId]);
 
   const handleBack = () => {
-    navigate("/stOneWork", { state: { workId } });
+    navigate("/adWork", { state: { workId } });
   };
 
-  const handleAdd = () => {
-    navigate("/stOneAddPowerSupply", { state: { workId } });
-  };
+  
 
   const handleEditDetails = (machineId: number) => {
     navigate("/stOneEditPowerSupply", { state: { machineId, workId } });
@@ -85,7 +83,7 @@ export default function StOnePowerSupplyList() {
                     onClick={() => handleEditDetails(machine.id)}
                     className="bg-lime-500 text-white py-2 px-4 rounded-lg hover:bg-lime-600"
                   >
-                    Edit
+                    ดูอะไหล่ที่ต้องใช้
                   </button>
                 </div>
               ))
@@ -97,7 +95,6 @@ export default function StOnePowerSupplyList() {
 
         <div className="flex space-x-4 mt-4">
           <button onClick={handleBack} className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800">Back</button>
-          <button onClick={handleAdd} className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">Add</button>
         </div>
       </div>
     </>

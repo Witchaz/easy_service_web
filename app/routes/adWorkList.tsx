@@ -28,7 +28,7 @@ interface Machine {
   add_date: string;
 }
 
-export default function WorkList() {
+export default function adWorkList() {
   const [works, setWorks] = useState<Work[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -104,42 +104,42 @@ export default function WorkList() {
   };
 
   useEffect(() => {
-    const fetchWorks = async () => {
-      const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/0`;
-      const options = { method: "GET" };
+  const fetchWorks = async () => {
+    const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/2,5`;
+    const options = { method: "GET" };
 
-      try {
-        const response = await fetch(url, options);
-        if (!response.ok) throw new Error(`Failed to fetch works, status: ${response.status}`);
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) throw new Error(`Failed to fetch works, status: ${response.status}`);
 
-        const data: Work[] = await response.json();
+      const data: Work[] = await response.json();
 
-        const worksWithDetails = await Promise.all(
-          data.map(async (work) => {
-            const customerName = await fetchCustomerName(work.customer_id);
-            const userName = await fetchEngineerName(work.user_id);
-            const machines = await fetchMachinesByWorkID(work.id);
-            const additionalCost = await fetchAdditionalCost(work.id);
+      const worksWithDetails = await Promise.all(
+        data.map(async (work) => {
+          const customerName = await fetchCustomerName(work.customer_id);
+          const userName = await fetchEngineerName(work.user_id);
+          const machines = await fetchMachinesByWorkID(work.id);
+          const additionalCost = await fetchAdditionalCost(work.id);
 
-            return { ...work, customerName, userName, machines, additionalCost };
-          })
-        );
+          return { ...work, customerName, userName, machines, additionalCost };
+        })
+      );
 
-        setWorks(worksWithDetails);
-      } catch (err) {
-        setError("Error loading works data");
-        console.error(err);
-      }
-    };
-
-    fetchWorks();
-  }, []);
-
-  const handleSelect = (workId: number) => {
-    navigate("/stOneWork", { state: { workId } });
+      setWorks(worksWithDetails);
+    } catch (err) {
+      setError("Error loading works data");
+      console.error(err);
+    }
   };
 
-  const handleNewButtonAction = async (workId: number) => {
+  fetchWorks();
+  }, []);
+
+
+  const handleSelect = (workId: number) => {
+    navigate("/adWork", { state: { workId } });
+    };
+    const handleNewButtonAction = async (workId: number) => {
     const work = works.find((w) => w.id === workId);
     if (!work) {
       alert("Work not found.");
@@ -164,7 +164,7 @@ export default function WorkList() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: workId,
-          status: 1,
+          status: work.id+1,
         }),
       };
 
@@ -187,15 +187,17 @@ export default function WorkList() {
     }
   };
 
-  return (
-    <>
-      <NavBar />
-      <div className="flex flex-col items-center min-h-screen bg-gray-100">
-        <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
-          จำนวนงานที่รอเลือกช่าง
-        </h2>
-        <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
-          {works.map((work) => (
+
+ return (
+  <>
+    <NavBar />
+    <div className="flex flex-col items-center min-h-screen bg-gray-100">
+      <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
+        งานที่รอการทำ
+      </h2>
+      <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
+        {works.length > 0 ? (
+          works.map((work) => (
             <div key={work.id} className="bg-gray-50 p-6 rounded-lg shadow-md flex justify-between items-start">
               <div>
                 <p><strong>Work {work.id}</strong></p>
@@ -218,7 +220,7 @@ export default function WorkList() {
                   onClick={() => handleSelect(work.id)}
                 >
                   Select
-                </button>
+                      </button>
                 <button
                   className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
                   onClick={() => handleNewButtonAction(work.id)}
@@ -227,9 +229,12 @@ export default function WorkList() {
                 </button>
               </div>
             </div>
-          ))}
-        </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-500">ยังไม่มีงานที่ต้องทำ</p>
+        )}
       </div>
-    </>
-  );
+    </div>
+  </>
+);
 }

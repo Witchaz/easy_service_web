@@ -10,7 +10,7 @@ interface Expense {
     amount: number;
 }
 
-export default function ExpensesEdit() {
+export default function adANCostEdit() {
     const location = useLocation();
     const navigate = useNavigate();
     const { expenses, expenseId, workId } = location.state || {};
@@ -85,7 +85,7 @@ export default function ExpensesEdit() {
 
 
     const handleBack = () => {
-        navigate("/expensesList", { state: { expenses, workId } });
+        navigate("/adANCostList", { state: { expenses, workId } });
     };
 
     const handleDelete = async () => {
