@@ -27,7 +27,7 @@ interface Machine {
   add_date: string;
 }
 
-export default function WorkList() {
+export default function workWaitList() {
   const [works, setWorks] = useState<Work[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -81,78 +81,47 @@ export default function WorkList() {
   };
 
   useEffect(() => {
-    const fetchWorks = async () => {
-      const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/0`; // Using status 0
-      const options = { method: "GET" };
-
-      try {
-        const response = await fetch(url, options);
-        if (!response.ok) throw new Error(`Failed to fetch works, status: ${response.status}`);
-
-        const data: Work[] = await response.json();
-
-        const worksWithDetails = await Promise.all(
-          data.map(async (work) => {
-            const customerName = await fetchCustomerName(work.customerID);
-            const userName = await fetchEngineerName(work.userID);
-            const machines = await fetchMachinesByWorkID(work.id);
-            return { ...work, customerName, userName, machines };
-          })
-        );
-
-        setWorks(worksWithDetails);
-      } catch (err) {
-        setError("Error loading works data");
-        console.error(err);
-      }
-    };
-
-    fetchWorks();
-  }, []);
-
-  const handleSelect = (workId: number) => {
-    navigate("/stOneWork", { state: { workId } });
-  };
-
-  const handleNewButtonAction = async (workId: number) => {
-  const confirmed = window.confirm("Are you sure you want to confirm this work?");
-  if (confirmed) {
-    const url = 'https://easy-service.prakasitj.com/works/setWorkStatus';
-    const options = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: workId,
-        status: 1, // Set the status to 1 for confirming the work
-      }),
-    };
+  const fetchWorks = async () => {
+    const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/1`; // Using status 1
+    const options = { method: "GET" };
 
     try {
       const response = await fetch(url, options);
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response text:", errorText);
-        throw new Error("Failed to confirm the work: " + errorText);
-      }
-      
-      
-      const data = await response.text();
-      console.log("Work status updated:", data);
-      alert("Work confirmed successfully!");
-       window.location.reload();
-    } catch (error) {
-      console.error("Error confirming work:", error);
-      alert("Failed to confirm the work. Please try again.");
+      if (!response.ok) throw new Error(`Failed to fetch works, status: ${response.status}`);
+
+      const data: Work[] = await response.json();
+
+      const worksWithDetails = await Promise.all(
+        data.map(async (work) => {
+          const customerName = await fetchCustomerName(work.customerID);
+          const userName = await fetchEngineerName(work.userID);
+          const machines = await fetchMachinesByWorkID(work.id);
+          return { ...work, customerName, userName, machines };
+        })
+      );
+
+      setWorks(worksWithDetails);
+    } catch (err) {
+      setError("Error loading works data");
+      console.error(err);
     }
-  }
-};
+  };
+
+  fetchWorks();
+}, []);
+
+
+  const handleSelect = (workId: number) => {
+    navigate("/stWaitWork", { state: { workId } });
+  };
+
 
   return (
     <>
       <NavBar />
       <div className="flex flex-col items-center min-h-screen bg-gray-100">
         <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
-          จำนวนงานที่รอเลือกช่าง
+          จำนวนงานที่รอช่างกำลังทำ
         </h2>
         <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
           {works.map((work) => (
@@ -179,13 +148,7 @@ export default function WorkList() {
                 >
                   Select
                 </button>
-                <button
-                  className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
-                  onClick={() => handleNewButtonAction(work.id)}
-                >
-                  Confirm Work
-                </button>
-
+        
               </div>
             </div>
           ))}
