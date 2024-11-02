@@ -19,17 +19,25 @@ export default function Login() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     };
-
+    console.log(username);
+    console.log(password);
     try {
       const response = await fetch(url, options);
-      
+      console.log(response);
       if (response.ok) {
         const data = await response.json();
+        console.log(data);
         console.log(data.error);
         if (!data.error) {
           setError(""); 
           alert("Login successful!");
-          navigate("/customerList");
+          if (data.payload != 7){
+            console.log(data.payload)
+            navigate(`/workListEngineer/${data.payload}`, { state: { userId: data.id} });    
+          }
+          else{
+            navigate(`/workList`);    
+          }
         } else {
           setError("Invalid username or password");
         }
