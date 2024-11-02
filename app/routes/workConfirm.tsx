@@ -47,15 +47,14 @@ export default function WorkConfirm() {
 
         if (warrantyDetails.length > 0 || nonWarrantyDetails.length > 0) {
             try {
-                // Fetch customerID
+                
                 const urlCustomerID = `https://easy-service.prakasitj.com/customers/getIDbyName/${encodeURIComponent(formData.customerName)}`;
                 const optionsCustomerID = { method: 'GET' };
                 const responseCustomerID = await fetch(urlCustomerID, optionsCustomerID);
                 const dataCustomerID = await responseCustomerID.json();
                 const customerID = dataCustomerID[0].id;
-                alert(customerID);
+                
 
-                // Create new Work for warrantyDetails
                 if (warrantyDetails.length > 0) {
                     const urlCreateWork = 'https://easy-service.prakasitj.com/works/createNewWork';
                     const optionsCreateWork = {
@@ -63,7 +62,7 @@ export default function WorkConfirm() {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             mail_date: "2024-11-01T08:00:00Z",
-                            customerID,
+                            customer_id:customerID,
                             address: formData.address,
                             province: formData.province,
                         })
@@ -75,7 +74,7 @@ export default function WorkConfirm() {
                     const dataWorkID = await responseWorkID.json();
                     const workID = dataWorkID[0].id;
 
-                    // Create Requests for each detail in warrantyDetails
+                 
                     for (const detail of warrantyDetails) {
                         const urlCreateRequests = 'https://easy-service.prakasitj.com/Requests/insertRequest';
                         const optionsCreateRequests = {
@@ -87,7 +86,7 @@ export default function WorkConfirm() {
                                 rated: detail.rated,
                                 description: detail.description,
                                 warranty: true,
-                                workID: workID
+                                work_id: workID
                             })
                         };
                         await fetch(urlCreateRequests, optionsCreateRequests);
@@ -102,7 +101,7 @@ export default function WorkConfirm() {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             mail_date: "2024-11-01T08:00:00Z",
-                            customerID,
+                            customer_id:customerID,
                             address: formData.address,
                             province: formData.province,
                         })
@@ -126,7 +125,7 @@ export default function WorkConfirm() {
                                 rated: detail.rated,
                                 description: detail.description,
                                 warranty: false,
-                                workID: workID
+                                work_id: workID
                             })
                         };
                         await fetch(urlCreateRequests, optionsCreateRequests);

@@ -82,7 +82,7 @@ export default function WorkWaitList() {
 
   useEffect(() => {
     const fetchWorks = async () => {
-      const statuses = [1, 4]; 
+      const statuses = [2, 5]; 
       const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/${statuses.join(",")}`;
       const options = { method: "GET" };
 

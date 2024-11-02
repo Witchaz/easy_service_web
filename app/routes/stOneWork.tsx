@@ -4,20 +4,23 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 interface WorkDetails {
   id: number;
-  customerName: string;
+  customerID: number;
   address: string;
   province: string;
-  userID: string;
+  user_id: string | null;
+  userName?: string; // เพิ่มฟิลด์นี้เพื่อแสดงชื่อช่าง
+  userSurname?: string; // เพิ่มฟิลด์นี้เพื่อแสดงนามสกุลช่าง
   status: number;
 }
 
 interface Machine {
   id: number;
   model: string;
-  serialNumber: string;
+  sn: string;
   warranty: boolean;
-  description: string;
   rated: string;
+  description: string;
+  add_date: string;
 }
 
 export default function StOneWork() {
@@ -40,10 +43,24 @@ export default function StOneWork() {
         if (!response.ok) throw new Error("Failed to fetch work details");
 
         const data = await response.json();
-        setWorkDetails(data[0]);
+        if (data.length > 0) {
+          const work = data[0];
+          setWorkDetails({
+            id: work.id,
+            customerID: work.customer_id,
+            address: work.address,
+            province: work.province,
+            user_id: work.user_id,
+            status: work.status,
+          });
 
-        fetchCustomerName(data[0].customerID);
-        fetchMachinesByWorkID(data[0].id);
+          fetchCustomerName(work.customer_id);
+          fetchEngineerName(work.user_id); // เรียกใช้ฟังก์ชันนี้เพื่อดึงชื่อและนามสกุลช่าง
+          const machinesData = await fetchMachinesByWorkID(work.id);
+          setMachines(machinesData);
+        } else {
+          setError("No work details found");
+        }
       } catch (error) {
         console.error("Error fetching work details:", error);
         setError("Error loading work details");
@@ -62,15 +79,37 @@ export default function StOneWork() {
       if (!response.ok) throw new Error("Failed to fetch customer name");
 
       const data = await response.json();
-      setCustomerName(data[0].name);
+      setCustomerName(data[0]?.name || "Unknown");
     } catch (error) {
       console.error("Error fetching customer name:", error);
       setCustomerName("Unknown");
     }
   };
 
-  const fetchMachinesByWorkID = async (workId: number) => {
-    const url = `https://easy-service.prakasitj.com/Requests/getListByWorkID/${workId}`;
+  const fetchEngineerName = async (user_id: string | null) => {
+    if (!user_id) return;
+
+    const url = `https://easy-service.prakasitj.com/user/searchbyID/${user_id}`;
+    const options = { method: "GET" };
+
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) throw new Error("Failed to fetch engineer name");
+
+      const data = await response.json();
+      setWorkDetails((prev) => {
+        if (prev) {
+          return { ...prev, userName: data[0]?.name || "Unknown", userSurname: data[0]?.surname || "" };
+        }
+        return prev;
+      });
+    } catch (error) {
+      console.error("Error fetching engineer name:", error);
+    }
+  };
+
+  const fetchMachinesByWorkID = async (workId: number): Promise<Machine[]> => {
+    const url = `https://easy-service.prakasitj.com/Requests/getListBywork_id/${workId}`;
     const options = { method: "GET" };
 
     try {
@@ -78,10 +117,18 @@ export default function StOneWork() {
       if (!response.ok) throw new Error("Failed to fetch machines");
 
       const data = await response.json();
-      setMachines(data);
+      return data.map((machine: any) => ({
+        id: machine.id,
+        model: machine.model,
+        sn: machine.sn,
+        warranty: machine.warranty,
+        rated: machine.rated,
+        description: machine.description,
+        add_date: machine.add_date,
+      }));
     } catch (error) {
       console.error("Error fetching machines:", error);
-      setError("Error loading machine details");
+      return [];
     }
   };
 
@@ -89,20 +136,15 @@ export default function StOneWork() {
     navigate("/workList");
   };
 
-  
-
   const handleEdit = (field: string) => {
     if (field === "Power Supply") {
       navigate("/stOnePowerSupplyList", { state: { workId } });
-    }
-    else if (field === "Location") {
-        navigate("/stOneDescription", { state: { workId } });
-    }
-    else if (field === 'Engineer') {
-        navigate("/selectEngineer", { state: { workId } });
-    }
-    else if(field === 'AN Cost'){
-        navigate("/expensesList", { state: { workId } });
+    } else if (field === "Location") {
+      navigate("/stOneDescription", { state: { workId, customerID: workDetails?.customerID } });
+    } else if (field === "Engineer") {
+      navigate("/selectEngineer", { state: { workId } });
+    } else if (field === "AN Cost") {
+      navigate("/expensesList", { state: { workId } });
     }
   };
 
@@ -115,36 +157,41 @@ export default function StOneWork() {
       <NavBar />
       <div className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
         <h2 className="text-center text-2xl font-semibold text-lime-600 mb-6">หน้างาน</h2>
-        
+
         {workDetails ? (
           <div className="bg-white p-6 rounded-lg shadow-md w-[800px] h-[500px] max-w-full mb-6">
             <p><strong>Work ID:</strong> {workDetails.id}</p>
             <p><strong>ชื่อลูกค้า:</strong> {customerName}</p>
             <p><strong>สถานที่ซ่อม:</strong> {workDetails.address}, {workDetails.province}</p>
 
-            {machines.slice(0, 3).map((machine, index) => (
-              <p key={machine.id}>รายละเอียดเครื่องซ่อมลำดับที่ {index + 1}: Model: {machine.model}</p>
-            ))}
-            {machines.length > 3 && <p>...</p>}
+            {machines.length > 0 ? (
+              machines.map((machine, index) => (
+                <p key={machine.id}>
+                  รายละเอียดเครื่องซ่อมลำดับที่ {index + 1}: Model: {machine.model} SN: {machine.sn}
+                </p>
+              ))
+            ) : (
+              <p>No machine data available</p>
+            )}
 
-            <p><strong>ช่างผู้รับผิดชอบ:</strong> {workDetails.userID}</p>
+            <p><strong>ช่างผู้รับผิดชอบ:</strong> {workDetails.userName} {workDetails.userSurname || "-"}</p>
             <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> 0</p>
             <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> 0</p>
             <p><strong>สถานะการทำงาน:</strong> {workDetails.status}</p>
 
             <div className="flex flex-col gap-2 mt-4 items-start">
-                <button onClick={() => handleEdit("Power Supply")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                    Edit Power Supply
-                </button>
-                <button onClick={() => handleEdit("Location")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                    Edit Location
-                </button>
-                <button onClick={() => handleEdit("Engineer")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                    Edit Engineer
-                </button>
-                <button onClick={() => handleEdit("AN Cost")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                    Edit AN Cost
-                </button>
+              <button onClick={() => handleEdit("Power Supply")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
+                Edit Power Supply
+              </button>
+              <button onClick={() => handleEdit("Location")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
+                Edit Location
+              </button>
+              <button onClick={() => handleEdit("Engineer")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
+                Edit Engineer
+              </button>
+              <button onClick={() => handleEdit("AN Cost")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
+                Edit AN Cost
+              </button>
             </div>
           </div>
         ) : (
@@ -158,4 +205,3 @@ export default function StOneWork() {
     </>
   );
 }
-

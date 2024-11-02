@@ -5,7 +5,7 @@ import NavBar from "app/components/_navBar";
 export default function StOneDescription() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { workId } = location.state || {}; // รับค่า workId จาก state ที่ถูกส่งมา
+    const { workId, customerID } = location.state || {}; // รับค่า workId และ customerID จาก state
 
     const [formData, setFormData] = useState({
         customerID: 0,
@@ -20,31 +20,33 @@ export default function StOneDescription() {
     });
 
     useEffect(() => {
-        const fetchWorkData = async () => {
-            const url = `https://easy-service.prakasitj.com/works/searchByID/${workId}`;
-            const options = { method: 'GET' };
+    const fetchWorkData = async () => {
+        const url = `https://easy-service.prakasitj.com/works/searchByID/${workId}`;
+        const options = { method: 'GET' };
 
-            try {
-                const response = await fetch(url, options);
-                if (!response.ok) throw new Error("Failed to fetch work data");
-                const data = await response.json();
-                
-                if (data.length > 0) {
-                    const work = data[0];
-                    setFormData({
-                        customerID: work.customerID,
-                        address: work.address || "",
-                        province: work.province || "",
-                        userID: work.userID || "", // ควรมีค่า userID ที่ได้มาจาก API
-                    });
-                }
-            } catch (error) {
-                console.error("Error fetching work data:", error);
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) throw new Error("Failed to fetch work data");
+            const data = await response.json();
+            
+            if (data.length > 0) {
+                const work = data[0];
+                setFormData({
+                    customerID: work.customer_id, // ใช้ข้อมูล customer_id ที่ได้จาก API
+                    address: work.address || "",
+                    province: work.province || "",
+                    userID: work.user_id || "",
+                });
             }
-        };
+        } catch (error) {
+            console.error("Error fetching work data:", error);
+        }
+    };
 
-        if (workId) fetchWorkData();
-    }, [workId]);
+    if (workId) fetchWorkData();
+}, [workId]);
+
+
 
     const handleChange = (e: { target: { name: any; value: any; }; }) => {
         const { name, value } = e.target;
@@ -55,38 +57,47 @@ export default function StOneDescription() {
     };
 
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        const newErrors = {
-            address: !formData.address,
-            province: !formData.province,
+    const newErrors = {
+        address: !formData.address,
+        province: !formData.province,
+    };
+        console.log(formData);
+    setErrors(newErrors);
+    if (!newErrors.address && !newErrors.province) {
+        const url = 'https://easy-service.prakasitj.com/works/editWork';
+        const options = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: workId,
+                customer_id: formData.customerID,
+                address: formData.address,
+                province: formData.province,
+            }),
         };
+        console.log("Request body:", options.body);
 
-        setErrors(newErrors);
-        if (!newErrors.address && !newErrors.province) {
-            const url = 'https://easy-service.prakasitj.com/works/editWork';
-            const options = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id: workId,
-                    customerID: formData.customerID,
-                    address: formData.address,
-                    province: formData.province,
-                    userID: formData.userID,
-                }),
-            };
-
-            try {
-                const response = await fetch(url, options);
-                const data = await response.json();
-                console.log("Update successful:", data);
-                navigate("/stOneWork", { state: { workId } });
-            } catch (error) {
-                console.error("Error updating work data:", error);
+        try {
+            const response = await fetch(url, options);
+            if (!response.ok) {
+            const errorText = await response.text(); // อ่านข้อมูลแบบ text
+            console.error("Server response:", errorText);
+            throw new Error("Failed to update work data: " + errorText);
             }
+            const data = await response.text(); 
+            console.log("Update successful:", data);
+            alert("แก้ไขข้อมูลและบันทึกแล้ว");
+            navigate("/stOneWork", { state: { workId } });
+        } catch (error) {
+        console.error("Error updating work data:", error);
+        alert("Failed to update work. Please try again.");
+        }
+
         }
     };
+
 
     const handleCancel = () => {
         navigate("/stOneWork", { state: { workId } });

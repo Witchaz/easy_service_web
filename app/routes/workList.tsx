@@ -7,9 +7,9 @@ interface Work {
   mail_date: string;
   service_date: string | null;
   status: number;
-  userID: string | null;
+  user_id: string | null;
   userName?: string; // Added field for engineer name
-  customerID: number;
+  customer_id: number;
   customerName?: string;
   address: string;
   province: string;
@@ -20,7 +20,7 @@ interface Work {
 interface Machine {
   id: number;
   model: string;
-  serialNumber: string;
+  sn: string;
   warranty: boolean;
   description: string;
   rated: string;
@@ -32,43 +32,51 @@ export default function WorkList() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const fetchCustomerName = async (customerID: number): Promise<string> => {
-    const url = `https://easy-service.prakasitj.com/customers/getByID/${customerID}`;
+  const fetchCustomerName = async (customer_id: number): Promise<string> => {
+    const url = `https://easy-service.prakasitj.com/customers/getByID/${customer_id}`;
     const options = { method: "GET" };
     try {
       const response = await fetch(url, options);
       const data = await response.json();
-      return data[0].name;
+      return data[0]?.name || "Unknown";
     } catch (error) {
       console.error("Error fetching customer name:", error);
       return "Unknown";
     }
   };
 
-  const fetchEngineerName = async (userID: string | null): Promise<string> => {
-    if (!userID) return "-";
-    const url = `https://easy-service.prakasitj.com/user/searchbyID/${userID}`;
+  const fetchEngineerName = async (user_id: string | null): Promise<string> => {
+    if (!user_id) return "-";
+    const url = `https://easy-service.prakasitj.com/user/searchbyID/${user_id}`;
     const options = { method: "GET" };
     try {
       const response = await fetch(url, options);
       const data = await response.json();
-      return data[0].name;
+      if (data.length > 0) {
+        // Include both name and surname
+        return `${data[0].name} ${data[0].surname}`;
+      }
+      return "Unknown";
     } catch (error) {
       console.error("Error fetching engineer name:", error);
       return "Unknown";
     }
   };
 
-  const fetchMachinesByWorkID = async (workID: number): Promise<Machine[]> => {
-    const url = `https://easy-service.prakasitj.com/Requests/getListByWorkID/${workID}`;
+  const fetchMachinesByWorkID = async (work_id: number): Promise<Machine[]> => {
+    const url = `https://easy-service.prakasitj.com/Requests/getListBywork_id/${work_id}`;
     const options = { method: "GET" };
+    
     try {
       const response = await fetch(url, options);
+      if (!response.ok) throw new Error("Failed to fetch machine data");
+
       const data = await response.json();
+      console.log("Fetched machine data:", data);
       return data.map((machine: any) => ({
         id: machine.id,
         model: machine.model,
-        serialNumber: machine.sn,
+        sn: machine.sn,
         warranty: machine.warranty,
         description: machine.description,
         rated: machine.rated,
@@ -93,8 +101,8 @@ export default function WorkList() {
 
         const worksWithDetails = await Promise.all(
           data.map(async (work) => {
-            const customerName = await fetchCustomerName(work.customerID);
-            const userName = await fetchEngineerName(work.userID);
+            const customerName = await fetchCustomerName(work.customer_id);
+            const userName = await fetchEngineerName(work.user_id);
             const machines = await fetchMachinesByWorkID(work.id);
             return { ...work, customerName, userName, machines };
           })
@@ -115,37 +123,36 @@ export default function WorkList() {
   };
 
   const handleNewButtonAction = async (workId: number) => {
-  const confirmed = window.confirm("Are you sure you want to confirm this work?");
-  if (confirmed) {
-    const url = 'https://easy-service.prakasitj.com/works/setWorkStatus';
-    const options = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        id: workId,
-        status: 1, // Set the status to 1 for confirming the work
-      }),
-    };
+    const confirmed = window.confirm("Are you sure you want to confirm this work?");
+    if (confirmed) {
+      const url = 'https://easy-service.prakasitj.com/works/setWorkStatus';
+      const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: workId,
+          status: 1, // Set the status to 1 for confirming the work
+        }),
+      };
 
-    try {
-      const response = await fetch(url, options);
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response text:", errorText);
-        throw new Error("Failed to confirm the work: " + errorText);
+      try {
+        const response = await fetch(url, options);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Error response text:", errorText);
+          throw new Error("Failed to confirm the work: " + errorText);
+        }
+        
+        const data = await response.text();
+        console.log("Work status updated:", data);
+        alert("Work confirmed successfully!");
+        window.location.reload();
+      } catch (error) {
+        console.error("Error confirming work:", error);
+        alert("Failed to confirm the work. Please try again.");
       }
-      
-      
-      const data = await response.text();
-      console.log("Work status updated:", data);
-      alert("Work confirmed successfully!");
-       window.location.reload();
-    } catch (error) {
-      console.error("Error confirming work:", error);
-      alert("Failed to confirm the work. Please try again.");
     }
-  }
-};
+  };
 
   return (
     <>
@@ -185,7 +192,6 @@ export default function WorkList() {
                 >
                   Confirm Work
                 </button>
-
               </div>
             </div>
           ))}

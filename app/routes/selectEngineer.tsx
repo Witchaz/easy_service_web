@@ -66,39 +66,36 @@ export default function SelectEngineer() {
     const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
     const handleSelect = async () => {
-    if (selectedUser) {
-        const url = 'https://easy-service.prakasitj.com/works/editResponsiblePerson';
-        const options = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: workId,
-                userID: selectedUser.id,
-            }),
-        };
-        try {
-            const response = await fetch(url, options);
-            const responseData = await response.text(); // เปลี่ยนเป็น text() เพื่ออ่านข้อมูลที่ไม่ใช่ JSON
+        if (selectedUser) {
+            const url = 'https://easy-service.prakasitj.com/works/editResponsiblePerson';
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: workId,
+                    user_id: selectedUser.id, 
+                }),
+            };
+            try {
+                const response = await fetch(url, options);
+                const responseText = await response.text(); //
+                
+                if (!response.ok) {
+                    console.error("Error response:", responseText);
+                    throw new Error("Failed to assign engineer. " + responseText);
+                }
 
-            
-
-            if (response.ok) {
-                console.log("Update successful:", responseData);
+                console.log("Update successful:", responseText);
                 alert("เลือกช่างแล้ว");
                 navigate("/stOneWork", { state: { workId } });
-            } else {
-                console.error("Failed with response status:", response.status);
+            } catch (error) {
+                console.error("Error updating responsible person:", error);
                 alert("Failed to assign engineer. Please try again.");
             }
-        } catch (error) {
-            console.error("Error updating responsible person:", error);
-            alert("Failed to assign engineer. Please try again.");
-        }
         } else {
             alert("Please select an engineer.");
         }
     };
-
 
 
     const handleBack = () => {
