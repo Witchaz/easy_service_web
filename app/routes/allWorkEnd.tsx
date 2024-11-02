@@ -105,7 +105,7 @@ export default function adWorkList() {
 
   useEffect(() => {
   const fetchWorks = async () => {
-    const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/2,5`;
+    const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/6,7`;
     const options = { method: "GET" };
 
     try {
@@ -193,7 +193,7 @@ export default function adWorkList() {
     <NavBar />
     <div className="flex flex-col items-center min-h-screen bg-gray-100">
       <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
-        งานที่รอการทำ
+        งานที่เสร็จแล้ว
       </h2>
       <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
         {works.length > 0 ? (
@@ -221,17 +221,12 @@ export default function adWorkList() {
                 >
                   Select
                       </button>
-                <button
-                  className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
-                  onClick={() => handleNewButtonAction(work.id)}
-                >
-                  Confirm Work
-                </button>
+                
               </div>
             </div>
           ))
         ) : (
-          <p className="text-center text-gray-500">ยังไม่มีงานที่ต้องทำ</p>
+          <p className="text-center text-gray-500">ยังไม่มีงานที่ทำเสร็จ</p>
         )}
       </div>
     </div>

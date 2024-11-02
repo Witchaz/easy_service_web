@@ -32,7 +32,7 @@ interface AdditionalCost {
   work_id: number;
 }
 
-export default function StOneWork() {
+export default function adWork() {
   const navigate = useNavigate();
   const location = useLocation();
   const { workId } = location.state || {};
@@ -68,7 +68,7 @@ export default function StOneWork() {
           fetchEngineerName(work.user_id);
           const machinesData = await fetchMachinesByWorkID(work.id);
           setMachines(machinesData);
-          fetchAdditionalCosts(work.id); // Fetch additional costs
+          fetchAdditionalCosts(work.id);
         } else {
           setError("No work details found");
         }
@@ -160,18 +160,18 @@ export default function StOneWork() {
   };
 
   const handleBack = () => {
-    navigate("/workList");
+    navigate("/adWorkList");
   };
 
   const handleEdit = (field: string) => {
     if (field === "Power Supply") {
-      navigate("/stOnePowerSupplyList", { state: { workId } });
+      navigate("/adPowerSupply", { state: { workId } });
     } else if (field === "Location") {
-      navigate("/stOneDescription", { state: { workId, customerID: workDetails?.customerID } });
+      navigate("/adLocation", { state: { workId, customerID: workDetails?.customerID } });
     } else if (field === "Engineer") {
-      navigate("/selectEngineer", { state: { workId, previousPage: "/stOneWork" } });
+      navigate("/selectEngineer", { state: { workId, previousPage: "/adWork" } }); // Navigate with previousPage
     } else if (field === "AN Cost") {
-      navigate("/expensesList", { state: { workId } });
+      navigate("/adANCostList", { state: { workId } });
     }
   };
 

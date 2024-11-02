@@ -52,7 +52,7 @@ export default function SelectEngineer() {
     const submit = useSubmit();
     const navigate = useNavigate();
     const location = useLocation();
-    const { workId } = location.state || {}; // รับค่า workId จาก state
+    const { workId, previousPage } = location.state || {}; // Receive workId and previousPage from state
 
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
@@ -78,8 +78,8 @@ export default function SelectEngineer() {
             };
             try {
                 const response = await fetch(url, options);
-                const responseText = await response.text(); //
-                
+                const responseText = await response.text();
+
                 if (!response.ok) {
                     console.error("Error response:", responseText);
                     throw new Error("Failed to assign engineer. " + responseText);
@@ -87,7 +87,7 @@ export default function SelectEngineer() {
 
                 console.log("Update successful:", responseText);
                 alert("เลือกช่างแล้ว");
-                navigate("/stOneWork", { state: { workId } });
+                navigate(previousPage || "/stOneWork", { state: { workId } }); // Navigate back to the previous page or default
             } catch (error) {
                 console.error("Error updating responsible person:", error);
                 alert("Failed to assign engineer. Please try again.");
@@ -97,10 +97,13 @@ export default function SelectEngineer() {
         }
     };
 
-
     const handleBack = () => {
-        navigate("/stOneWork", { state: { workId } });
-    };
+    if (previousPage) {
+      navigate(previousPage, { state: { workId } });
+    } else {
+      navigate("/");
+    }
+  };
 
     return (
         <>
