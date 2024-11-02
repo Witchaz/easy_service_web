@@ -39,8 +39,6 @@ export default function StOneEditPowerSupply() {
                     rated: data[0].rated,
                     description: data[0].description,
                 });
-                console.log(data);
-                
             } catch (error) {
                 console.error("Error fetching machine data:", error);
             }
@@ -87,9 +85,8 @@ export default function StOneEditPowerSupply() {
 
             try {
                 const response = await fetch(url, options);
-                const data = await response.json();
-                console.log("Update successful:", data);
-                // Navigate back to the machine list after update
+                await response.text();
+                alert("แก้ไขและบันทึกข้อมูลแล้ว");
                 navigate("/stOnePowerSupplyList", { state: { workId } });
             } catch (error) {
                 console.error("Error updating machine data:", error);
@@ -101,9 +98,27 @@ export default function StOneEditPowerSupply() {
         navigate("/stOnePowerSupplyList", { state: { workId } });
     };
 
-    const handleDelete = () => {
-        // Perform delete operation if required, then navigate back
-        navigate("/stOnePowerSupplyList", { state: { workId } });
+    const handleDelete = async () => {
+        const confirmed = window.confirm("Are you sure you want to delete this machine?");
+        if (confirmed) {
+            const url = 'https://easy-service.prakasitj.com/Requests/deleteRequest';
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: machineId }),
+            };
+
+            try {
+                const response = await fetch(url, options);
+                const data = await response.text();
+                console.log(data);
+                alert("Machine deleted successfully!");
+                navigate("/stOnePowerSupplyList", { state: { workId } });
+            } catch (error) {
+                console.error("Error deleting machine data:", error);
+                alert("An error occurred while deleting the machine. Please try again.");
+            }
+        }
     };
 
     return (
@@ -163,30 +178,18 @@ export default function StOneEditPowerSupply() {
                             {errors.description && <p className="text-red-500 text-sm">Please enter a description.</p>}
                         </div>
 
-                        <div className="mb-4">
-                            <label className="block text-sm font-semibold mb-2">Warranty</label>
-                            <input 
-                                type="checkbox" 
-                                name="warranty"
-                                checked={formMachineData.warranty}
-                                onChange={handleChange}
-                                className="appearance-none w-8 h-8 border-2 border-red-500 rounded-md checked:bg-lime-500 checked:border-lime-500 focus:outline-none mr-2"
-                            />
-                            <span>{formMachineData.warranty ? "Yes" : "No"}</span>
-                        </div>
-                        
                         <div className="mt-6 flex justify-between">
-                            <button type="button" className="bg-black text-white shrink border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
+                            <button type="button" className="bg-black text-white border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
                                 onClick={handleBack}>
                                 Back
                             </button>
 
-                            <button type="button" className="bg-red-600 text-white shrink border-white border-2 hover:bg-red-800 p-2 rounded-lg"
+                            <button type="button" className="bg-red-600 text-white border-white border-2 hover:bg-red-800 p-2 rounded-lg"
                                 onClick={handleDelete}>
                                 Delete
                             </button>
 
-                            <button type="submit" className="bg-lime-500 text-white shrink border-white border-2 hover:bg-lime-600 p-2 rounded-lg">
+                            <button type="submit" className="bg-lime-500 text-white border-white border-2 hover:bg-lime-600 p-2 rounded-lg">
                                 Confirm
                             </button>
                         </div>

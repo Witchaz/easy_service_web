@@ -12,7 +12,7 @@ interface Machine {
   add_date: string;
 }
 
-export default function StOnePowerSupplyList() {
+export default function workWaitPowerSupplyList() {
   const navigate = useNavigate();
   const location = useLocation();
   const { workId } = location.state || {}; // รับค่า workId จาก state ที่ถูกส่งมา
@@ -50,16 +50,10 @@ export default function StOnePowerSupplyList() {
   }, [workId]);
 
   const handleBack = () => {
-    navigate("/stOneWork", { state: { workId } });
+    navigate("/workWait", { state: { workId } });
   };
 
-  const handleAdd = () => {
-    navigate("/stOneAddPowerSupply", { state: { workId } });
-  };
-
-  const handleEditDetails = (machineId: number) => {
-    navigate("/stOneEditPowerSupply", { state: { machineId, workId } });
-  };
+  
 
   return (
     <>
@@ -81,12 +75,7 @@ export default function StOnePowerSupplyList() {
                     <p><strong>Description:</strong> {machine.description}</p>
                     <p><strong>Warranty:</strong> {machine.warranty ? "Yes" : "No"}</p>
                   </div>
-                  <button
-                    onClick={() => handleEditDetails(machine.id)}
-                    className="bg-lime-500 text-white py-2 px-4 rounded-lg hover:bg-lime-600"
-                  >
-                    Edit
-                  </button>
+                  
                 </div>
               ))
             ) : (
@@ -97,7 +86,6 @@ export default function StOnePowerSupplyList() {
 
         <div className="flex space-x-4 mt-4">
           <button onClick={handleBack} className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800">Back</button>
-          <button onClick={handleAdd} className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600">Add</button>
         </div>
       </div>
     </>

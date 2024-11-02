@@ -7,33 +7,34 @@ interface Work {
   mail_date: string;
   service_date: string | null;
   status: number;
-  userID: string | null;
-  userName?: string; // Added field for engineer name
-  customerID: number;
+  user_id: string | null;
+  userName?: string;
+  customer_id: number;
   customerName?: string;
   address: string;
   province: string;
   add_date: string;
   machines?: Machine[];
+  additionalCost?: number;
 }
 
 interface Machine {
   id: number;
   model: string;
-  serialNumber: string;
+  sn: string;
   warranty: boolean;
   description: string;
   rated: string;
   add_date: string;
 }
 
-export default function WorkWaitList() {
+export default function workWaitList() {
   const [works, setWorks] = useState<Work[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const fetchCustomerName = async (customerID: number): Promise<string> => {
-    const url = `https://easy-service.prakasitj.com/customers/getByID/${customerID}`;
+  const fetchCustomerName = async (customer_id: number): Promise<string> => {
+    const url = `https://easy-service.prakasitj.com/customers/getByID/${customer_id}`;
     const options = { method: "GET" };
     try {
       const response = await fetch(url, options);
@@ -45,30 +46,36 @@ export default function WorkWaitList() {
     }
   };
 
-  const fetchEngineerName = async (userID: string | null): Promise<string> => {
-    if (!userID) return "-";
-    const url = `https://easy-service.prakasitj.com/user/searchbyID/${userID}`;
+  const fetchEngineerName = async (user_id: string | null): Promise<string> => {
+    if (!user_id) return "-";
+    const url = `https://easy-service.prakasitj.com/user/searchbyID/${user_id}`;
     const options = { method: "GET" };
     try {
       const response = await fetch(url, options);
       const data = await response.json();
-      return data[0]?.name || "Unknown";
+      if (data.length > 0) {
+        return `${data[0].name} ${data[0].surname}`;
+      }
+      return "Unknown";
     } catch (error) {
       console.error("Error fetching engineer name:", error);
       return "Unknown";
     }
   };
 
-  const fetchMachinesByWorkID = async (workID: number): Promise<Machine[]> => {
-    const url = `https://easy-service.prakasitj.com/Requests/getListByWorkID/${workID}`;
+  const fetchMachinesByWorkID = async (work_id: number): Promise<Machine[]> => {
+    const url = `https://easy-service.prakasitj.com/Requests/getListBywork_id/${work_id}`;
     const options = { method: "GET" };
+
     try {
       const response = await fetch(url, options);
+      if (!response.ok) throw new Error("Failed to fetch machine data");
+
       const data = await response.json();
       return data.map((machine: any) => ({
         id: machine.id,
         model: machine.model,
-        serialNumber: machine.sn,
+        sn: machine.sn,
         warranty: machine.warranty,
         description: machine.description,
         rated: machine.rated,
@@ -80,47 +87,67 @@ export default function WorkWaitList() {
     }
   };
 
+  const fetchAdditionalCost = async (work_id: number): Promise<number> => {
+    const url = `https://easy-service.prakasitj.com/additionalcosts/getFromWorkId/${work_id}`;
+    const options = { method: "GET" };
+
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) throw new Error("Failed to fetch additional costs");
+
+      const data = await response.json();
+      return data.reduce((total: number, cost: { cost: number }) => total + cost.cost, 0);
+    } catch (error) {
+      console.error("Error fetching additional costs:", error);
+      return 0;
+    }
+  };
+
   useEffect(() => {
-    const fetchWorks = async () => {
-      const statuses = [1, 4]; 
-      const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/${statuses.join(",")}`;
-      const options = { method: "GET" };
+  const fetchWorks = async () => {
+    // Update API URL to get works with status 1 or 4
+    const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/1,4`;
+    const options = { method: "GET" };
 
-      try {
-        const response = await fetch(url, options);
-        if (!response.ok) throw new Error(`Failed to fetch works, status: ${response.status}`);
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) throw new Error(`Failed to fetch works, status: ${response.status}`);
 
-        const data: Work[] = await response.json();
+      const data: Work[] = await response.json();
 
-        const worksWithDetails = await Promise.all(
-          data.map(async (work) => {
-            const customerName = await fetchCustomerName(work.customerID);
-            const userName = await fetchEngineerName(work.userID);
-            const machines = await fetchMachinesByWorkID(work.id);
-            return { ...work, customerName, userName, machines };
-          })
-        );
+      const worksWithDetails = await Promise.all(
+        data.map(async (work) => {
+          const customerName = await fetchCustomerName(work.customer_id);
+          const userName = await fetchEngineerName(work.user_id);
+          const machines = await fetchMachinesByWorkID(work.id);
+          const additionalCost = await fetchAdditionalCost(work.id);
 
-        setWorks(worksWithDetails);
-      } catch (err) {
-        setError("Error loading works data");
-        console.error(err);
-      }
-    };
+          return { ...work, customerName, userName, machines, additionalCost };
+        })
+      );
 
-    fetchWorks();
+      setWorks(worksWithDetails);
+    } catch (err) {
+      setError("Error loading works data");
+      console.error(err);
+    }
+  };
+
+  fetchWorks();
   }, []);
 
+
   const handleSelect = (workId: number) => {
-    navigate("/stWaitWork", { state: { workId } });
+    navigate("/workWait", { state: { workId } });
   };
+
 
   return (
     <>
       <NavBar />
       <div className="flex flex-col items-center min-h-screen bg-gray-100">
         <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
-          จำนวนงานที่รอช่างกำลังทำ
+          งานที่ช่างกำลังทำ
         </h2>
         <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
           {works.map((work) => (
@@ -137,7 +164,7 @@ export default function WorkWaitList() {
                 {work.machines && work.machines.length > 3 && <p>...</p>}
                 <p><strong>ช่างผู้รับผิดชอบ:</strong> {work.userName || "-"}</p>
                 <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> 0</p>
-                <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> 0</p>
+                <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{work.additionalCost?.toFixed(2) || "0"}</p>
                 <p><strong>สถานะการทำงาน:</strong> {work.status}</p>
               </div>
               <div className="flex flex-col items-center">
@@ -147,6 +174,7 @@ export default function WorkWaitList() {
                 >
                   Select
                 </button>
+                
               </div>
             </div>
           ))}

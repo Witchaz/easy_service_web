@@ -2,7 +2,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import NavBar from "app/components/_navBar";
 
-interface Expenses {
+interface Expense {
+    id: number;
     description: string;
     unit: string;
     cost: number;
@@ -12,15 +13,15 @@ interface Expenses {
 export default function ExpensesEdit() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { expenses, index, formData, formDataLast } = location.state || {};
+    const { expenses, expenseId, workId } = location.state || {};
 
-    const expenseToEdit = expenses[index];
+    const expenseToEdit = expenses.find((expense: Expense) => expense.id === expenseId);
 
-    const [formExpensesData, setFormExpensesData] = useState({
-        description: expenseToEdit.description,
-        unit: expenseToEdit.unit,
-        cost: expenseToEdit.cost,
-        amount: expenseToEdit.amount,
+    const [formExpensesData, setFormExpensesData] = useState(expenseToEdit || {
+        description: "",
+        unit: "",
+        cost: 0,
+        amount: 0,
     });
 
     const [errors, setErrors] = useState({
@@ -38,42 +39,86 @@ export default function ExpensesEdit() {
         });
     };
 
-    const handleSubmit = (e: { preventDefault: () => void; }) => {
-        e.preventDefault();
+    const handleSubmit = async (e: { preventDefault: () => void; }) => {
+    e.preventDefault();
 
-        const newErrors = {
-            description: !formExpensesData.description,
-            unit: !formExpensesData.unit,
-            cost: formExpensesData.cost <= 0,
-            amount: formExpensesData.amount <= 0,
-        };
+    const newErrors = {
+        description: !formExpensesData.description,
+        unit: !formExpensesData.unit,
+        cost: formExpensesData.cost <= 0,
+        amount: formExpensesData.amount <= 0,
+    };
 
-        setErrors(newErrors);
-        if (!newErrors.description && !newErrors.unit && !newErrors.cost && !newErrors.amount) {
-            const updatedExpenses = expenses.map((expense: Expenses, i: number) =>
-                i === index ? { ...expense, ...formExpensesData } : expense
-            );
+    setErrors(newErrors);
+    if (!newErrors.description && !newErrors.unit && !newErrors.cost && !newErrors.amount) {
+        try {
+            const url = 'https://easy-service.prakasitj.com/additionalcosts/editAdditionalCost';
+            const options = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: expenseId,
+                    description: formExpensesData.description,
+                    cost: formExpensesData.cost,
+                    amount: formExpensesData.amount,
+                    unit: formExpensesData.unit,
+                    work_id: workId,
+                }),
+            };
 
-            const updatedFormData = { ...formData, additionalExpenses: updatedExpenses };
-            sessionStorage.setItem("formData", JSON.stringify(updatedFormData));
+            const response = await fetch(url, options);
+            const data = await response.text();
+            console.log(data);
 
-            navigate("/expensesList", {
-                state: { ...updatedFormData, formDataLast }
-            });
+            if (response.ok) {
+                alert("Expense updated successfully!");
+                navigate("/expensesList", { state: { expenses, workId } });
+            } else {
+                alert("Failed to update expense. Please try again.");
+            }
+        } catch (error) {
+            console.error("Error updating expense:", error);
+            alert("An error occurred. Please try again.");
+        }
+    }
+};
+
+
+    const handleBack = () => {
+        navigate("/expensesList", { state: { expenses, workId } });
+    };
+
+    const handleDelete = async () => {
+        const confirmed = window.confirm("Are you sure you want to delete this expense?");
+        if (confirmed) {
+            try {
+                const url = 'https://easy-service.prakasitj.com/additionalcosts/deleteAdditionalCost';
+                const options = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: expenseId }),
+                };
+
+                const response = await fetch(url, options);
+                const data = await response.text();
+                console.log(data);
+
+                if (response.ok) {
+                    alert("Expense deleted successfully!");
+                    navigate("/expensesList", { state: { expenses: expenses.filter((expense: Expense) => expense.id !== expenseId), workId } });
+                } else {
+                    alert("Failed to delete expense. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error deleting expense:", error);
+                alert("An error occurred. Please try again.");
+            }
         }
     };
 
-    const handleBack = () => {
-        navigate("/expensesList", { state: { ...formData, additionalExpenses: expenses, formDataLast } });
-    };
 
-    const handleDelete = () => {
-        const updatedExpenses = expenses.filter((_: any, i: any) => i !== index);
-        const updatedFormData = { ...formData, additionalExpenses: updatedExpenses };
-        sessionStorage.setItem("formData", JSON.stringify(updatedFormData));
 
-        navigate("/expensesList", { state: { ...updatedFormData, formDataLast } });
-    };
+    if (!formExpensesData) return <p>Loading...</p>;
 
     return (
         <>
@@ -133,17 +178,17 @@ export default function ExpensesEdit() {
                         </div>
                         
                         <div className="mt-6 flex justify-between">
-                            <button type="button" className="bg-black text-white shrink border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
+                            <button type="button" className="bg-black text-white border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
                                 onClick={handleBack}>
                                 Back
                             </button>
 
-                            <button type="button" className="bg-red-600 text-white shrink border-white border-2 hover:bg-red-800 p-2 rounded-lg"
+                            <button type="button" className="bg-red-600 text-white border-white border-2 hover:bg-red-800 p-2 rounded-lg"
                                 onClick={handleDelete}>
                                 Delete
                             </button>
 
-                            <button type="submit" className="bg-lime-500 text-white shrink border-white border-2 hover:bg-lime-600 p-2 rounded-lg">
+                            <button type="submit" className="bg-lime-500 text-white border-white border-2 hover:bg-lime-600 p-2 rounded-lg">
                                 Confirm
                             </button>
                         </div>

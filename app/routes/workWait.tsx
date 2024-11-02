@@ -32,7 +32,7 @@ interface AdditionalCost {
   work_id: number;
 }
 
-export default function StOneWork() {
+export default function WorkWait() {
   const navigate = useNavigate();
   const location = useLocation();
   const { workId } = location.state || {};
@@ -160,18 +160,15 @@ export default function StOneWork() {
   };
 
   const handleBack = () => {
-    navigate("/workList");
+    navigate("/workWaitList");
   };
 
   const handleEdit = (field: string) => {
     if (field === "Power Supply") {
-      navigate("/stOnePowerSupplyList", { state: { workId } });
-    } else if (field === "Location") {
-      navigate("/stOneDescription", { state: { workId, customerID: workDetails?.customerID } });
-    } else if (field === "Engineer") {
-      navigate("/selectEngineer", { state: { workId } });
+      navigate("/workWaitPowerSupplyList", { state: { workId } });
+
     } else if (field === "AN Cost") {
-      navigate("/expensesList", { state: { workId } });
+      navigate("/workWaitAnList", { state: { workId } });
     }
   };
 
@@ -208,16 +205,10 @@ export default function StOneWork() {
 
             <div className="flex flex-col gap-2 mt-4 items-start">
               <button onClick={() => handleEdit("Power Supply")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                Edit Power Supply
-              </button>
-              <button onClick={() => handleEdit("Location")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                Edit Location
-              </button>
-              <button onClick={() => handleEdit("Engineer")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                Edit Engineer
+                View Power Supply
               </button>
               <button onClick={() => handleEdit("AN Cost")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                Edit AN Cost
+                View AN Cost
               </button>
             </div>
           </div>

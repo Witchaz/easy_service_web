@@ -28,7 +28,7 @@ interface Machine {
   add_date: string;
 }
 
-export default function WorkList() {
+export default function adWorkList() {
   const [works, setWorks] = useState<Work[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -164,7 +164,7 @@ export default function WorkList() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: workId,
-          status: 1,
+          status: work.status+1,
         }),
       };
 
@@ -192,7 +192,7 @@ export default function WorkList() {
       <NavBar />
       <div className="flex flex-col items-center min-h-screen bg-gray-100">
         <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
-          จำนวนงานที่รอเลือกช่าง
+          จำนวนงานที่รอทำงานต่อ
         </h2>
         <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
           {works.map((work) => (

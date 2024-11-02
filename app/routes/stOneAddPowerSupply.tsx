@@ -51,17 +51,17 @@ export default function StOneAddPowerSupply() {
 
         setErrors(newErrors);
         if (!Object.values(newErrors).includes(true)) {
-        // Prepare data for API call
+    
         const payload = {
             model: formMachineData.model,
             sn: formMachineData.serialNumber,
             rated: formMachineData.rated,
             description: formMachineData.description,
             warranty: formMachineData.warranty,
-            workID: workId,
+            work_id: workId,
         };
 
-        // API call to insert new machine request
+        
         const url = 'https://easy-service.prakasitj.com/Requests/insertRequest';
         const options = {
             method: 'POST',
@@ -70,7 +70,7 @@ export default function StOneAddPowerSupply() {
         };
 
         const response = await fetch(url, options);
-        const data = await response.json();  
+        const data = await response.text();  
         alert("Machine added successfully!");
         navigate("/stOnePowerSupplyList", { state: { workId } });
     }
@@ -147,15 +147,22 @@ export default function StOneAddPowerSupply() {
               <span>{formMachineData.warranty ? "Yes" : "No"}</span>
             </div>
             
-            <div className="mt-6 flex justify-between">
-              <button type="button" className="bg-black text-white border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
-                onClick={handleBack}>
+            <div className="mt-6 flex justify-between space-x-20">
+              <button 
+                type="button" 
+                className="bg-black text-white border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
+                onClick={handleBack}
+              >
                 Back
               </button>
-              <button type="submit" className="bg-lime-500 text-white border-white border-2 hover:bg-lime-600 p-2 rounded-lg">
+              <button 
+                type="submit" 
+                className="bg-lime-500 text-white border-white border-2 hover:bg-lime-600 p-2 rounded-lg"
+              >
                 Confirm
               </button>
             </div>
+
           </form>
         </div>
       </div>

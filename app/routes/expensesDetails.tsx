@@ -12,8 +12,7 @@ interface Expenses {
 export default function ExpensesDetails() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { formData, formDataLast } = location.state || {};
-    const expenses = formData.additionalExpenses || [];
+    const { workId } = location.state || {};
 
     const [formExpensesData, setFormExpensesData] = useState<Expenses>({
         description: "",
@@ -37,7 +36,7 @@ export default function ExpensesDetails() {
         });
     };
 
-    const handleSubmit = (e: { preventDefault: () => void; }) => {
+    const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
 
         const newErrors = {
@@ -49,25 +48,39 @@ export default function ExpensesDetails() {
 
         setErrors(newErrors);
         if (!newErrors.description && !newErrors.unit && !newErrors.cost && !newErrors.amount) {
-            const newExpense = {
-                description: formExpensesData.description,
-                unit: formExpensesData.unit,
-                cost: formExpensesData.cost,
-                amount: formExpensesData.amount,
-            };
+            try {
+                const url = 'https://easy-service.prakasitj.com/additionalcosts/insertAdditionalCost';
+                const options = {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        description: formExpensesData.description,
+                        cost: formExpensesData.cost,
+                        amount: formExpensesData.amount,
+                        unit: formExpensesData.unit,
+                        work_id: workId,
+                    }),
+                };
 
-            const updatedExpenses = [...expenses, newExpense];
-            const updatedFormData = { ...formData, additionalExpenses: updatedExpenses };
+                const response = await fetch(url, options);
+                const data = await response.text();
+                console.log(data);
 
-            // Store updated data in sessionStorage
-            sessionStorage.setItem("formData", JSON.stringify(updatedFormData));
-
-            navigate("/expensesList", { state: updatedFormData });
+                if (response.ok) {
+                    alert("Expense added successfully!");
+                    navigate("/expensesList", { state: { workId } });
+                } else {
+                    alert("Failed to add expense. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error adding expense:", error);
+                alert("An error occurred. Please try again.");
+            }
         }
     };
 
     const handleBack = () => {
-        navigate("/expensesList", { state: { ...formData, additionalExpenses: expenses, formDataLast } });
+        navigate("/expensesList", { state: { workId } });
     };
 
     return (
@@ -128,7 +141,7 @@ export default function ExpensesDetails() {
                         <div className="mt-6 flex justify-between">
                             <button
                                 type="button"
-                                className="bg-black text-white shrink border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
+                                className="bg-black text-white border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
                                 onClick={handleBack}
                             >
                                 Back
@@ -136,7 +149,7 @@ export default function ExpensesDetails() {
 
                             <button
                                 type="submit"
-                                className="bg-lime-500 text-white shrink border-white border-2 hover:bg-lime-600 p-2 rounded-lg"
+                                className="bg-lime-500 text-white border-white border-2 hover:bg-lime-600 p-2 rounded-lg"
                             >
                                 Confirm
                             </button>
