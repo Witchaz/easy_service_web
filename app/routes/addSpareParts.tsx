@@ -61,7 +61,7 @@ export default function AddSpareparts() {
                 };
 
                 const response = await fetch(url, options);
-                const data = await response.json();
+                const data = await response.text();
 
                 if (response.ok) {
                     console.log("Spare part added successfully:", data);

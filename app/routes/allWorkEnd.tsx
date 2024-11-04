@@ -193,7 +193,7 @@ export default function adWorkList() {
     <NavBar />
     <div className="flex flex-col items-center min-h-screen bg-gray-100">
       <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
-        งานที่เสร็จแล้ว
+        งานที่จบแล้ว
       </h2>
       <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
         {works.length > 0 ? (
@@ -228,7 +228,10 @@ export default function adWorkList() {
         ) : (
           <p className="text-center text-gray-500">ยังไม่มีงานที่ทำเสร็จ</p>
         )}
-      </div>
+       </div>
+       <a href="/mainPage">
+              <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600">Back</button>
+            </a>
     </div>
   </>
 );

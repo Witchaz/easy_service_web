@@ -27,6 +27,14 @@ export default function Main() {
           >
             Go to Engineer List
           </button>
+
+           <button
+            className="bg-gray-500 text-black py-2 px-4 rounded-lg hover:bg-gray-600 w-full"
+            onClick={() => handleNavigation("/sparePartsList")}
+          >
+            Go to SpareParts List
+          </button>
+
           <button
             className="bg-orange-500 text-black py-2 px-4 rounded-lg hover:bg-orange-600 w-full"
             onClick={() => handleNavigation("/workList")}

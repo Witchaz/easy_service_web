@@ -163,6 +163,10 @@ export default function CustomerList() {
           </div>
 
           <div className="flex justify-center space-x-4 mt-8">
+            <a href="/mainPage">
+              <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600">Back</button>
+            </a>
+
             <a href="/newUser">
               <button className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600">ADD</button>
             </a>

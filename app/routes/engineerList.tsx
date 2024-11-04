@@ -47,7 +47,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({ users: paginatedUsers, total: users.length, q, page });
 };
 
-export default function SelectEngineer() {
+export default function engineerList() {
   const { users, total, q, page } = useLoaderData<LoaderData>(); 
   const submit = useSubmit();
   const navigate = useNavigate();
@@ -142,11 +142,17 @@ export default function SelectEngineer() {
           </div>
 
           <div className="flex justify-center space-x-20 mt-8">
+            <a href="/mainPage">
+              <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600">Back</button>
+            </a>
             <button className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600" onClick={handleAdd}>
                 Add
             </button>
             <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelect}>
                 Select Edit
+            </button>
+            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" >
+                Select 
             </button>
           </div>
         </div>
