@@ -33,7 +33,7 @@ export default function Login() {
           alert("Login successful!");
           if (data.payload != 7){
             console.log(data.payload)
-            navigate(`/workListEngineer/${data.payload}`, { state: { userId: data.id} });    
+            navigate(`/workListEngineer`, { state:  data.payload} );    
           }
           else{
             navigate(`/workList`);    
