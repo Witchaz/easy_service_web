@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "app/components/_navBar";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useID } from "../context/IDContext"; // ใช้ Context เพื่อนำค่า id
 
 interface Work {
   id: number;
@@ -28,13 +29,12 @@ interface Machine {
   add_date: string;
 }
 
-export default function WorkList() {
+export default function WorkListEngineer() {
   const [works, setWorks] = useState<Work[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const location = useLocation();
-  const id = location.state;
-  console.log(id)
+  const { id } = useID(); // รับ id จาก context
+  console.log("ID from Context:", id); // ตรวจสอบค่า id
 
   const fetchCustomerName = async (customer_id: number): Promise<string> => {
     const url = `https://easy-service.prakasitj.com/customers/getByID/${customer_id}`;
@@ -108,7 +108,8 @@ export default function WorkList() {
 
   useEffect(() => {
     const fetchWorks = async () => {
-      const url = `https://easy-service.prakasitj.com/works/getWorksList`;
+      const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/1`;
+
       const options = { method: "GET" };
 
       try {
@@ -118,13 +119,12 @@ export default function WorkList() {
         const data: Work[] = await response.json();
         const worksWithDetails = await Promise.all(
           data.map(async (work) => {
-              const customerName = await fetchCustomerName(work.customer_id);
-              const userName = await fetchEngineerName(work.user_id);
-              const machines = await fetchMachinesByWorkID(work.id);
-              const additionalCost = await fetchAdditionalCost(work.id);
+            const customerName = await fetchCustomerName(work.customer_id);
+            const userName = await fetchEngineerName(work.user_id);
+            const machines = await fetchMachinesByWorkID(work.id);
+            const additionalCost = await fetchAdditionalCost(work.id);
 
-              return { ...work, customerName, userName, machines, additionalCost };
-            
+            return { ...work, customerName, userName, machines, additionalCost };
           })
         );
 
@@ -138,10 +138,8 @@ export default function WorkList() {
     fetchWorks();
   }, []);
 
-  const handleSelect = (workId: number, status: number) => {
-    console.log(workId)
-    alert("lsad")
-    navigate(`/statusEdit`, { state:{ workId, status} });
+  const handleSelect = (workId: number) => {
+    navigate("/engineerWork", { state: { workId } });
   };
 
   const handleNewButtonAction = async (workId: number) => {
@@ -222,16 +220,16 @@ export default function WorkList() {
                 <div className="flex flex-col items-center">
                   <button
                     className="bg-lime-500 text-white py-2 px-4 rounded-lg hover:bg-lime-600"
-                    onClick={() => handleSelect(work.id, work.status)}
+                    onClick={() => handleSelect(work.id)}
                   >
-                    Edit Status
+                    View Details
                   </button>
                   <button
-                    className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
-                    onClick={() => handleNewButtonAction(work.id)}
-                  >
-                    Edit ของที่ต้องใช้ซ่อม
-                  </button>
+                  className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
+                  onClick={() => handleNewButtonAction(work.id)}
+                >
+                  Confirm Work
+                </button>
                 </div>
               </div>
             ))}
@@ -242,5 +240,4 @@ export default function WorkList() {
       </div>
     </>
   );
-  
 }

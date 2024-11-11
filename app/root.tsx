@@ -1,3 +1,4 @@
+// app/root.tsx
 import {
   Links,
   Meta,
@@ -8,6 +9,7 @@ import {
 import type { LinksFunction } from "@remix-run/node";
 
 import "./tailwind.css";
+import { IDProvider } from "./context/IDContext"; // เพิ่มการนำเข้า IDProvider
 
 export const links: LinksFunction = () => [
   {
@@ -36,5 +38,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <IDProvider> {/* ห่อแอปด้วย IDProvider */}
+      <Layout>
+        <Outlet /> {/* จะแสดงคอมโพเนนต์ตามเส้นทาง */}
+      </Layout>
+    </IDProvider>
+  );
 }

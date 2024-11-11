@@ -1,11 +1,18 @@
-import { useState } from "react";
+// login.tsx
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useID } from "../context/IDContext";
 
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(""); 
   const navigate = useNavigate();
+  const { id, setId } = useID(); // Use setId to store ID in context
+
+  useEffect(() => {
+    console.log("Current ID from context:", id); // ตรวจสอบว่า id ถูกอัปเดตใน context
+  }, [id]);
 
   const login = async (username: string, password: string): Promise<void> => {
     if (!username || !password) {
@@ -19,24 +26,20 @@ export default function Login() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     };
-    console.log(username);
-    console.log(password);
+
     try {
       const response = await fetch(url, options);
-      console.log(response);
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
-        console.log(data.error);
         if (!data.error) {
           setError(""); 
+          setId(data.payload); // Store the user ID in context
+          
           alert("Login successful!");
-          if (data.payload != 7){
-            console.log(data.payload)
-            navigate(`/workListEngineer`, { state:  data.payload} );    
-          }
-          else{
-            navigate(`/workList`);    
+          if (data.payload !== 7) {
+            navigate("/workListEngineer");
+          } else {
+            navigate("/workList");    
           }
         } else {
           setError("Invalid username or password");

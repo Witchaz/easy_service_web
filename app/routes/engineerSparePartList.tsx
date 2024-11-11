@@ -12,7 +12,7 @@ interface Machine {
   add_date: string;
 }
 
-export default function adPowerSupplyList() {
+export default function engineerSparePartList() {
   const navigate = useNavigate();
   const location = useLocation();
   const { workId } = location.state || {}; // รับค่า workId จาก state ที่ถูกส่งมา
@@ -38,7 +38,7 @@ export default function adPowerSupplyList() {
         }
 
         const data = await response.json();
-        console.log("Fetched machine data:", data); // ตรวจสอบข้อมูลที่ได้รับ
+        console.log("Fetched machine data:", data);
         setMachines(data);
       } catch (error) {
         console.error("Error fetching machines:", error);
@@ -50,13 +50,11 @@ export default function adPowerSupplyList() {
   }, [workId]);
 
   const handleBack = () => {
-    navigate("/adWork", { state: { workId } });
+    navigate("/engineerWork", { state: { workId } });
   };
 
-  
-
-  const handleEditDetails = (machineId: number) => {
-    navigate("/stOneEditPowerSupply", { state: { machineId, workId } });
+  const handleSparePart = (machineId: number) => {
+    navigate("/sparePartsList", { state: { machineId } }); 
   };
 
   return (
@@ -80,10 +78,10 @@ export default function adPowerSupplyList() {
                     <p><strong>Warranty:</strong> {machine.warranty ? "Yes" : "No"}</p>
                   </div>
                   <button
-                    onClick={() => handleEditDetails(machine.id)}
-                    className="bg-lime-500 text-white py-2 px-4 rounded-lg hover:bg-lime-600"
+                    onClick={() => handleSparePart(machine.id)}
+                    className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
                   >
-                    ดูอะไหล่ที่ต้องใช้
+                    Spare Part
                   </button>
                 </div>
               ))
