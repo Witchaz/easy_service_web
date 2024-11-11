@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "app/components/_navBar";
 import { useNavigate } from "react-router-dom";
-import { useID } from "../context/IDContext"; // ใช้ Context เพื่อนำค่า id
+import { useID } from "../context/IDContext"; 
 
 interface Work {
   id: number;
@@ -33,8 +33,8 @@ export default function WorkListEngineer() {
   const [works, setWorks] = useState<Work[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { id } = useID(); // รับ id จาก context
-  console.log("ID from Context:", id); // ตรวจสอบค่า id
+  const { id } = useID();
+  console.log("ID from Context:", id);
 
   const fetchCustomerName = async (customer_id: number): Promise<string> => {
     const url = `https://easy-service.prakasitj.com/customers/getByID/${customer_id}`;
@@ -109,7 +109,6 @@ export default function WorkListEngineer() {
   useEffect(() => {
     const fetchWorks = async () => {
       const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/1`;
-
       const options = { method: "GET" };
 
       try {
@@ -167,7 +166,7 @@ export default function WorkListEngineer() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: workId,
-          status: 1,
+          status: work.status +1,
         }),
       };
 
@@ -225,18 +224,15 @@ export default function WorkListEngineer() {
                     View Details
                   </button>
                   <button
-                  className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
-                  onClick={() => handleNewButtonAction(work.id)}
-                >
-                  Confirm Work
-                </button>
+                    className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
+                    onClick={() => handleNewButtonAction(work.id, work.status)}
+                  >
+                    Confirm Work
+                  </button>
                 </div>
               </div>
             ))}
         </div>
-        <a href="/mainPage">
-          <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600">Back</button>
-        </a>
       </div>
     </>
   );

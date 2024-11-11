@@ -1,16 +1,16 @@
-import NavBar from "app/components/_navBar";
+import NavBar from "app/components/_navBarEngineer";
 import { useLocation, useNavigate } from "react-router-dom";
 
 
 export default function statusEdit(){
     const location = useLocation();
-    const {workId, status} = location.state;
+    const {id, workId, status} = location.state;
     const navigate = useNavigate();
 
     console.log(workId)
     console.log(status)
     const onClickBack = () => {
-      navigate("/workListEngineer", { state: workId });
+      navigate("/workListEngineer", { state:id });
     };
     const updateStatus = async () => {
       const url = 'https://easy-service.prakasitj.com/works/setWorkStatus';
@@ -27,14 +27,14 @@ export default function statusEdit(){
       console.log(data);
       if (response.ok) {
           alert("Expense added successfully!");
-          navigate("/workListEngineer", { state:  workId });
+          navigate("/workListEngineer", { state:id });
         } else {
           alert("Failed to add expense. Please try again.");
       }
     };
     return (
         <>
-          <NavBar />
+          <NavBar id={id}/>
           <div className="flex flex-col items-center min-h-screen bg-gray-100">
             <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
               แก้ไขสถานะการทำงาน
