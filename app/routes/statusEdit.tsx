@@ -4,13 +4,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 export default function statusEdit(){
     const location = useLocation();
-    const {workId, status} = location.state;
+    const {id, workId, status} = location.state;
     const navigate = useNavigate();
 
     console.log(workId)
     console.log(status)
     const onClickBack = () => {
-      navigate("/workListEngineer", { state: workId });
+      navigate("/workListEngineer", { state:id });
     };
     const updateStatus = async () => {
       const url = 'https://easy-service.prakasitj.com/works/setWorkStatus';
@@ -27,7 +27,7 @@ export default function statusEdit(){
       console.log(data);
       if (response.ok) {
           alert("Expense added successfully!");
-          navigate("/workListEngineer", { state:  workId });
+          navigate("/workListEngineer", { state:id });
         } else {
           alert("Failed to add expense. Please try again.");
       }

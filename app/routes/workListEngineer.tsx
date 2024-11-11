@@ -140,56 +140,11 @@ export default function WorkList() {
 
   const handleSelect = (workId: number, status: number) => {
     console.log(workId)
-    alert("lsad")
-    navigate(`/statusEdit`, { state:{ workId, status} });
+    navigate(`/statusEdit`, { state:{id, workId, status} });
   };
 
   const handleNewButtonAction = async (workId: number) => {
-    const work = works.find((w) => w.id === workId);
-    if (!work) {
-      alert("Work not found.");
-      return;
-    }
-
-    if (!work.user_id) {
-      alert("This work has no assigned engineer. Please assign an engineer first.");
-      return;
-    }
-
-    if (!work.machines || work.machines.length === 0) {
-      alert("This work has no machines. Please ensure there is at least one machine.");
-      return;
-    }
-
-    const confirmed = window.confirm("Are you sure you want to confirm this work?");
-    if (confirmed) {
-      const url = 'https://easy-service.prakasitj.com/works/setWorkStatus';
-      const options = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: workId,
-          status: 1,
-        }),
-      };
-
-      try {
-        const response = await fetch(url, options);
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Error response text:", errorText);
-          throw new Error("Failed to confirm the work: " + errorText);
-        }
-
-        const data = await response.text();
-        console.log("Work status updated:", data);
-        alert("Work confirmed successfully!");
-        window.location.reload();
-      } catch (error) {
-        console.error("Error confirming work:", error);
-        alert("Failed to confirm the work. Please try again.");
-      }
-    }
+    navigate(`/powerSupplyRequestEngineer`, { state:{id, workId } });
   };
 
   return (
@@ -236,9 +191,6 @@ export default function WorkList() {
               </div>
             ))}
         </div>
-        <a href="/mainPage">
-          <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600">Back</button>
-        </a>
       </div>
     </>
   );
