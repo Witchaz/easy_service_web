@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import NavBar from "app/components/_navBar";
+import NavBar from "app/components/_navBarEngineer";
 import { useNavigate, useLocation } from "react-router-dom";
 
 interface Machine {
@@ -60,7 +60,7 @@ export default function StOnePowerSupplyList() {
 
   return (
     <>
-      <NavBar />
+      <NavBar id={id}/>
       <div className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
         <h2 className="text-center text-2xl font-semibold text-lime-600 mb-6">รายการเครื่องที่ซ่อม</h2>
         {error ? (

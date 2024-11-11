@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import NavBar from "app/components/_navBar";
+import NavBar from "app/components/_navBarEngineer";
 import { useLocation, useNavigate } from "react-router-dom";
 
 interface Work {
@@ -149,7 +149,7 @@ export default function WorkList() {
 
   return (
     <>
-      <NavBar />
+      <NavBar id={id}/>
       <div className="flex flex-col items-center min-h-screen bg-gray-100">
         <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
           งานทั้งหมดของคุณ

@@ -1,7 +1,7 @@
 import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
-import NavBar from "app/components/_navBar";
+import NavBar from "app/components/_navBarEngineer";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const ITEMS_PER_PAGE = 6;
@@ -163,7 +163,7 @@ export default function SparePartsList() {
 
   return (
     <>
-      <NavBar />
+      <NavBar id={id}/>
       <div className="min-h-screen p-8 bg-gray-50">
         <h1 className="text-center text-3xl font-bold text-lime-600 mb-8">คลังอะไหล่</h1>
 
