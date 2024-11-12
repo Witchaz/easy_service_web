@@ -1,4 +1,10 @@
+import {useNavigate } from "react-router-dom";
+
 function NavBar() {
+  const navigate = useNavigate();
+  const handleNavigate = (path:string) => {
+      navigate(path);
+  };
   return (
     <>
       <div className="bg-gray-500 flex p-5">
@@ -17,6 +23,9 @@ function NavBar() {
           </a>
           <a className="font-bold hover:text-primary" href="">
             Dcoument
+          </a>
+          <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/historyRequestAdmin")}>
+            Request
           </a>
         </div>
       </div>

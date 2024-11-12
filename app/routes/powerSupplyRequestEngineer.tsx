@@ -60,7 +60,7 @@ export default function StOnePowerSupplyList() {
 
   return (
     <>
-      <NavBar id={id}/>
+      <NavBar />
       <div className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
         <h2 className="text-center text-2xl font-semibold text-lime-600 mb-6">รายการเครื่องที่ซ่อม</h2>
         {error ? (

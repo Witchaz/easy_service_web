@@ -1,13 +1,10 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import {useNavigate } from "react-router-dom";
 
-interface NavBarProps {
-    id: string; // เพิ่ม props id
-  }
 
-function NavBar({ id }: NavBarProps) {
+function NavBar() {
     const navigate = useNavigate();
     const handleNavigate = (path:string) => {
-        navigate(path, { state:  id  }); // ส่ง id ไปยัง path ใหม่
+        navigate(path);
       };
     
     
@@ -18,20 +15,17 @@ function NavBar({ id }: NavBarProps) {
             Service Innovation
           </h1>
           <div className="flex flex-row space-x-5">
-            <a
-              className="font-bold hover:text-primary"
-              href="https://www.google.com"
-            >
-              Inventory
-            </a>
             <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/workListEngineer")}>
               Work order
             </a>
-            <a className="font-bold hover:text-primary" href="">
-              Document
-            </a>
-            <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/request")}>
+            <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/requestEngineer")}>
               Request
+            </a>
+            <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/historyRequest")}>
+              History Request
+            </a>
+            <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/workListEngineer")}>
+              Inventory
             </a>
           </div>
         </div>
