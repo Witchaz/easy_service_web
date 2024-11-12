@@ -23,6 +23,11 @@ interface Machine {
   add_date: string;
 }
 
+interface SparePartRequest {
+  price: number;
+  spare_parts_qty: number;
+}
+
 interface AdditionalCost {
   id: number;
   description: string;
@@ -32,7 +37,7 @@ interface AdditionalCost {
   work_id: number;
 }
 
-export default function engineerWork() {
+export default function EngineerWork() {
   const navigate = useNavigate();
   const location = useLocation();
   const { workId } = location.state || {};
@@ -41,6 +46,7 @@ export default function engineerWork() {
   const [machines, setMachines] = useState<Machine[]>([]);
   const [customerName, setCustomerName] = useState<string>("");
   const [totalAdditionalCost, setTotalAdditionalCost] = useState<number>(0);
+  const [totalRepairCost, setTotalRepairCost] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -68,7 +74,8 @@ export default function engineerWork() {
           fetchEngineerName(work.user_id);
           const machinesData = await fetchMachinesByWorkID(work.id);
           setMachines(machinesData);
-          fetchAdditionalCosts(work.id); // Fetch additional costs
+          fetchAdditionalCosts(work.id);
+          calculateRepairCost(machinesData);
         } else {
           setError("No work details found");
         }
@@ -159,6 +166,29 @@ export default function engineerWork() {
     }
   };
 
+  const calculateRepairCost = async (machines: Machine[]) => {
+    try {
+      let totalRepairCost = 0;
+
+      for (const machine of machines) {
+        const url = `https://easy-service.prakasitj.com/Spare_parts_requests/getListInRequest/${machine.id}`;
+        const options = { method: "GET" };
+        
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error("Failed to fetch spare parts for machine");
+
+        const data: SparePartRequest[] = await response.json();
+        
+        const machineCost = data.reduce((sum, part) => sum + part.price * part.spare_parts_qty, 0);
+        totalRepairCost += machineCost;
+      }
+      
+      setTotalRepairCost(totalRepairCost);
+    } catch (error) {
+      console.error("Error calculating repair cost:", error);
+    }
+  };
+
   const handleBack = () => {
     navigate("/workListEngineer");
   };
@@ -166,7 +196,6 @@ export default function engineerWork() {
   const handleEdit = (field: string) => {
     if (field === "Power Supply") {
       navigate("/engineerPowerSupplyList", { state: { workId } });
-
     }
   };
 
@@ -197,7 +226,7 @@ export default function engineerWork() {
             )}
 
             <p><strong>ช่างผู้รับผิดชอบ:</strong> {workDetails.userName} {workDetails.userSurname || "-"}</p>
-            <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> 0</p>
+            <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> ฿{totalRepairCost.toFixed(2)}</p>
             <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{totalAdditionalCost.toFixed(2)}</p>
             <p><strong>สถานะการทำงาน:</strong> {workDetails.status}</p>
 

@@ -12,7 +12,7 @@ interface Machine {
   add_date: string;
 }
 
-export default function workWaitPowerSupplyList() {
+export default function engineerSPowerSupplyList() {
   const navigate = useNavigate();
   const location = useLocation();
   const { workId } = location.state || {}; // รับค่า workId จาก state ที่ถูกส่งมา
@@ -38,7 +38,7 @@ export default function workWaitPowerSupplyList() {
         }
 
         const data = await response.json();
-        console.log("Fetched machine data:", data); // ตรวจสอบข้อมูลที่ได้รับ
+        console.log("Fetched machine data:", data);
         setMachines(data);
       } catch (error) {
         console.error("Error fetching machines:", error);
@@ -50,7 +50,7 @@ export default function workWaitPowerSupplyList() {
   }, [workId]);
 
   const handleBack = () => {
-    navigate("/workWait", { state: { workId } });
+    navigate("/engineerSWork", { state: { workId } });
   };
 
   const handleSparePart = (machineId: number) => {
@@ -61,7 +61,7 @@ export default function workWaitPowerSupplyList() {
     <>
       <NavBar />
       <div className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
-        <h2 className="text-center text-2xl font-semibold text-lime-600 mb-6">รายการเครื่องที่ต้องการซ่อม</h2>
+        <h2 className="text-center text-2xl font-semibold text-lime-600 mb-6">รายการเครื่องที่ต้องซ่อม</h2>
         {error ? (
           <p className="text-red-500 text-center">{error}</p>
         ) : (
@@ -83,7 +83,6 @@ export default function workWaitPowerSupplyList() {
                   >
                     Spare Part
                   </button>
-                  
                 </div>
               ))
             ) : (
