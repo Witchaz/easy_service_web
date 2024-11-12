@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "app/components/_navBar";
 import { useNavigate } from "react-router-dom";
-import { useID } from "../context/IDContext"; 
+import { useID } from "../context/IDContext";
 
 interface Work {
   id: number;
@@ -17,6 +17,7 @@ interface Work {
   add_date: string;
   machines?: Machine[];
   additionalCost?: number;
+  repairCost?: number;
 }
 
 interface Machine {
@@ -34,7 +35,6 @@ export default function WorkListEngineer() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { id } = useID();
-  console.log("ID from Context:", id);
 
   const fetchCustomerName = async (customer_id: number): Promise<string> => {
     const url = `https://easy-service.prakasitj.com/customers/getByID/${customer_id}`;
@@ -56,10 +56,7 @@ export default function WorkListEngineer() {
     try {
       const response = await fetch(url, options);
       const data = await response.json();
-      if (data.length > 0) {
-        return `${data[0].name} ${data[0].surname}`;
-      }
-      return "Unknown";
+      return data.length > 0 ? `${data[0].name} ${data[0].surname}` : "Unknown";
     } catch (error) {
       console.error("Error fetching engineer name:", error);
       return "Unknown";
@@ -87,6 +84,26 @@ export default function WorkListEngineer() {
     } catch (error) {
       console.error("Error fetching machine data:", error);
       return [];
+    }
+  };
+
+  const fetchRepairCost = async (machineId: number): Promise<number> => {
+    const url = `https://easy-service.prakasitj.com/Spare_parts_requests/getListInRequest/${machineId}`;
+    const options = { method: "GET" };
+
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) throw new Error("Failed to fetch spare parts data");
+
+      const data = await response.json();
+      return data.reduce(
+        (total: number, part: { price: number; spare_parts_qty: number }) =>
+          total + part.price * part.spare_parts_qty,
+        0
+      );
+    } catch (error) {
+      console.error("Error fetching repair cost:", error);
+      return 0;
     }
   };
 
@@ -123,7 +140,14 @@ export default function WorkListEngineer() {
             const machines = await fetchMachinesByWorkID(work.id);
             const additionalCost = await fetchAdditionalCost(work.id);
 
-            return { ...work, customerName, userName, machines, additionalCost };
+            // Calculate total repair cost for each work
+            const repairCost = await machines.reduce(async (totalPromise, machine) => {
+              const total = await totalPromise;
+              const machineCost = await fetchRepairCost(machine.id);
+              return total + machineCost;
+            }, Promise.resolve(0));
+
+            return { ...work, customerName, userName, machines, additionalCost, repairCost };
           })
         );
 
@@ -166,7 +190,7 @@ export default function WorkListEngineer() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: workId,
-          status: work.status +1,
+          status: work.status + 1,
         }),
       };
 
@@ -194,11 +218,11 @@ export default function WorkListEngineer() {
       <NavBar />
       <div className="flex flex-col items-center min-h-screen bg-gray-100">
         <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
-          งานทั้งหมดของคุณ
+          งานทั้งหมดที่ต้องไปตรวจ
         </h2>
         <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
           {works
-            .filter((work) => work.user_id === id) // กรองงานที่ user_id ตรงกับ id
+            .filter((work) => work.user_id === id) // Filter works where user_id matches id
             .map((work) => (
               <div key={work.id} className="bg-gray-50 p-6 rounded-lg shadow-md flex justify-between items-start">
                 <div>
@@ -212,7 +236,7 @@ export default function WorkListEngineer() {
                   ))}
                   {work.machines && work.machines.length > 3 && <p>...</p>}
                   <p><strong>ช่างผู้รับผิดชอบ:</strong> {work.userName || "-"}</p>
-                  <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> 0</p>
+                  <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> ฿{work.repairCost?.toFixed(2) || "0"}</p>
                   <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{work.additionalCost?.toFixed(2) || "0"}</p>
                   <p><strong>สถานะการทำงาน:</strong> {work.status}</p>
                 </div>

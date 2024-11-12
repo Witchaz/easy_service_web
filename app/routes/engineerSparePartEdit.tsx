@@ -45,7 +45,9 @@ export default function EngineerSparePartEdit() {
         setSn(data[0].sn || "-");
       } catch (error) {
         console.error("Error fetching spare part:", error);
-        }
+      }
+      console.log(sparePartId)
+      console.log(sparePart?.spare_part_id)
         
     };
 

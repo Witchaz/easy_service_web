@@ -23,6 +23,11 @@ interface Machine {
   add_date: string;
 }
 
+interface SparePartRequest {
+  price: number;
+  spare_parts_qty: number;
+}
+
 interface AdditionalCost {
   id: number;
   description: string;
@@ -32,7 +37,7 @@ interface AdditionalCost {
   work_id: number;
 }
 
-export default function WorkWait() {
+export default function engineerSWork() {
   const navigate = useNavigate();
   const location = useLocation();
   const { workId } = location.state || {};
@@ -41,7 +46,7 @@ export default function WorkWait() {
   const [machines, setMachines] = useState<Machine[]>([]);
   const [customerName, setCustomerName] = useState<string>("");
   const [totalAdditionalCost, setTotalAdditionalCost] = useState<number>(0);
-  const [totalRepairCost, setTotalRepairCost] = useState<number>(0); // New state for repair cost
+  const [totalRepairCost, setTotalRepairCost] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -70,7 +75,7 @@ export default function WorkWait() {
           const machinesData = await fetchMachinesByWorkID(work.id);
           setMachines(machinesData);
           fetchAdditionalCosts(work.id);
-          calculateTotalRepairCost(machinesData); // Calculate repair cost
+          calculateRepairCost(machinesData);
         } else {
           setError("No work details found");
         }
@@ -161,46 +166,36 @@ export default function WorkWait() {
     }
   };
 
-  const calculateTotalRepairCost = async (machines: Machine[]) => {
-    let totalRepairCost = 0;
-
-    for (const machine of machines) {
-      const machineCost = await fetchRepairCost(machine.id);
-      totalRepairCost += machineCost;
-    }
-
-    setTotalRepairCost(totalRepairCost);
-  };
-
-  const fetchRepairCost = async (machineId: number): Promise<number> => {
-    const url = `https://easy-service.prakasitj.com/Spare_parts_requests/getListInRequest/${machineId}`;
-    const options = { method: "GET" };
-
+  const calculateRepairCost = async (machines: Machine[]) => {
     try {
-      const response = await fetch(url, options);
-      if (!response.ok) throw new Error("Failed to fetch spare parts data");
+      let totalRepairCost = 0;
 
-      const data = await response.json();
-      return data.reduce(
-        (total: number, part: { price: number; spare_parts_qty: number }) =>
-          total + part.price * part.spare_parts_qty,
-        0
-      );
+      for (const machine of machines) {
+        const url = `https://easy-service.prakasitj.com/Spare_parts_requests/getListInRequest/${machine.id}`;
+        const options = { method: "GET" };
+        
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error("Failed to fetch spare parts for machine");
+
+        const data: SparePartRequest[] = await response.json();
+        
+        const machineCost = data.reduce((sum, part) => sum + part.price * part.spare_parts_qty, 0);
+        totalRepairCost += machineCost;
+      }
+      
+      setTotalRepairCost(totalRepairCost);
     } catch (error) {
-      console.error("Error fetching repair cost:", error);
-      return 0;
+      console.error("Error calculating repair cost:", error);
     }
   };
 
   const handleBack = () => {
-    navigate("/workWaitList");
+    navigate("/workListSEngineer");
   };
 
   const handleEdit = (field: string) => {
     if (field === "Power Supply") {
-      navigate("/workWaitPowerSupplyList", { state: { workId } });
-    } else if (field === "AN Cost") {
-      navigate("/workWaitAnList", { state: { workId } });
+      navigate("/engineerSPowerSupplyList", { state: { workId } });
     }
   };
 
@@ -238,9 +233,6 @@ export default function WorkWait() {
             <div className="flex flex-col gap-2 mt-4 items-start">
               <button onClick={() => handleEdit("Power Supply")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
                 View Power Supply
-              </button>
-              <button onClick={() => handleEdit("AN Cost")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                View AN Cost
               </button>
             </div>
           </div>

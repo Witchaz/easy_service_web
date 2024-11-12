@@ -56,7 +56,7 @@ export default function adPowerSupplyList() {
   
 
   const handleEditDetails = (machineId: number) => {
-    navigate("/stOneEditPowerSupply", { state: { machineId, workId } });
+    navigate("/sSparePartList", { state: { machineId, workId } });
   };
 
   return (

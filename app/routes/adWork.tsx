@@ -41,6 +41,7 @@ export default function adWork() {
   const [machines, setMachines] = useState<Machine[]>([]);
   const [customerName, setCustomerName] = useState<string>("");
   const [totalAdditionalCost, setTotalAdditionalCost] = useState<number>(0);
+  const [repairCost, setRepairCost] = useState<number>(0); // New state for repair cost
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -69,6 +70,7 @@ export default function adWork() {
           const machinesData = await fetchMachinesByWorkID(work.id);
           setMachines(machinesData);
           fetchAdditionalCosts(work.id);
+          calculateTotalRepairCost(machinesData); // Calculate repair cost
         } else {
           setError("No work details found");
         }
@@ -159,6 +161,35 @@ export default function adWork() {
     }
   };
 
+  const calculateTotalRepairCost = async (machines: Machine[]) => {
+    const totalRepairCost = await machines.reduce(async (accPromise, machine) => {
+      const acc = await accPromise;
+      const machineRepairCost = await fetchRepairCost(machine.id);
+      return acc + machineRepairCost;
+    }, Promise.resolve(0));
+    setRepairCost(totalRepairCost);
+  };
+
+  const fetchRepairCost = async (machineId: number): Promise<number> => {
+    const url = `https://easy-service.prakasitj.com/Spare_parts_requests/getListInRequest/${machineId}`;
+    const options = { method: "GET" };
+
+    try {
+      const response = await fetch(url, options);
+      if (!response.ok) throw new Error("Failed to fetch repair costs");
+
+      const data = await response.json();
+      return data.reduce(
+        (total: number, part: { price: number; spare_parts_qty: number }) =>
+          total + part.price * part.spare_parts_qty,
+        0
+      );
+    } catch (error) {
+      console.error("Error fetching repair cost:", error);
+      return 0;
+    }
+  };
+
   const handleBack = () => {
     navigate("/adWorkList");
   };
@@ -169,7 +200,7 @@ export default function adWork() {
     } else if (field === "Location") {
       navigate("/adLocation", { state: { workId, customerID: workDetails?.customerID } });
     } else if (field === "Engineer") {
-      navigate("/selectEngineer", { state: { workId, previousPage: "/adWork" } }); // Navigate with previousPage
+      navigate("/selectEngineer", { state: { workId, previousPage: "/adWork" } });
     } else if (field === "AN Cost") {
       navigate("/adANCostList", { state: { workId } });
     }
@@ -202,13 +233,13 @@ export default function adWork() {
             )}
 
             <p><strong>ช่างผู้รับผิดชอบ:</strong> {workDetails.userName} {workDetails.userSurname || "-"}</p>
-            <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> 0</p>
+            <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> ฿{repairCost.toFixed(2)}</p>
             <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{totalAdditionalCost.toFixed(2)}</p>
             <p><strong>สถานะการทำงาน:</strong> {workDetails.status}</p>
 
             <div className="flex flex-col gap-2 mt-4 items-start">
               <button onClick={() => handleEdit("Power Supply")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                Edit Power Supply
+                View Power Supply
               </button>
               <button onClick={() => handleEdit("Location")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
                 Edit Location
