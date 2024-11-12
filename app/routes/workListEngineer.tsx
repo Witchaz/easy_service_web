@@ -140,7 +140,6 @@ export default function WorkListEngineer() {
             const machines = await fetchMachinesByWorkID(work.id);
             const additionalCost = await fetchAdditionalCost(work.id);
 
-            // Calculate total repair cost for each work
             const repairCost = await machines.reduce(async (totalPromise, machine) => {
               const total = await totalPromise;
               const machineCost = await fetchRepairCost(machine.id);
@@ -221,41 +220,45 @@ export default function WorkListEngineer() {
           งานทั้งหมดที่ต้องไปตรวจ
         </h2>
         <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
-          {works
-            .filter((work) => work.user_id === id) // Filter works where user_id matches id
-            .map((work) => (
-              <div key={work.id} className="bg-gray-50 p-6 rounded-lg shadow-md flex justify-between items-start">
-                <div>
-                  <p><strong>Work {work.id}</strong></p>
-                  <p><strong>ชื่อลูกค้า:</strong> {work.customerName}</p>
-                  <p><strong>สถานที่ซ่อม:</strong> {work.address}, {work.province}</p>
-                  {work.machines && work.machines.slice(0, 3).map((machine, index) => (
-                    <p key={machine.id}>
-                      รายละเอียดเครื่องซ่อมลำดับที่ {index + 1} : Model: {machine.model.slice(0, 5)}...
-                    </p>
-                  ))}
-                  {work.machines && work.machines.length > 3 && <p>...</p>}
-                  <p><strong>ช่างผู้รับผิดชอบ:</strong> {work.userName || "-"}</p>
-                  <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> ฿{work.repairCost?.toFixed(2) || "0"}</p>
-                  <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{work.additionalCost?.toFixed(2) || "0"}</p>
-                  <p><strong>สถานะการทำงาน:</strong> {work.status}</p>
+          {works.filter((work) => work.user_id === id).length > 0 ? (
+            works
+              .filter((work) => work.user_id === id)
+              .map((work) => (
+                <div key={work.id} className="bg-gray-50 p-6 rounded-lg shadow-md flex justify-between items-start">
+                  <div>
+                    <p><strong>Work {work.id}</strong></p>
+                    <p><strong>ชื่อลูกค้า:</strong> {work.customerName}</p>
+                    <p><strong>สถานที่ซ่อม:</strong> {work.address}, {work.province}</p>
+                    {work.machines && work.machines.slice(0, 3).map((machine, index) => (
+                      <p key={machine.id}>
+                        รายละเอียดเครื่องซ่อมลำดับที่ {index + 1} : Model: {machine.model.slice(0, 5)}...
+                      </p>
+                    ))}
+                    {work.machines && work.machines.length > 3 && <p>...</p>}
+                    <p><strong>ช่างผู้รับผิดชอบ:</strong> {work.userName || "-"}</p>
+                    <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> ฿{work.repairCost?.toFixed(2) || "0"}</p>
+                    <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{work.additionalCost?.toFixed(2) || "0"}</p>
+                    <p><strong>สถานะการทำงาน:</strong> {work.status}</p>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <button
+                      className="bg-lime-500 text-white py-2 px-4 rounded-lg hover:bg-lime-600"
+                      onClick={() => handleSelect(work.id)}
+                    >
+                      View Details
+                    </button>
+                    <button
+                      className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
+                      onClick={() => handleNewButtonAction(work.id)}
+                    >
+                      Confirm Work
+                    </button>
+                  </div>
                 </div>
-                <div className="flex flex-col items-center">
-                  <button
-                    className="bg-lime-500 text-white py-2 px-4 rounded-lg hover:bg-lime-600"
-                    onClick={() => handleSelect(work.id)}
-                  >
-                    View Details
-                  </button>
-                  <button
-                    className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
-                    onClick={() => handleNewButtonAction(work.id)}
-                  >
-                    Confirm Work
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))
+          ) : (
+            <p className="text-center text-lg font-semibold text-gray-600">ยังไม่มีงานที่ต้องไปตรวจ</p>
+          )}
         </div>
       </div>
     </>
