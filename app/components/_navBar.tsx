@@ -12,20 +12,29 @@ function NavBar() {
           Service Innovation
         </h1>
         <div className="flex flex-row space-x-5">
-          <a
-            className="font-bold hover:text-primary"
-            href="https://www.google.com"
-          >
-            Inventory
+          <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/customerList")}>
+            รายชื่อลูกค้า
           </a>
-          <a className="font-bold hover:text-primary" href="">
-            Work order
+          <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/workList")}>
+            งานที่รอเลือกช่าง
           </a>
-          <a className="font-bold hover:text-primary" href="">
-            Dcoument
+          <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/adWorkList")}>
+            งานที่รอช่างเข้าไปตรวจสอบ
+          </a>
+          <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/workWaitList")}>
+            งานที่ช่างกำลังทำ
+          </a>
+          <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/allWorkEnd")}>
+            งานที่จบแล้ว
+          </a>
+          <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/engineerList")}>
+            รายชื่อช่าง
+          </a>
+          <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/sparePartsList")}>
+            คลังอะไหล่
           </a>
           <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/historyRequestAdmin")}>
-            Request
+            เบิกของ
           </a>
         </div>
       </div>

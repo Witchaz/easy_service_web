@@ -16,13 +16,16 @@ function NavBar() {
           </h1>
           <div className="flex flex-row space-x-5">
             <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/workListEngineer")}>
-              Work order
+              งานทั้งหมดที่ต้องไปตรวจ
             </a>
-            <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/requestEngineer")}>
-              Request
+            <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/workListSEngineer")}>
+              งานทั้งหมดที่ต้องไปซ่อม
+            </a>
+            <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/request")}>
+              เบิกของ
             </a>
             <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/historyRequest")}>
-              History Request
+              ประวัติเบิกของ
             </a>
             <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/workListEngineer")}>
               Inventory

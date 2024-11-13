@@ -29,7 +29,7 @@ export default function TransactionList() {
         if (!response.ok) throw new Error(`Failed to fetch transactions, status: ${response.status}`);
 
         const data: TransactionLog[] = await response.json();
-        const filteredTransactions = data.filter((transaction) => transaction.user_id === id);
+        const filteredTransactions = data.filter((transaction) => transaction.fromuser_id === id);
         setTransactions(filteredTransactions);
       } catch (err) {
         setError("Error loading transaction data");
@@ -124,6 +124,7 @@ export default function TransactionList() {
                 <p><strong>Transaction ID:</strong> {transaction.id}</p>
                 <p><strong>Spare Part ID:</strong> {transaction.spare_part_id}</p>
                 <p><strong>Quantity:</strong> {transaction.quantity}</p>
+                <p><strong>Quantity:</strong> {transaction.user_id}</p>
                 <p><strong>Status:</strong> {transaction.status}</p>
                 <p><strong>Add Date:</strong> {new Date(transaction.add_date).toLocaleString()}</p>
               </div>
