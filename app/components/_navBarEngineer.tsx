@@ -27,9 +27,6 @@ function NavBar() {
             <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/historyRequest")}>
               ประวัติเบิกของ
             </a>
-            <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/workListEngineer")}>
-              Inventory
-            </a>
           </div>
         </div>
       </>

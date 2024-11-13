@@ -25,6 +25,7 @@ export default function TransactionList() {
   const [transactions, setTransactions] = useState<TransactionLog[]>([]);
   const [spareParts, setSpareParts] = useState<SparePart[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<number | null>(null);
   const { id } = useID();
   console.log("ID from Context:", id);
 
@@ -129,10 +130,15 @@ export default function TransactionList() {
       setTransactions((prev) =>
         prev.map((t) => (t.id === transactionId ? { ...t, status: statusUpdate } : t))
       );
+      alert("อัพเดตข้อมูลเรียบร้อย");
     } catch (err) {
       console.error("Error rejecting transaction:", err);
     }
   };
+
+  const filteredTransactions = statusFilter !== null
+  ? transactions.filter((transaction) => transaction.status === statusFilter)
+  : transactions;
 
   return (
     <>
@@ -141,9 +147,49 @@ export default function TransactionList() {
         <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
           รายการเบิกอะไหล่ของคุณ
         </h2>
+
+        <div className="flex space-x-4 mb-4">
+          <button
+            className={`px-4 py-2 rounded ${statusFilter === null ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setStatusFilter(null)}
+          >
+            ทั้งหมด
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${statusFilter === 0 ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setStatusFilter(0)}
+          >
+            รอดำเนินการ
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${statusFilter === 1 ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setStatusFilter(1)}
+          >
+            อนุมัติแล้ว
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${statusFilter === 2 ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setStatusFilter(2)}
+          >
+            ปฏิเสธ
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${statusFilter === 3 ? 'bg-green-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setStatusFilter(3)}
+          >
+            เสร็จสิ้น(เรียบร้อย)
+          </button>
+          <button
+            className={`px-4 py-2 rounded ${statusFilter === 4 ? 'bg-red-500 text-white' : 'bg-gray-200'}`}
+            onClick={() => setStatusFilter(4)}
+          >
+            เสร็จสิ้น(ถูกปฎิเสธ)
+          </button>
+        </div>
+
         <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
           {error && <p className="text-red-500">{error}</p>}
-          {transactions.map((transaction) => (
+          {filteredTransactions.map((transaction) => (
             <div key={transaction.id} className="bg-gray-50 p-6 rounded-lg shadow-md flex justify-between items-start">
               <div>
                 <p><strong>Transaction ID:</strong> {transaction.id}</p>
