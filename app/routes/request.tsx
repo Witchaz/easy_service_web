@@ -56,7 +56,14 @@ export default function SparePartsList() {
   const submit = useSubmit();
   const navigate = useNavigate();
   const { id } = useID();
-  const [selectedSpareParts, setSelectedSpareParts] = useState<{ id: string; qty: number }[]>([]);
+  const [selectedSpareParts, setSelectedSpareParts] = useState<{ id: string; qty: number }[]>(() => {
+    const saved = localStorage.getItem("selectedSpareParts");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("selectedSpareParts", JSON.stringify(selectedSpareParts));
+  }, [selectedSpareParts]);
 
   useEffect(() => {
     const searchField = document.getElementById("q");
@@ -71,8 +78,7 @@ export default function SparePartsList() {
     if (qty <= 0) {
       alert("กรุณากรอกจำนวนอะไหล่มากกว่า 0");
       return;
-    }
-    else if(qty >= 1000){
+    } else if (qty >= 1000) {
       alert("กรุณากรอกจำนวนอะไหล่น้อยกว่า 1000");
       return;
     }
@@ -166,6 +172,9 @@ export default function SparePartsList() {
                     <input
                       type="number"
                       min="0"
+                      defaultValue={
+                        selectedSpareParts.find((part) => part.id === sparePart.id)?.qty || ""
+                      }
                       onChange={(e) =>
                         handleSparePartSelection(sparePart.id, parseInt(e.target.value, 10) || 0)
                       }
