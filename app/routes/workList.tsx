@@ -146,16 +146,6 @@ export default function WorkList() {
       return;
     }
 
-    if (!work.user_id) {
-      alert("This work has no assigned engineer. Please assign an engineer first.");
-      return;
-    }
-
-    if (!work.machines || work.machines.length === 0) {
-      alert("This work has no machines. Please ensure there is at least one machine.");
-      return;
-    }
-
     const confirmed = window.confirm("Are you sure you want to confirm this work?");
     if (confirmed) {
       const url = 'https://easy-service.prakasitj.com/works/setWorkStatus';
@@ -195,43 +185,49 @@ export default function WorkList() {
           จำนวนงานที่รอเลือกช่าง
         </h2>
         <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
-          {works.map((work) => (
-            <div key={work.id} className="bg-gray-50 p-6 rounded-lg shadow-md flex justify-between items-start">
-              <div>
-                <p><strong>Work {work.id}</strong></p>
-                <p><strong>ชื่อลูกค้า:</strong> {work.customerName}</p>
-                <p><strong>สถานที่ซ่อม:</strong> {work.address}, {work.province}</p>
-                {work.machines && work.machines.slice(0, 3).map((machine, index) => (
-                  <p key={machine.id}>
-                    รายละเอียดเครื่องซ่อมลำดับที่ {index + 1} : Model: {machine.model.slice(0, 5)}...
-                  </p>
-                ))}
-                {work.machines && work.machines.length > 3 && <p>...</p>}
-                <p><strong>ช่างผู้รับผิดชอบ:</strong> {work.userName || "-"}</p>
-                <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> 0</p>
-                <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{work.additionalCost?.toFixed(2) || "0"}</p>
-                <p><strong>สถานะการทำงาน:</strong> {work.status}</p>
+          {works.length > 0 ? (
+            works.map((work) => (
+              <div key={work.id} className="bg-gray-50 p-6 rounded-lg shadow-md flex justify-between items-start">
+                <div>
+                  <p><strong>Work {work.id}</strong></p>
+                  <p><strong>ชื่อลูกค้า:</strong> {work.customerName}</p>
+                  <p><strong>สถานที่ซ่อม:</strong> {work.address}, {work.province}</p>
+                  {work.machines && work.machines.slice(0, 3).map((machine, index) => (
+                    <p key={machine.id}>
+                      รายละเอียดเครื่องซ่อมลำดับที่ {index + 1} : Model: {machine.model.slice(0, 5)}...
+                    </p>
+                  ))}
+                  {work.machines && work.machines.length > 3 && <p>...</p>}
+                  <p><strong>ช่างผู้รับผิดชอบ:</strong> {work.userName || "-"}</p>
+                  <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> 0</p>
+                  <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{work.additionalCost?.toFixed(2) || "0"}</p>
+                  <p><strong>สถานะการทำงาน:</strong> {work.status}</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <button
+                    className="bg-lime-500 text-white py-2 px-4 rounded-lg hover:bg-lime-600"
+                    onClick={() => handleSelect(work.id)}
+                  >
+                    Select
+                  </button>
+                  <button
+                    className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
+                    onClick={() => handleNewButtonAction(work.id)}
+                  >
+                    Confirm Work
+                  </button>
+                </div>
               </div>
-              <div className="flex flex-col items-center">
-                <button
-                  className="bg-lime-500 text-white py-2 px-4 rounded-lg hover:bg-lime-600"
-                  onClick={() => handleSelect(work.id)}
-                >
-                  Select
-                </button>
-                <button
-                  className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
-                  onClick={() => handleNewButtonAction(work.id)}
-                >
-                  Confirm Work
-                </button>
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-center text-lg font-semibold text-gray-600">
+              ยังไม่มีงานที่ต้องเลือกช่างไปตรวจ
+            </p>
+          )}
         </div>
         <a href="/mainPage">
-              <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600">Back</button>
-            </a>
+          <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600">Back</button>
+        </a>
       </div>
     </>
   );
