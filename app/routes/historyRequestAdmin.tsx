@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import NavBar from "app/components/_navBar";
-import { useNavigate } from "react-router-dom";
 import { useID } from "../context/IDContext";
 
 interface TransactionLog {
@@ -13,8 +12,18 @@ interface TransactionLog {
   add_date: string;
 }
 
+interface SparePart {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  unit: string;
+  add_date: string;
+}
+
 export default function TransactionList() {
   const [transactions, setTransactions] = useState<TransactionLog[]>([]);
+  const [spareParts, setSpareParts] = useState<SparePart[]>([]);
   const [error, setError] = useState<string | null>(null);
   const { id } = useID();
   console.log("ID from Context:", id);
@@ -22,12 +31,9 @@ export default function TransactionList() {
   useEffect(() => {
     const fetchTransactions = async () => {
       const url = `https://easy-service.prakasitj.com/transactionLogs/getList`;
-      const options = { method: "GET" };
-
       try {
-        const response = await fetch(url, options);
+        const response = await fetch(url);
         if (!response.ok) throw new Error(`Failed to fetch transactions, status: ${response.status}`);
-
         const data: TransactionLog[] = await response.json();
         const filteredTransactions = data.filter((transaction) => transaction.fromuser_id === id);
         setTransactions(filteredTransactions);
@@ -37,8 +43,27 @@ export default function TransactionList() {
       }
     };
 
+    const fetchSpareParts = async () => {
+      try {
+        const response = await fetch(`https://easy-service.prakasitj.com/spare_parts/getList`);
+        if (!response.ok) throw new Error("Failed to fetch spare parts");
+        const data: SparePart[] = await response.json();
+        setSpareParts(data);
+      } catch (err) {
+        setError("Error loading spare parts data");
+        console.error(err);
+      }
+    };
+
     fetchTransactions();
+    fetchSpareParts();
   }, [id]);
+
+  const getSparePartName = (sparePartId: number) => {
+    const sparePart = spareParts.find((part) => part.id === sparePartId);
+    return sparePart ? sparePart.name : "Unknown";
+  };
+
 
   const handleAccept = async (transactionId: number) => {
     try {
@@ -122,9 +147,8 @@ export default function TransactionList() {
             <div key={transaction.id} className="bg-gray-50 p-6 rounded-lg shadow-md flex justify-between items-start">
               <div>
                 <p><strong>Transaction ID:</strong> {transaction.id}</p>
-                <p><strong>Spare Part ID:</strong> {transaction.spare_part_id}</p>
+                <p><strong>Spare Part:</strong> {getSparePartName(transaction.spare_part_id)}</p>
                 <p><strong>Quantity:</strong> {transaction.quantity}</p>
-                <p><strong>Quantity:</strong> {transaction.user_id}</p>
                 <p><strong>Status:</strong> {transaction.status}</p>
                 <p><strong>Add Date:</strong> {new Date(transaction.add_date).toLocaleString()}</p>
               </div>
