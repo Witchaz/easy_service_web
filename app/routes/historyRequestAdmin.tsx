@@ -139,6 +139,8 @@ export default function TransactionList() {
   const filteredTransactions = statusFilter !== null
   ? transactions.filter((transaction) => transaction.status === statusFilter)
   : transactions;
+  
+  const sortedTransactions = filteredTransactions.sort((a, b) => b.id - a.id);
 
   return (
     <>
@@ -189,7 +191,7 @@ export default function TransactionList() {
 
         <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
           {error && <p className="text-red-500">{error}</p>}
-          {filteredTransactions.map((transaction) => (
+          {sortedTransactions.map((transaction) => (
             <div key={transaction.id} className="bg-gray-50 p-6 rounded-lg shadow-md flex justify-between items-start">
               <div>
                 <p><strong>Transaction ID:</strong> {transaction.id}</p>

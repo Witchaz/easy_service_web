@@ -139,6 +139,9 @@ export default function TransactionList() {
   ? transactions.filter((transaction) => transaction.status === statusFilter)
   : transactions;
 
+  
+  const sortedTransactions = filteredTransactions.sort((a, b) => b.id - a.id);
+
   return (
     <>
       <NavBar />
@@ -187,33 +190,34 @@ export default function TransactionList() {
 
         <div className="w-full max-w-4xl h-[500px] overflow-y-auto space-y-6">
           {error && <p className="text-red-500">{error}</p>}
-          {filteredTransactions.map((transaction) => (
-            <div key={transaction.id} className="bg-gray-50 p-6 rounded-lg shadow-md flex justify-between items-start">
-              <div>
-                <p><strong>Transaction ID:</strong> {transaction.id}</p>
-                <p><strong>Spare Part:</strong> {getSparePartName(transaction.spare_part_id)}</p>
-                <p><strong>Quantity:</strong> {transaction.quantity}</p>
-                <p><strong>Status:</strong> {transaction.status}</p>
-                <p><strong>Add Date:</strong> {new Date(transaction.add_date).toLocaleString()}</p>
-              </div>
-              {transaction.status === 1 ? (
-                <div className="flex space-x-4">
-                  <button
-                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                    onClick={() => handleAccept(transaction.id)}
-                  >
-                    ยอมรับ
-                  </button>
-                  <button
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                    onClick={() => handleReject(transaction.id)}
-                  >
-                    ปฏิเสธ
-                  </button>
+          {sortedTransactions.map((transaction) => (
+              <div key={transaction.id} className="bg-gray-50 p-6 rounded-lg shadow-md flex justify-between items-start">
+                <div>
+                  <p><strong>Transaction ID:</strong> {transaction.id}</p>
+                  <p><strong>Spare Part:</strong> {getSparePartName(transaction.spare_part_id)}</p>
+                  <p><strong>Quantity:</strong> {transaction.quantity}</p>
+                  <p><strong>Status:</strong> {transaction.status}</p>
+                  <p><strong>Add Date:</strong> {new Date(transaction.add_date).toLocaleString()}</p>
                 </div>
-              ) : null}
-            </div>
-          ))}
+                {transaction.status === 1 ? (
+                  <div className="flex space-x-4">
+                    <button
+                      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                      onClick={() => handleAccept(transaction.id)}
+                    >
+                      ยอมรับ
+                    </button>
+                    <button
+                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                      onClick={() => handleReject(transaction.id)}
+                    >
+                      ปฏิเสธ
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            ))}
+
         </div>
       </div>
     </>

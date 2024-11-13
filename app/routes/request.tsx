@@ -56,7 +56,7 @@ export default function SparePartsList() {
   const submit = useSubmit();
   const navigate = useNavigate();
   const { id } = useID();
-  const [selectedSpareParts, setSelectedSpareParts] = useState<{ id: string; qty: number }[]>(() => {
+  const [selectedSpareParts, setSelectedSpareParts] = useState<{ id: string;  name: string;   price: number;   qty: number }[]>(() => {
     const saved = localStorage.getItem("selectedSpareParts");
     return saved ? JSON.parse(saved) : [];
   });
@@ -74,65 +74,36 @@ export default function SparePartsList() {
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
-  const handleSparePartSelection = (id: string, qty: number) => {
-    if (qty <= 0) {
-      alert("กรุณากรอกจำนวนอะไหล่มากกว่า 0");
-      return;
-    } else if (qty >= 1000) {
-      alert("กรุณากรอกจำนวนอะไหล่น้อยกว่า 1000");
-      return;
-    }
-
-    setSelectedSpareParts((prev) => {
-      const existing = prev.find((part) => part.id === id);
-      if (existing) {
-        return prev.map((part) => (part.id === id ? { ...part, qty } : part));
+  const handleQuantityChange = (id: string, qty: number) => {
+    setSelectedSpareParts((prevSelected) => {
+      if (qty === 0) {
+        return prevSelected.filter((part) => part.id !== id);
+      }
+      const existingPart = prevSelected.find((part) => part.id === id);
+      if (existingPart) {
+        return prevSelected.map((part) =>
+          part.id === id ? { ...part, qty } : part
+        );
       } else {
-        return [...prev, { id, qty }];
+        const sparePart = SparePartsList.find((part) => part.id === id);
+        if (sparePart) {
+          return [...prevSelected, { id: sparePart.id, name: sparePart.name, price: sparePart.price, qty }];
+        }
+        return prevSelected;
       }
     });
   };
+  
 
-  const handleAdd = async () => {
+  const handleAdd = () => {
     if (selectedSpareParts.length === 0) {
       alert("กรุณาเลือกอะไหล่และกรอกจำนวนก่อน");
       return;
     }
-
-    for (let part of selectedSpareParts) {
-      const payload = {
-        spare_part_id: Number(part.id),
-        quantity: Number(part.qty),
-        user_id: Number(id),
-        fromuser_id: 7,
-      };
-
-      try {
-        const response = await fetch("https://easy-service.prakasitj.com/transactionLogs/insertTransactionLog", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error(`Error adding spare part ${part.id}:`, errorData);
-          alert("เกิดข้อผิดพลาดในการเพิ่มอะไหล่");
-          break;
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
-        break;
-      }
-    }
-
-    alert("เพิ่มอะไหล่สำเร็จ");
-    navigate("/workListEngineer", { state: id });
+  
+    navigate("/requestList"); // Navigate to requestList for preview
   };
-
+  
   return (
     <>
       <NavBar />
@@ -171,14 +142,13 @@ export default function SparePartsList() {
                   <td className="p-2">
                     <input
                       type="number"
-                      min="0"
                       defaultValue={
                         selectedSpareParts.find((part) => part.id === sparePart.id)?.qty || ""
                       }
-                      onChange={(e) =>
-                        handleSparePartSelection(sparePart.id, parseInt(e.target.value, 10) || 0)
-                      }
                       className="border border-gray-300 rounded-lg p-1 w-full"
+                      onChange={(e) =>
+                        handleQuantityChange(sparePart.id, Number(e.target.value) || 0)
+                      }
                     />
                   </td>
                 </tr>
@@ -203,7 +173,7 @@ export default function SparePartsList() {
               <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600">Back</button>
             </a>
             <button className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600" onClick={handleAdd}>
-              Add
+              Next
             </button>
           </div>
         </div>
