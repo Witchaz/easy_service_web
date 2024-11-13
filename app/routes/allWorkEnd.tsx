@@ -105,7 +105,7 @@ export default function adWorkList() {
 
   useEffect(() => {
   const fetchWorks = async () => {
-    const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/6,7`;
+    const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/4`;
     const options = { method: "GET" };
 
     try {
@@ -137,7 +137,7 @@ export default function adWorkList() {
 
 
   const handleSelect = (workId: number) => {
-    navigate("/adWork", { state: { workId } });
+    navigate("/workEnd", { state: { workId } });
     };
     const handleNewButtonAction = async (workId: number) => {
     const work = works.find((w) => w.id === workId);

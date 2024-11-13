@@ -15,7 +15,7 @@ interface User {
   address: string;
   province: string;
   role: string;
-  addDate: Date | string;
+  add_date: Date | string;
 }
 
 interface LoaderData {
@@ -63,7 +63,7 @@ export default function engineerList() {
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
   
-  const handleSelect = () => {
+  const handleSelectEdit = () => {
     if (selectedUserId) {
       navigate(`/editEngineer/${selectedUserId}`); // ส่ง id ไปยังหน้า editEngineer
     } else {
@@ -71,6 +71,14 @@ export default function engineerList() {
     }
   };
   
+  const handleSelect = () => {
+  if (selectedUserId) {
+    navigate("/engineerSparePart", { state: { userId: selectedUserId } });
+  } else {
+    alert("กรุณาเลือกผู้ใช้ก่อน");
+  }
+};
+
   const handleAdd = () => {
     navigate("/addEngineer");
   };
@@ -121,7 +129,7 @@ export default function engineerList() {
                   <td className="p-2">{user.address}</td>
                   <td className="p-2">{user.province}</td>
                   <td className="p-2">{user.role}</td>
-                  <td className="p-2">{new Date(user.addDate).toLocaleDateString()}</td>
+                  <td className="p-2">{new Date(user.add_date).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -148,10 +156,10 @@ export default function engineerList() {
             <button className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600" onClick={handleAdd}>
                 Add
             </button>
-            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelect}>
+            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelectEdit}>
                 Select Edit
             </button>
-            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" >
+            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelect} >
                 Select 
             </button>
           </div>

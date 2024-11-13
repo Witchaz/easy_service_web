@@ -81,7 +81,6 @@ export default function EditEngineer() {
     const newErrors: Partial<User> = {};
 
     if (!formData.username) newErrors.username = "Username is required.";
-    if (!formData.password) newErrors.password = "Password is required.";
     if (!formData.name) newErrors.name = "Name is required.";
     if (!formData.surname) newErrors.surname = "Surname is required.";
     if (!formData.address) newErrors.address = "Address is required.";
@@ -122,18 +121,6 @@ export default function EditEngineer() {
               placeholder="Enter username"
             />
             {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
-          </div>
-          <div className="mb-4">
-            <label>Password *</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="border rounded w-full py-2 px-3"
-              placeholder="Enter password"
-            />
-            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </div>
           <div className="mb-4">
             <label>Name *</label>

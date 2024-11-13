@@ -126,7 +126,7 @@ export default function adWorkList() {
 
   useEffect(() => {
     const fetchWorks = async () => {
-      const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/2,4`;
+      const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/2`;
       const options = { method: "GET" };
 
       try {
