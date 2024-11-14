@@ -15,11 +15,8 @@ function NavBar() {
           <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/customerList")}>
             รายชื่อลูกค้า
           </a>
-          <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/workList")}>
-            งานที่รอเลือกช่าง
-          </a>
           <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/adWorkList")}>
-            งานที่รอช่างเข้าไปตรวจสอบ
+            งานที่รอการทำ
           </a>
           <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/workWaitList")}>
             งานที่ช่างกำลังทำ

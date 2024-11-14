@@ -132,6 +132,7 @@ export default function workListSEngineer() {
     const fetchWorks = async () => {
       const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/3`;
       const options = { method: "GET" };
+
       try {
         const response = await fetch(url, options);
         if (!response.ok) throw new Error(`Failed to fetch works, status: ${response.status}`);
@@ -144,11 +145,12 @@ export default function workListSEngineer() {
             const machines = await fetchMachinesByWorkID(work.id);
             const additionalCost = await fetchAdditionalCost(work.id);
 
-            const repairCost = await machines.reduce(async (totalPromise, machine) => {
-              const total = await totalPromise;
-              const machineCost = await fetchRepairCost(machine.id);
-              return total + machineCost;
-            }, Promise.resolve(0));
+            let repairCost = 0;
+            for (const machine of machines) {
+              if (!machine.description.includes("(ไม่ต้องซ่อม)")) {
+                repairCost += await fetchRepairCost(machine.id);
+              }
+            }
 
             return { ...work, customerName, userName, machines, additionalCost, repairCost };
           })
@@ -248,6 +250,17 @@ export default function workListSEngineer() {
     }
   };
 
+  const getStatusText = (status: number) => {
+    switch (status) {
+      case 1:
+        return "งานที่ต้องไปตรวจ";
+      case 3:
+        return "งานที่ต้องไปซ่อม";
+      default:
+        return "สถานะไม่ทราบ";
+    }
+  };
+  
   return (
     <>
       <NavBar />
@@ -274,7 +287,7 @@ export default function workListSEngineer() {
                     <p><strong>ช่างผู้รับผิดชอบ:</strong> {work.userName || "-"}</p>
                     <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> ฿{work.repairCost?.toFixed(2) || "0"}</p>
                     <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{work.additionalCost?.toFixed(2) || "0"}</p>
-                    <p><strong>สถานะการทำงาน:</strong> {work.status}</p>
+                    <p><strong>สถานะการทำงาน:</strong> {getStatusText(work.status)}</p>
                   </div>
                   <div className="flex flex-col items-center">
                     <button

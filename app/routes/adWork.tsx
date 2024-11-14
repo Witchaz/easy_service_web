@@ -41,7 +41,7 @@ export default function adWork() {
   const [machines, setMachines] = useState<Machine[]>([]);
   const [customerName, setCustomerName] = useState<string>("");
   const [totalAdditionalCost, setTotalAdditionalCost] = useState<number>(0);
-  const [repairCost, setRepairCost] = useState<number>(0); // New state for repair cost
+  const [repairCost, setRepairCost] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export default function adWork() {
           const machinesData = await fetchMachinesByWorkID(work.id);
           setMachines(machinesData);
           fetchAdditionalCosts(work.id);
-          calculateTotalRepairCost(machinesData); // Calculate repair cost
+          calculateTotalRepairCost(machinesData); // Calculate repair cost excluding "(ไม่ต้องซ่อม)"
         } else {
           setError("No work details found");
         }
@@ -164,6 +164,12 @@ export default function adWork() {
   const calculateTotalRepairCost = async (machines: Machine[]) => {
     const totalRepairCost = await machines.reduce(async (accPromise, machine) => {
       const acc = await accPromise;
+
+      // Skip machines with "(ไม่ต้องซ่อม)" in the description
+      if (machine.description.includes("(ไม่ต้องซ่อม)")) {
+        return acc;
+      }
+
       const machineRepairCost = await fetchRepairCost(machine.id);
       return acc + machineRepairCost;
     }, Promise.resolve(0));
@@ -206,9 +212,22 @@ export default function adWork() {
     }
   };
 
-  if (error) {
-    return <p className="text-red-500 text-center">{error}</p>;
-  }
+  const getStatusText = (status: number) => {
+    switch (status) {
+      case 0:
+        return "งานที่รอการเลือกช่างให้ไปตรวจ";
+      case 1:
+        return "งานที่ช่างกำลังตรวจ";
+      case 2:
+        return "งานที่รอการยืนยันให้ไปซ่อม";
+      case 3:
+        return "งานที่ช่างกำลังซ่อม";
+      case 4:
+        return "งานที่เสร็จสิ้น";
+      default:
+        return "สถานะไม่ทราบ";
+    }
+  };
 
   return (
     <>
@@ -235,7 +254,7 @@ export default function adWork() {
             <p><strong>ช่างผู้รับผิดชอบ:</strong> {workDetails.userName} {workDetails.userSurname || "-"}</p>
             <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> ฿{repairCost.toFixed(2)}</p>
             <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{totalAdditionalCost.toFixed(2)}</p>
-            <p><strong>สถานะการทำงาน:</strong> {workDetails.status}</p>
+            <p><strong>สถานะการทำงาน:</strong> {getStatusText(workDetails.status)}</p>
 
             <div className="flex flex-col gap-2 mt-4 items-start">
               <button onClick={() => handleEdit("Power Supply")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">

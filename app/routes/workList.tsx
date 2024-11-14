@@ -103,6 +103,23 @@ export default function WorkList() {
     }
   };
 
+  const getStatusText = (status: number) => {
+    switch (status) {
+      case 0:
+        return "งานที่รอการเลือกช่างให้ไปตรวจ";
+      case 1:
+        return "งานที่ช่างกำลังตรวจ";
+      case 2:
+        return "งานที่รอการยืนยันให้ไปซ่อม";
+      case 3:
+        return "งานที่ช่างกำลังซ่อม";
+      case 4:
+        return "งานที่เสร็จสิ้น";
+      default:
+        return "สถานะไม่ทราบ";
+    }
+  };
+
   useEffect(() => {
     const fetchWorks = async () => {
       const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/0`;
@@ -201,7 +218,7 @@ export default function WorkList() {
                   <p><strong>ช่างผู้รับผิดชอบ:</strong> {work.userName || "-"}</p>
                   <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> 0</p>
                   <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{work.additionalCost?.toFixed(2) || "0"}</p>
-                  <p><strong>สถานะการทำงาน:</strong> {work.status}</p>
+                  <p><strong>สถานะการทำงาน:</strong> {getStatusText(work.status)}</p>
                 </div>
                 <div className="flex flex-col items-center">
                   <button

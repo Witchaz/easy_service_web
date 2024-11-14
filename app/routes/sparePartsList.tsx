@@ -105,7 +105,7 @@ export default function SparePartsList() {
               <tr>
                 <th className="p-2">Select</th>
                 <th className="p-2">Part Name</th>
-                <th className="p-2">ID</th>
+                
                 <th className="p-2">Description</th>
                 <th className="p-2">Price</th>
                 <th className="p-2">Unit</th>
@@ -124,7 +124,7 @@ export default function SparePartsList() {
                     />
                   </td>
                   <td className="p-2">{sparePart.name}</td>
-                  <td className="p-2">{sparePart.id}</td>
+                
                   <td className="p-2">{sparePart.description}</td>
                   <td className="p-2">{sparePart.price} Baht</td>
                   <td className="p-2">{sparePart.unit}</td>
@@ -157,7 +157,7 @@ export default function SparePartsList() {
             </button>
             
             <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelect}>
-              Select
+              Select Edit
             </button>
           </div>
         </div>

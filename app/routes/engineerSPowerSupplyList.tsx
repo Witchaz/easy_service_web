@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import NavBar from "app/components/_navBar";
+import NavBar from "app/components/_navBarEngineer";
 import { useNavigate, useLocation } from "react-router-dom";
 
 interface Machine {
@@ -54,7 +54,7 @@ export default function engineerSPowerSupplyList() {
   };
 
   const handleSparePart = (machineId: number) => {
-    navigate("/sSparePartList", { state: { machineId, workId } }); // ส่ง workId ไปด้วย
+    navigate("/engineerSSparePartList", { state: { machineId, workId } }); // ส่ง workId ไปด้วย
   };
 
   return (

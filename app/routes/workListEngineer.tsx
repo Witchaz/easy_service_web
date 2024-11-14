@@ -87,26 +87,6 @@ export default function WorkListEngineer() {
     }
   };
 
-  const fetchRepairCost = async (machineId: number): Promise<number> => {
-    const url = `https://easy-service.prakasitj.com/Spare_parts_requests/getListInRequest/${machineId}`;
-    const options = { method: "GET" };
-
-    try {
-      const response = await fetch(url, options);
-      if (!response.ok) throw new Error("Failed to fetch spare parts data");
-
-      const data = await response.json();
-      return data.reduce(
-        (total: number, part: { price: number; spare_parts_qty: number }) =>
-          total + part.price * part.spare_parts_qty,
-        0
-      );
-    } catch (error) {
-      console.error("Error fetching repair cost:", error);
-      return 0;
-    }
-  };
-
   const fetchAdditionalCost = async (work_id: number): Promise<number> => {
     const url = `https://easy-service.prakasitj.com/additionalcosts/getFromWorkId/${work_id}`;
     const options = { method: "GET" };
@@ -120,6 +100,17 @@ export default function WorkListEngineer() {
     } catch (error) {
       console.error("Error fetching additional costs:", error);
       return 0;
+    }
+  };
+
+  const getStatusText = (status: number) => {
+    switch (status) {
+      case 1:
+        return "งานที่ต้องไปตรวจ";
+      case 3:
+        return "งานที่ต้องไปซ่อม";
+      default:
+        return "สถานะไม่ทราบ";
     }
   };
 
@@ -140,13 +131,7 @@ export default function WorkListEngineer() {
             const machines = await fetchMachinesByWorkID(work.id);
             const additionalCost = await fetchAdditionalCost(work.id);
 
-            const repairCost = await machines.reduce(async (totalPromise, machine) => {
-              const total = await totalPromise;
-              const machineCost = await fetchRepairCost(machine.id);
-              return total + machineCost;
-            }, Promise.resolve(0));
-
-            return { ...work, customerName, userName, machines, additionalCost, repairCost };
+            return { ...work, customerName, userName, machines, additionalCost };
           })
         );
 
@@ -162,54 +147,6 @@ export default function WorkListEngineer() {
 
   const handleSelect = (workId: number) => {
     navigate("/engineerWork", { state: { workId } });
-  };
-
-  const handleNewButtonAction = async (workId: number) => {
-    const work = works.find((w) => w.id === workId);
-    if (!work) {
-      alert("Work not found.");
-      return;
-    }
-
-    if (!work.user_id) {
-      alert("This work has no assigned engineer. Please assign an engineer first.");
-      return;
-    }
-
-    if (!work.machines || work.machines.length === 0) {
-      alert("This work has no machines. Please ensure there is at least one machine.");
-      return;
-    }
-
-    const confirmed = window.confirm("Are you sure you want to confirm this work?");
-    if (confirmed) {
-      const url = 'https://easy-service.prakasitj.com/works/setWorkStatus';
-      const options = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: workId,
-          status: work.status + 1,
-        }),
-      };
-
-      try {
-        const response = await fetch(url, options);
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error("Error response text:", errorText);
-          throw new Error("Failed to confirm the work: " + errorText);
-        }
-
-        const data = await response.text();
-        console.log("Work status updated:", data);
-        alert("Work confirmed successfully!");
-        window.location.reload();
-      } catch (error) {
-        console.error("Error confirming work:", error);
-        alert("Failed to confirm the work. Please try again.");
-      }
-    }
   };
 
   return (
@@ -236,9 +173,7 @@ export default function WorkListEngineer() {
                     ))}
                     {work.machines && work.machines.length > 3 && <p>...</p>}
                     <p><strong>ช่างผู้รับผิดชอบ:</strong> {work.userName || "-"}</p>
-                    <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> ฿{work.repairCost?.toFixed(2) || "0"}</p>
-                    <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{work.additionalCost?.toFixed(2) || "0"}</p>
-                    <p><strong>สถานะการทำงาน:</strong> {work.status}</p>
+                    <p><strong>สถานะการทำงาน:</strong> {getStatusText(work.status)}</p>
                   </div>
                   <div className="flex flex-col items-center">
                     <button
@@ -246,12 +181,6 @@ export default function WorkListEngineer() {
                       onClick={() => handleSelect(work.id)}
                     >
                       View Details
-                    </button>
-                    <button
-                      className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
-                      onClick={() => handleNewButtonAction(work.id)}
-                    >
-                      Confirm Work
                     </button>
                   </div>
                 </div>

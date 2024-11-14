@@ -36,9 +36,8 @@ export default function workWaitList() {
 
   const fetchCustomerName = async (customer_id: number): Promise<string> => {
     const url = `https://easy-service.prakasitj.com/customers/getByID/${customer_id}`;
-    const options = { method: "GET" };
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url);
       const data = await response.json();
       return data[0]?.name || "Unknown";
     } catch (error) {
@@ -50,9 +49,8 @@ export default function workWaitList() {
   const fetchEngineerName = async (user_id: string | null): Promise<string> => {
     if (!user_id) return "-";
     const url = `https://easy-service.prakasitj.com/user/searchbyID/${user_id}`;
-    const options = { method: "GET" };
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url);
       const data = await response.json();
       return data.length > 0 ? `${data[0].name} ${data[0].surname}` : "Unknown";
     } catch (error) {
@@ -63,10 +61,8 @@ export default function workWaitList() {
 
   const fetchMachinesByWorkID = async (work_id: number): Promise<Machine[]> => {
     const url = `https://easy-service.prakasitj.com/Requests/getListBywork_id/${work_id}`;
-    const options = { method: "GET" };
-
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch machine data");
 
       const data = await response.json();
@@ -87,10 +83,8 @@ export default function workWaitList() {
 
   const fetchRepairCost = async (machineId: number): Promise<number> => {
     const url = `https://easy-service.prakasitj.com/Spare_parts_requests/getListInRequest/${machineId}`;
-    const options = { method: "GET" };
-
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch spare parts data");
 
       const data = await response.json();
@@ -107,10 +101,8 @@ export default function workWaitList() {
 
   const fetchAdditionalCost = async (work_id: number): Promise<number> => {
     const url = `https://easy-service.prakasitj.com/additionalcosts/getFromWorkId/${work_id}`;
-    const options = { method: "GET" };
-
     try {
-      const response = await fetch(url, options);
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to fetch additional costs");
 
       const data = await response.json();
@@ -124,10 +116,9 @@ export default function workWaitList() {
   useEffect(() => {
     const fetchWorks = async () => {
       const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/1,3`;
-      const options = { method: "GET" };
 
       try {
-        const response = await fetch(url, options);
+        const response = await fetch(url);
         if (!response.ok) throw new Error(`Failed to fetch works, status: ${response.status}`);
 
         const data: Work[] = await response.json();
@@ -141,6 +132,9 @@ export default function workWaitList() {
 
             const repairCost = await machines.reduce(async (totalPromise, machine) => {
               const total = await totalPromise;
+              if (machine.description.includes("(ไม่ต้องซ่อม)")) {
+                return total; // Skip machines marked as "(ไม่ต้องซ่อม)"
+              }
               const machineCost = await fetchRepairCost(machine.id);
               return total + machineCost;
             }, Promise.resolve(0));
@@ -161,6 +155,23 @@ export default function workWaitList() {
 
   const handleSelect = (workId: number) => {
     navigate("/workWait", { state: { workId } });
+  };
+
+  const getStatusText = (status: number) => {
+    switch (status) {
+      case 0:
+        return "งานที่รอการเลือกช่างให้ไปตรวจ";
+      case 1:
+        return "งานที่ช่างกำลังตรวจสอบ";
+      case 2:
+        return "งานที่รอการยืนยันให้ไปซ่อม";
+      case 3:
+        return "งานที่ช่างกำลังซ่อม";
+      case 4:
+        return "งานที่เสร็จสิ้น";
+      default:
+        return "สถานะไม่ทราบ";
+    }
   };
 
   return (
@@ -187,7 +198,7 @@ export default function workWaitList() {
                   <p><strong>ช่างผู้รับผิดชอบ:</strong> {work.userName || "-"}</p>
                   <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> ฿{work.repairCost?.toFixed(2) || "0"}</p>
                   <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{work.additionalCost?.toFixed(2) || "0"}</p>
-                  <p><strong>สถานะการทำงาน:</strong> {work.status}</p>
+                  <p><strong>สถานะการทำงาน:</strong> {getStatusText(work.status)}</p>
                 </div>
                 <div className="flex flex-col items-center">
                   <button

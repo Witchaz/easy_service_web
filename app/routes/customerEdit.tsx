@@ -52,14 +52,14 @@ export default function CustomerEdit() {
                 }
 
                 setCustomer({
-                    id: data.id || customerId,
-                    name: data.name || "",
-                    credit_limit: data.credit_limit || 0,
-                    address: data.address || "",
-                    tax_id: data.tax_id || "",
-                    tel: data.tel || "",
-                    province: data.province || "",
-                    add_date: new Date(data.add_date),
+                    id: data[0].id || customerId,
+                    name: data[0].name || "",
+                    credit_limit: data[0].credit_limit || 0,
+                    address: data[0].address || "",
+                    tax_id: data[0].tax_id || "",
+                    tel: data[0].tel || "",
+                    province: data[0].province || "",
+                    add_date: new Date(data[0].add_date),
                 });
                 setError("");
             } catch (error: any) {

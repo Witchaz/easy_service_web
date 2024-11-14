@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import NavBar from "app/components/_navBar";
+import NavBar from "app/components/_navBarEngineer";
 import { useNavigate, useLocation } from "react-router-dom";
 
 interface WorkDetails {
@@ -48,6 +48,17 @@ export default function engineerSWork() {
   const [totalAdditionalCost, setTotalAdditionalCost] = useState<number>(0);
   const [totalRepairCost, setTotalRepairCost] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+
+  const getStatusText = (status: number) => {
+    switch (status) {
+      case 1:
+        return "งานที่ต้องไปตรวจ";
+      case 3:
+        return "งานที่ต้องไปซ่อม";
+      default:
+        return "สถานะไม่ทราบ";
+    }
+  };
 
   useEffect(() => {
     const fetchWorkDetails = async () => {
@@ -171,6 +182,9 @@ export default function engineerSWork() {
       let totalRepairCost = 0;
 
       for (const machine of machines) {
+        if (machine.description.includes("(ไม่ต้องซ่อม)")) {
+          continue;
+        }
         const url = `https://easy-service.prakasitj.com/Spare_parts_requests/getListInRequest/${machine.id}`;
         const options = { method: "GET" };
         
@@ -228,7 +242,7 @@ export default function engineerSWork() {
             <p><strong>ช่างผู้รับผิดชอบ:</strong> {workDetails.userName} {workDetails.userSurname || "-"}</p>
             <p><strong>ค่าใช้จ่ายซ่อมเครื่อง:</strong> ฿{totalRepairCost.toFixed(2)}</p>
             <p><strong>ค่าใช้จ่ายอื่นๆ:</strong> ฿{totalAdditionalCost.toFixed(2)}</p>
-            <p><strong>สถานะการทำงาน:</strong> {workDetails.status}</p>
+            <p><strong>สถานะการทำงาน:</strong> {getStatusText(workDetails.status)}</p>
 
             <div className="flex flex-col gap-2 mt-4 items-start">
               <button onClick={() => handleEdit("Power Supply")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
