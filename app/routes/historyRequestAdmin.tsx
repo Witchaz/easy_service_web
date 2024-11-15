@@ -219,6 +219,9 @@ export default function TransactionList() {
             </div>
           ))}
         </div>
+        <a href="/mainPage">
+          <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600 mt-4">Back</button>
+        </a>
       </div>
     </>
   );

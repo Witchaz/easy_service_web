@@ -48,8 +48,8 @@ const NewCustomer: React.FC = () => {
         if (!formData.address) newErrors.address = "Address is required.";
         if (!formData.tax_id) {
             newErrors.tax_id = "Customer TAX is required.";
-        } else if (!/^\d{10}$/.test(formData.tax_id)) {
-            newErrors.tax_id = "Customer TAX must be a 10-digit number.";
+        } else if (!/^\d{13}$/.test(formData.tax_id)) {
+            newErrors.tax_id = "Customer TAX must be a 13-digit number.";
         }
         if (!formData.province) newErrors.province = "Province is required.";
 

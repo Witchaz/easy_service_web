@@ -78,8 +78,8 @@ export default function MachineConfirm() {
                 <h2 className="text-center text-2xl font-semibold text-lime-600 mt-8 mb-6">
                     จำนวนเครื่องที่ต้องการซ่อม
                 </h2>
-                <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl">
-                    <div className="max-h-96 overflow-y-auto">
+                <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl h-[500px] overflow-y-auto">
+                    
                         {formData.details.map((machine: Machine, index) => (
                             <div key={index} className="bg-gray-50 p-4 mb-4 rounded-md flex justify-between items-center">
                                 <div>
@@ -91,14 +91,15 @@ export default function MachineConfirm() {
                                 </div>
                             </div>
                         ))}
-                    </div>
+                    
 
-                    <div className="flex justify-between mt-8">
+                    
+                </div>
+                <div className="flex justify-between mt-8">
                         <button className="bg-black text-white font-semibold px-4 py-2 rounded-lg hover:bg-gray-800" onClick={handleBack}>
                             Back
                         </button>
                     </div>
-                </div>
             </div>
         </>
     );

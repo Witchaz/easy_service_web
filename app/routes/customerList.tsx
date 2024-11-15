@@ -107,7 +107,7 @@ export default function CustomerList() {
             <thead className="text-gray-600">
               <tr>
                 <th className="p-2">Select</th>
-                <th className="p-2">ID</th>
+                
                 <th className="p-2">Name</th>
                 <th className="p-2">Credit Limit</th>
                 <th className="p-2">Address</th>
@@ -129,7 +129,7 @@ export default function CustomerList() {
                       checked={selectedCustomer === customer.id}
                     />
                   </td>
-                  <td className="p-2">{customer.id}</td>
+                  
                   <td className="p-2">{customer.name}</td>
                   <td className="p-2">${customer.credit_limit.toFixed(2)}</td>
                   <td className="p-2">{customer.address}</td>
@@ -162,7 +162,7 @@ export default function CustomerList() {
             </div>
           </div>
 
-          <div className="flex justify-center space-x-4 mt-8">
+          <div className="flex justify-center space-x-12 mt-8">
             <a href="/mainPage">
               <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600">Back</button>
             </a>

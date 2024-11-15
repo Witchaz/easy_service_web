@@ -72,9 +72,9 @@ export default function EngineerAddSpareParts() {
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
-    const handleSelect = () => {
-      if (selectedSparePart) {
-      navigate('/engineerDetailsSpareParts', { state: {  selectedSparePart, workId, machineId } });
+  const handleSelect = () => {
+    if (selectedSparePart) {
+      navigate('/engineerDetailsSpareParts', { state: { selectedSparePart, workId, machineId } });
     } else {
       alert("กรุณาเลือกอะไหล่ก่อน");
     }
@@ -91,7 +91,7 @@ export default function EngineerAddSpareParts() {
         <h1 className="text-center text-3xl font-bold text-lime-600 mb-8">คลังอะไหล่</h1>
         
         <div className="bg-white p-4 shadow-md rounded-lg">
-          <Form id="search-form" onChange={(event) => submit(event.currentTarget)} role="search">
+          <Form id="search-form" onChange={(event) => submit(event.currentTarget, { replace: true, state: { workId, machineId } })} role="search">
             <input
               type="text"
               aria-label="Search SparePartsList"
@@ -140,10 +140,10 @@ export default function EngineerAddSpareParts() {
             </div>
             <div className="flex items-center space-x-2">
               {page > 1 && (
-                <Link to={`?page=${page - 1}&q=${q}`} className="bg-gray-300 rounded-full h-8 w-8 flex items-center justify-center">Previous</Link>
+                <Link to={`?page=${page - 1}&q=${q}`} state={{ workId, machineId }} className="bg-gray-300 rounded-full h-8 w-8 flex items-center justify-center">Previous</Link>
               )}
               {page < totalPages && (
-                <Link to={`?page=${page + 1}&q=${q}`} className="bg-gray-300 rounded-full h-8 w-8 flex items-center justify-center">Next</Link>
+                <Link to={`?page=${page + 1}&q=${q}`} state={{ workId, machineId }} className="bg-gray-300 rounded-full h-8 w-8 flex items-center justify-center">Next</Link>
               )}
             </div>
           </div>

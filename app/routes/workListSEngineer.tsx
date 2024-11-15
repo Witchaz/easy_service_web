@@ -171,84 +171,90 @@ export default function workListSEngineer() {
   };
 
   const handleNewButtonAction = async (workId: number) => {
-    const confirmed = window.confirm("Are you sure you want to confirm this work?");
-    if (!confirmed) return;
+  const confirmed = window.confirm("Are you sure you want to confirm this work?");
+  if (!confirmed) return;
 
-    const work = works.find((w) => w.id === workId);
-    if (!work) {
-      alert("Work not found.");
-      return;
-    }
+  const work = works.find((w) => w.id === workId);
+  if (!work) {
+    alert("Work not found.");
+    return;
+  }
 
-    try {
-      // Fetch engineer's spare parts inventory using the specified API format
-      const url = `https://easy-service.prakasitj.com/spare_parts_engineer/getFromUserID/${engineerId}`;
-      const options = { method: "GET" };
-      const engineerPartsResponse = await fetch(url, options);
-      const engineerSpareParts = await engineerPartsResponse.json();
+  try {
+    // Fetch engineer's spare parts inventory
+    const url = `https://easy-service.prakasitj.com/spare_parts_engineer/getFromUserID/${engineerId}`;
+    const options = { method: "GET" };
+    const engineerPartsResponse = await fetch(url, options);
+    const engineerSpareParts = await engineerPartsResponse.json();
 
-      // Check spare parts for each machine in the work
-      for (const machine of work.machines || []) {
-        const machinePartsResponse = await fetch(
-          `https://easy-service.prakasitj.com/Spare_parts_requests/getListInRequest/${machine.id}`,
-          { method: "GET" }
-        );
-        const machineSpareParts = await machinePartsResponse.json();
-
-        for (const machinePart of machineSpareParts) {
-          // Find matching spare part by `spare_part_id` in the engineer's inventory
-          const matchingEngineerPart = engineerSpareParts.find(
-            (part: { spare_part_id: any }) => part.spare_part_id === machinePart.spare_part_id
-          );
-
-          if (matchingEngineerPart) {
-            if (matchingEngineerPart.quantity >= machinePart.spare_parts_qty) {
-              // Calculate the new quantity after usage
-              const newQuantity = matchingEngineerPart.quantity - machinePart.spare_parts_qty;
-
-              // Update the quantity in the database, using `spare_part_engineer_id` from engineer's part
-              await fetch(`https://easy-service.prakasitj.com/spare_parts_engineer/editSparePartsEngineer`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  id: matchingEngineerPart.spare_part_engineer_id,
-                  spare_part_id: machinePart.spare_part_id,
-                  quantity: newQuantity >= 0 ? newQuantity : 0,
-                  user_id: engineerId,
-                }),
-              });
-            } else {
-              alert(`Insufficient quantity of spare part: ${machinePart.name}`);
-              return;
-            }
-          } else {
-            alert(`Spare part ${machinePart.name} is not available in the engineer's inventory.`);
-            return;
-          }
-        }
+    // Check spare parts for each machine in the work
+    for (const machine of work.machines || []) {
+      if (machine.description.includes("(ไม่ต้องซ่อม)")) {
+        console.log(`Skipping machine ${machine.id} due to '(ไม่ต้องซ่อม)' in description.`);
+        continue; // Skip machines marked as "(ไม่ต้องซ่อม)"
       }
 
-      // Confirm work status update if spare parts are successfully updated
-      const confirmUrl = 'https://easy-service.prakasitj.com/works/setWorkStatus';
-      const confirmOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: workId,
-          status: work.status + 1,
-        }),
-      };
+      const machinePartsResponse = await fetch(
+        `https://easy-service.prakasitj.com/Spare_parts_requests/getListInRequest/${machine.id}`,
+        { method: "GET" }
+      );
+      const machineSpareParts = await machinePartsResponse.json();
 
-      const confirmResponse = await fetch(confirmUrl, confirmOptions);
-      if (!confirmResponse.ok) throw new Error("Failed to confirm the work.");
+      for (const machinePart of machineSpareParts) {
+        // Find matching spare part by `spare_part_id` in the engineer's inventory
+        const matchingEngineerPart = engineerSpareParts.find(
+          (part: { spare_part_id: any }) => part.spare_part_id === machinePart.spare_part_id
+        );
 
-      alert("Work confirmed and spare parts updated successfully!");
-      window.location.reload();
-    } catch (error) {
-      console.error("Error updating work and spare parts:", error);
-      alert("Failed to confirm the work. Please try again.");
+        if (matchingEngineerPart) {
+          if (matchingEngineerPart.quantity >= machinePart.spare_parts_qty) {
+            // Calculate the new quantity after usage
+            const newQuantity = matchingEngineerPart.quantity - machinePart.spare_parts_qty;
+
+            // Update the quantity in the database
+            await fetch(`https://easy-service.prakasitj.com/spare_parts_engineer/editSparePartsEngineer`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id: matchingEngineerPart.spare_part_engineer_id,
+                spare_part_id: machinePart.spare_part_id,
+                quantity: newQuantity >= 0 ? newQuantity : 0,
+                user_id: engineerId,
+              }),
+            });
+          } else {
+            alert(`Insufficient quantity of spare part: ${machinePart.name}`);
+            return;
+          }
+        } else {
+          alert(`Spare part ${machinePart.name} is not available in the engineer's inventory.`);
+          return;
+        }
+      }
     }
-  };
+
+    // Confirm work status update
+    const confirmUrl = 'https://easy-service.prakasitj.com/works/setWorkStatus';
+    const confirmOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: workId,
+        status: work.status + 1,
+      }),
+    };
+
+    const confirmResponse = await fetch(confirmUrl, confirmOptions);
+    if (!confirmResponse.ok) throw new Error("Failed to confirm the work.");
+
+    alert("Work confirmed and spare parts updated successfully!");
+    window.location.reload();
+  } catch (error) {
+    console.error("Error updating work and spare parts:", error);
+    alert("Failed to confirm the work. Please try again.");
+  }
+};
+
 
   const getStatusText = (status: number) => {
     switch (status) {
@@ -309,6 +315,9 @@ export default function workListSEngineer() {
             <p className="text-center text-lg font-semibold text-gray-600">ยังไม่มีงานที่ต้องไปซ่อม</p>
           )}
         </div>
+        <a href="/mainPageEngineer">
+          <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600 mt-4">Back</button>
+        </a>
       </div>
     </>
   );

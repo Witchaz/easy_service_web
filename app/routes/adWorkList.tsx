@@ -185,10 +185,7 @@ export default function adWorkList() {
         alert("กรุณาเลือกช่าง.");
         return;
       }
-      if (!work.machines || work.machines.length === 0) {
-        alert("ต้องมีเครื่องอย่างน้อย 1 เครื่อง.");
-        return;
-      }
+      
     }
 
     const confirmed = window.confirm("Are you sure you want to confirm this work?");

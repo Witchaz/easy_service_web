@@ -28,7 +28,7 @@ export default function WorkConfirm() {
         additionalExpenses,  
         status: 0,
     });
-
+    console.log(customerName)
     useEffect(() => {
         sessionStorage.setItem("initialFormData", JSON.stringify(formData));
     }, []);
@@ -42,106 +42,132 @@ export default function WorkConfirm() {
     };
 
     const handleSave = async () => {
-        const warrantyDetails = formData.details.filter((detail: { warranty: boolean; }) => detail.warranty === true);
-        const nonWarrantyDetails = formData.details.filter((detail: { warranty: boolean; }) => detail.warranty === false);
+    const warrantyDetails = formData.details.filter((detail: { warranty: boolean; }) => detail.warranty === true);
+    const nonWarrantyDetails = formData.details.filter((detail: { warranty: boolean; }) => detail.warranty === false);
 
-        if (warrantyDetails.length > 0 || nonWarrantyDetails.length > 0) {
-            try {
-                
-                const urlCustomerID = `https://easy-service.prakasitj.com/customers/getIDbyName/${encodeURIComponent(formData.customerName)}`;
-                const optionsCustomerID = { method: 'GET' };
-                const responseCustomerID = await fetch(urlCustomerID, optionsCustomerID);
-                const dataCustomerID = await responseCustomerID.json();
-                const customerID = dataCustomerID[0].id;
-                
+    if (warrantyDetails.length > 0 || nonWarrantyDetails.length > 0) {
+        try {
+            const urlCustomerID = `https://easy-service.prakasitj.com/customers/getIDbyName/${(formData.customerName)}`;
+            const optionsCustomerID = { method: 'GET' };
+            const responseCustomerID = await fetch(urlCustomerID, optionsCustomerID);
 
-                if (warrantyDetails.length > 0) {
-                    const urlCreateWork = 'https://easy-service.prakasitj.com/works/createNewWork';
-                    const optionsCreateWork = {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            mail_date: "2024-11-01T08:00:00Z",
-                            customer_id:customerID,
-                            address: formData.address,
-                            province: formData.province,
-                        })
-                    };
-                    await fetch(urlCreateWork, optionsCreateWork);
-
-                    const urlWorkID = 'https://easy-service.prakasitj.com/works/getLastWork';
-                    const responseWorkID = await fetch(urlWorkID, { method: 'GET' });
-                    const dataWorkID = await responseWorkID.json();
-                    const workID = dataWorkID[0].id;
-
-                 
-                    for (const detail of warrantyDetails) {
-                        const urlCreateRequests = 'https://easy-service.prakasitj.com/Requests/insertRequest';
-                        const optionsCreateRequests = {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                model: detail.model,
-                                sn: detail.serialNumber,
-                                rated: detail.rated,
-                                description: detail.description,
-                                warranty: true,
-                                work_id: workID
-                            })
-                        };
-                        await fetch(urlCreateRequests, optionsCreateRequests);
-                    }
-                }
-
-                // Create new Work for nonWarrantyDetails
-                if (nonWarrantyDetails.length > 0) {
-                    const urlCreateWork = 'https://easy-service.prakasitj.com/works/createNewWork';
-                    const optionsCreateWork = {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            mail_date: "2024-11-01T08:00:00Z",
-                            customer_id:customerID,
-                            address: formData.address,
-                            province: formData.province,
-                        })
-                    };
-                    await fetch(urlCreateWork, optionsCreateWork);
-
-                    const urlWorkID = 'https://easy-service.prakasitj.com/works/getLastWork';
-                    const responseWorkID = await fetch(urlWorkID, { method: 'GET' });
-                    const dataWorkID = await responseWorkID.json();
-                    const workID = dataWorkID[0].id;
-
-                    // Create Requests for each detail in nonWarrantyDetails
-                    for (const detail of nonWarrantyDetails) {
-                        const urlCreateRequests = 'https://easy-service.prakasitj.com/Requests/insertRequest';
-                        const optionsCreateRequests = {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                model: detail.model,
-                                sn: detail.serialNumber,
-                                rated: detail.rated,
-                                description: detail.description,
-                                warranty: false,
-                                work_id: workID
-                            })
-                        };
-                        await fetch(urlCreateRequests, optionsCreateRequests);
-                    }
-                }
-
-                // แสดงข้อความและเปลี่ยนหน้า
-                alert("ได้ทำการบันทึกงานแล้ว");
-                navigate("/customerList");
-
-            } catch (error) {
-                console.error("Error creating work or fetching customer ID:", error);
-                alert("เกิดข้อผิดพลาดขณะสร้างงานหรือดึงข้อมูล ID ของลูกค้า");
+            if (!responseCustomerID.ok) {
+                throw new Error(`Failed to fetch customer ID: ${responseCustomerID.status}`);
             }
+
+            const dataCustomerID = await responseCustomerID.json();
+
+            if (!dataCustomerID || !Array.isArray(dataCustomerID) || dataCustomerID.length === 0) {
+                throw new Error('No customer found with the given name.');
+            }
+
+            const customerID = dataCustomerID[0].id;
+
+            // Process warrantyDetails
+            if (warrantyDetails.length > 0) {
+                await createWorkAndRequests(customerID, warrantyDetails, true);
+            }
+
+            // Process nonWarrantyDetails
+            if (nonWarrantyDetails.length > 0) {
+                await createWorkAndRequests(customerID, nonWarrantyDetails, false);
+            }
+
+            // Show success message and navigate
+            alert("ได้ทำการบันทึกงานแล้ว");
+            navigate("/customerList");
+        } catch (error) {
+            console.error("Error creating work or fetching customer ID:", error);
+            alert("เกิดข้อผิดพลาดขณะสร้างงานหรือดึงข้อมูล ID ของลูกค้า");
         }
+        }
+    else {
+        const urlCustomerID = `https://easy-service.prakasitj.com/customers/getIDbyName/${(formData.customerName)}`;
+        const optionsCustomerID = { method: 'GET' };
+        const responseCustomerID = await fetch(urlCustomerID, optionsCustomerID);
+
+        if (!responseCustomerID.ok) {
+            throw new Error(`Failed to fetch customer ID: ${responseCustomerID.status}`);
+        }
+
+        const dataCustomerID = await responseCustomerID.json();
+
+        if (!dataCustomerID || !Array.isArray(dataCustomerID) || dataCustomerID.length === 0) {
+            throw new Error('No customer found with the given name.');
+        }
+
+        const customerID = dataCustomerID[0].id;
+        const urlCreateWork = 'https://easy-service.prakasitj.com/works/createNewWork';
+        const optionsCreateWork = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            
+            customer_id: customerID,
+            address: formData.address,
+            province: formData.province,
+        }),
+        };
+
+        const responseCreateWork = await fetch(urlCreateWork, optionsCreateWork);
+        alert("ได้ทำการบันทึกงานแล้ว");
+        navigate("/customerList");
+        }
+};
+
+// Helper function to create work and requests
+const createWorkAndRequests = async (customerID: any, details: any, isWarranty: boolean) => {
+    const urlCreateWork = 'https://easy-service.prakasitj.com/works/createNewWork';
+    const optionsCreateWork = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            
+            customer_id: customerID,
+            address: formData.address,
+            province: formData.province,
+        }),
     };
+
+    const responseCreateWork = await fetch(urlCreateWork, optionsCreateWork);
+
+    if (!responseCreateWork.ok) {
+        throw new Error('Failed to create a new work entry.');
+    }
+
+    const urlWorkID = 'https://easy-service.prakasitj.com/works/getLastWork';
+    const responseWorkID = await fetch(urlWorkID, { method: 'GET' });
+
+    if (!responseWorkID.ok) {
+        throw new Error('Failed to fetch the last work ID.');
+    }
+
+    const dataWorkID = await responseWorkID.json();
+    const workID = dataWorkID[0].id;
+
+    for (const detail of details) {
+        const urlCreateRequests = 'https://easy-service.prakasitj.com/Requests/insertRequest';
+        const optionsCreateRequests = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                model: detail.model,
+                sn: detail.serialNumber,
+                rated: detail.rated,
+                description: detail.description,
+                warranty: isWarranty,
+                work_id: workID,
+            }),
+        };
+
+        const responseCreateRequest = await fetch(urlCreateRequests, optionsCreateRequests);
+
+        if (!responseCreateRequest.ok) {
+            throw new Error('Failed to create a request entry.');
+        }
+    }
+};
+
 
     return (
         <>

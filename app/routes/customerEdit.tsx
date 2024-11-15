@@ -87,7 +87,7 @@ export default function CustomerEdit() {
         if (!customer.name) errors.name = "ชื่อ/บริษัท ต้องไม่ว่าง";
         if (!customer.tel || customer.tel.length !== 10) errors.tel = "หมายเลขโทรศัพท์ต้องมี 10 หลัก";
         if (!customer.address) errors.address = "ที่อยู่ ต้องไม่ว่าง";
-        if (!customer.tax_id || customer.tax_id.length !== 10) errors.tax_id = "หมายเลขประจำตัวผู้เสียภาษีต้องมี 10 หลัก";
+        if (!customer.tax_id || customer.tax_id.length !== 13) errors.tax_id = "หมายเลขประจำตัวผู้เสียภาษีต้องมี 13 หลัก";
         if (!customer.province) errors.province = "จังหวัด ต้องไม่ว่าง";
         if (customer.credit_limit <= 0) errors.credit_limit = "Credit limit ต้องมากกว่า 0";
 

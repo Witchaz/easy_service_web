@@ -1,14 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface IDContextProps {
-  id: number | null;
-  setId: (id: number) => void;
+  id: number | null; // เปลี่ยนให้ `id` รองรับ `null`
+  setId: (id: number | null) => void; // เปลี่ยน `setId` ให้รองรับ `null`
+  clearId: () => void; // ฟังก์ชันสำหรับตั้งค่า `id` เป็น `null`
 }
 
 const IDContext = createContext<IDContextProps | undefined>(undefined);
 
 export const IDProvider = ({ children }: { children: ReactNode }) => {
-  const [id, setId] = useState<number | null>(null);
+  const [id, setId] = useState<number | null>(null); // เปลี่ยน useState ให้รองรับ `null`
 
   // ดึงค่า `id` จาก `localStorage` เมื่อโหลดครั้งแรก
   useEffect(() => {
@@ -18,14 +19,21 @@ export const IDProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // อัปเดตค่า `localStorage` ทุกครั้งที่ค่า `id` เปลี่ยนแปลง
-  const handleSetId = (newId: number) => {
+  // ฟังก์ชันสำหรับตั้งค่า id และอัปเดตใน localStorage
+  const handleSetId = (newId: number | null) => {
     setId(newId);
-    localStorage.setItem("userId", newId.toString());
+    if (newId === null) {
+      localStorage.removeItem("userId"); // ลบ `userId` ออกจาก localStorage
+    } else {
+      localStorage.setItem("userId", newId.toString());
+    }
   };
 
+  // ฟังก์ชันสำหรับตั้งค่า id เป็น null
+  const clearId = () => handleSetId(null);
+
   return (
-    <IDContext.Provider value={{ id, setId: handleSetId }}>
+    <IDContext.Provider value={{ id, setId: handleSetId, clearId }}>
       {children}
     </IDContext.Provider>
   );

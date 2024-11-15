@@ -10,7 +10,6 @@ interface FormData {
     surname: string;
     address: string;
     province: string;
-    role: string;
 }
 
 export default function AddEngineer() {
@@ -21,7 +20,7 @@ export default function AddEngineer() {
         surname: "",
         address: "",
         province: "",
-        role: ""
+
     });
 
     const [errors, setErrors] = useState<Partial<FormData>>({});
@@ -50,7 +49,7 @@ export default function AddEngineer() {
         if (!formData.surname) newErrors.surname = "Surname is required.";
         if (!formData.address) newErrors.address = "Address is required.";
         if (!formData.province) newErrors.province = "Province is required.";
-        if (!formData.role) newErrors.role = "Role is required.";
+        
 
         if (Object.keys(newErrors).length === 0) {
             try {
@@ -154,17 +153,7 @@ export default function AddEngineer() {
                         />
                         {errors.province && <p className="text-red-500 text-sm">{errors.province}</p>}
                     </div>
-                    <div className="mb-4">
-                        <label>Role</label>
-                        <input
-                            type="text"
-                            name="role"
-                            value={formData.role}
-                            onChange={handleChange}
-                            className="border rounded w-full py-2 px-3"
-                        />
-                        {errors.role && <p className="text-red-500 text-sm">{errors.role}</p>}
-                    </div>
+                    
 
                     <div className="flex justify-between">
                         <button type="button" className="bg-red-500 text-white py-2 px-4 rounded" onClick={handleBack}>

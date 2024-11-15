@@ -50,9 +50,8 @@ export const action: ActionFunction = async ({ request }) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(userData),
   });
-  alert("Login successful!");
+  alert("Update successful!");
   
-
   return redirect(`/user/${userData.id}`);
 };
 
@@ -72,7 +71,7 @@ export default function EditEngineer() {
     });
     setErrors({
       ...errors,
-      [name]: "" 
+      [name]: ""
     });
   };
 
@@ -85,18 +84,20 @@ export default function EditEngineer() {
     if (!formData.surname) newErrors.surname = "Surname is required.";
     if (!formData.address) newErrors.address = "Address is required.";
     if (!formData.province) newErrors.province = "Province is required.";
-    if (!formData.role) newErrors.role = "Role is required.";
 
     if (Object.keys(newErrors).length === 0) {
-      await fetch("https://easy-service.prakasitj.com/user/editUser", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-      });
-      alert("Update Succesful!");
-      navigate("/engineerList");
+      const confirmed = window.confirm("Are you sure you want to save these changes?");
+      if (confirmed) {
+        await fetch("https://easy-service.prakasitj.com/user/editUser", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(formData)
+        });
+        alert("Update Successful!");
+        navigate("/engineerList");
+      }
     } else {
       setErrors(newErrors);
     }
@@ -170,25 +171,10 @@ export default function EditEngineer() {
             />
             {errors.province && <p className="text-red-500 text-sm">{errors.province}</p>}
           </div>
-          <div className="mb-4">
-            <label>Role *</label>
-            <input
-              type="text"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="border rounded w-full py-2 px-3"
-              placeholder="Enter role"
-            />
-            {errors.role && <p className="text-red-500 text-sm">{errors.role}</p>}
-          </div>
+          
           <div className="flex justify-between">
-            <button type="button" className="bg-red-500 text-white py-2 px-4 rounded" onClick={() => navigate("/engineerList")}>
-              Back
-            </button>
-            <button type="submit" className="bg-lime-500 text-white py-2 px-4 rounded" >
-              Confirm
-            </button>
+            <button type="button" className="bg-red-500 text-white py-2 px-4 rounded" onClick={() => navigate("/engineerList")}>Back</button>
+            <button type="submit" className="bg-lime-500 text-white py-2 px-4 rounded">Confirm</button>
           </div>
         </Form>
       </div>

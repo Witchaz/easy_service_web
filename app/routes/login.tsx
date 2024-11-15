@@ -33,13 +33,13 @@ export default function Login() {
         const data = await response.json();
         if (!data.error) {
           setError(""); 
-          setId(data.payload); // Store the user ID in context
+          setId(data.payload); 
           
           alert("Login successful!");
           if (data.payload !== 7) {
-            navigate("/workListEngineer");
+            navigate("/mainPageEngineer");
           } else {
-            navigate("/workList");    
+            navigate("/mainPage");    
           }
         } else {
           setError("Invalid username or password");

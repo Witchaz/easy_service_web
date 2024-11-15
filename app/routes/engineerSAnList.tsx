@@ -10,7 +10,7 @@ interface Expenses {
   amount: number;
 }
 
-export default function ExpensesList() {
+export default function engineerSAnList() {
   const navigate = useNavigate();
   const location = useLocation();
   const { workId } = location.state || {}; // Receive workId
@@ -39,7 +39,7 @@ export default function ExpensesList() {
   }, [workId]);
 
   const handleBack = () => {
-    navigate("/workWait", { state: { workId } });
+    navigate("/engineerSWork", { state: { workId } });
   };
 
   if (error) {

@@ -86,7 +86,7 @@ export default function SparePartsList() {
     <>
       <NavBar />
       <div className="min-h-screen p-8 bg-gray-50">
-        <h1 className="text-center text-3xl font-bold text-lime-600 mb-8">คลังอะไหล่</h1>
+        <h1 className="text-center text-3xl font-bold text-lime-600 mb-8">รายการอะไหล่</h1>
         
         <div className="bg-white p-4 shadow-md rounded-lg">
           <Form id="search-form" onChange={(event) => submit(event.currentTarget)} role="search">

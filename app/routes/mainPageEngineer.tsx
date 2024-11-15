@@ -1,12 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import NavBar from "app/components/_navBar";
+import NavBar from "app/components/_navBarEngineer";
 import { useID } from "~/context/IDContext";
 
 export default function Main() {
   const navigate = useNavigate();
   const { id, clearId } = useID();
-  console.log(id)
   const handleNavigation = (path: string) => {
     navigate(path);
   };
@@ -19,7 +18,11 @@ export default function Main() {
       alert("You have been logged out.");
       navigate("/login"); // Redirect to login page
     }
-  };
+    };
+    
+    const handleEdit = () => {
+        navigate("/profileEngineer");
+    }
 
   return (
     <>
@@ -28,50 +31,32 @@ export default function Main() {
         <h1 className="text-3xl font-bold text-lime-600 mb-8">Main Menu</h1>
         <div className="flex flex-col space-y-4 w-full max-w-md">
           <button
-            className="bg-blue-500 text-black py-2 px-4 rounded-lg hover:bg-blue-600 w-full"
-            onClick={() => handleNavigation("/customerList")}
-          >
-            รายชื่อลูกค้า
-          </button>
-          <button
-            className="bg-gray-500 text-black py-2 px-4 rounded-lg hover:bg-gray-600 w-full"
-            onClick={() => handleNavigation("/engineerList")}
-          >
-            รายชื่อช่าง
-          </button>
-          <button
-            className="bg-gray-500 text-black py-2 px-4 rounded-lg hover:bg-gray-600 w-full"
-            onClick={() => handleNavigation("/sparePartsList")}
-          >
-            รายการอะไหล่
-          </button>
-          <button
-            className="bg-gray-500 text-black py-2 px-4 rounded-lg hover:bg-gray-600 w-full"
-            onClick={() => handleNavigation("/historyRequestAdmin")}
-          >
-            รายการเบิกของ
-          </button>
-          <button
             className="bg-lime-500 text-black py-2 px-4 rounded-lg hover:bg-lime-600 w-full"
-            onClick={() => handleNavigation("/adWorkList")}
+            onClick={() => handleNavigation("/workListEngineer")}
           >
-            งานที่รอการทำ
+            งานทั้งหมดที่ต้องไปตรวจ
           </button>
           <button
             className="bg-purple-500 text-black py-2 px-4 rounded-lg hover:bg-purple-600 w-full"
-            onClick={() => handleNavigation("/workWaitList")}
+            onClick={() => handleNavigation("/workListSEngineer")}
           >
-            งานที่ช่างกำลังทำ
+            งานทั้งหมดที่ต้องไปซ่อม
           </button>
           <button
-            className="bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 w-full"
-            onClick={() => handleNavigation("/allWorkEnd")}
+            className="bg-gray-500 text-black py-2 px-4 rounded-lg hover:bg-gray-600 w-full"
+            onClick={() => handleNavigation("/request")}
           >
-            งานที่จบแล้ว
+            เบิกอะไหล่
+          </button>
+          <button
+            className="bg-gray-500 text-black py-2 px-4 rounded-lg hover:bg-gray-600 w-full"
+            onClick={() => handleNavigation("/historyRequest")}
+          >
+            ประวัติการเบิก
           </button>
           <button
             className="bg-orange-500 text-black py-2 px-4 rounded-lg hover:bg-orange-600 w-full"
-            onClick={() => handleNavigation("/profile")}
+            onClick={handleEdit}
           >
             โปรไฟล์ผู้ใช้
           </button>

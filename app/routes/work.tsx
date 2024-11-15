@@ -50,11 +50,7 @@ export default function Work() {
     };
 
     const handleNext = () => {
-        if (formData.details.length < 1) {
-            alert("กรุณาเพิ่มรายละเอียดเครื่องอย่างน้อย 1 เครื่องก่อนดำเนินการต่อ");
-        } else {
-            navigate("/workConfirm", { state: { ...formData } });
-        }
+        navigate("/workConfirm", { state: { ...formData } }); 
     };
 
     return (

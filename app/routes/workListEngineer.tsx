@@ -149,6 +149,29 @@ export default function WorkListEngineer() {
     navigate("/engineerWork", { state: { workId } });
   };
 
+  const handleConfirm = async (workId: number,workStatus: number) => {
+    const confirmed = window.confirm("Are you sure you want to confirm this work?");
+    if (confirmed) {
+      const url = `https://easy-service.prakasitj.com/works/setWorkStatus`;
+      const options = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: workId, status: workStatus+1 }),
+      };
+
+      try {
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error("Failed to confirm work");
+
+        alert("Work confirmed successfully!");
+        window.location.reload();
+      } catch (error) {
+        console.error("Error confirming work:", error);
+        alert("Failed to confirm work.");
+      }
+    }
+  };
+
   return (
     <>
       <NavBar />
@@ -182,6 +205,12 @@ export default function WorkListEngineer() {
                     >
                       View Details
                     </button>
+                    <button
+                      className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 mt-2"
+                      onClick={() => handleConfirm(work.id,work.status)}
+                    >
+                      Confirm Work
+                    </button>
                   </div>
                 </div>
               ))
@@ -189,6 +218,9 @@ export default function WorkListEngineer() {
             <p className="text-center text-lg font-semibold text-gray-600">ยังไม่มีงานที่ต้องไปตรวจ</p>
           )}
         </div>
+        <a href="/mainPageEngineer">
+          <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600 mt-4">Back</button>
+        </a>
       </div>
     </>
   );

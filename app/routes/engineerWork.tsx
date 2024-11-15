@@ -208,7 +208,11 @@ export default function EngineerWork() {
     if (field === "Power Supply") {
       navigate("/engineerPowerSupplyList", { state: { workId } });
     }
+    else if (field === "An Cost") {
+      navigate("/engineerAnList", { state: { workId } });
+    }
   };
+
 
   if (error) {
     return <p className="text-red-500 text-center">{error}</p>;
@@ -244,6 +248,9 @@ export default function EngineerWork() {
             <div className="flex flex-col gap-2 mt-4 items-start">
               <button onClick={() => handleEdit("Power Supply")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
                 View Power Supply
+              </button>
+              <button onClick={() => handleEdit("An Cost")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
+                View An Cost
               </button>
             </div>
           </div>

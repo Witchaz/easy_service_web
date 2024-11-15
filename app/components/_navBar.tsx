@@ -28,7 +28,7 @@ function NavBar() {
             รายชื่อช่าง
           </a>
           <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/sparePartsList")}>
-            คลังอะไหล่
+            รายการอะไหล่
           </a>
           <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/historyRequestAdmin")}>
             เบิกของ
