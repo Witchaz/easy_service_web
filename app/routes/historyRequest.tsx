@@ -68,39 +68,86 @@ export default function TransactionList() {
   const handleAccept = async (transactionId: number) => {
     try {
       const transaction = transactions.find((t) => t.id === transactionId);
-      const statusUpdate = 3;
-
       if (!transaction) {
         alert("Transaction not found");
         return;
       }
-
-      const response = await fetch(`https://easy-service.prakasitj.com/transactionLogs/updateStatusTransactionLog`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...transaction,
-          status: statusUpdate,
-        }),
-      });
-
+  
+      // ดึงข้อมูลอะไหล่ในคลังของช่าง
+      const response = await fetch(
+        `https://easy-service.prakasitj.com/spare_parts_engineer/getFromUserID/${transaction.user_id}`
+      );
+  
       if (!response.ok) {
+        alert("Failed to fetch spare parts in stock");
+        return;
+      }
+  
+      const sparePartsInStock = await response.json();
+      const existingSparePart = sparePartsInStock.find(
+        (part: any) => part.spare_part_id === transaction.spare_part_id
+      );
+  
+      if (existingSparePart) {
+        // แก้ไขจำนวนอะไหล่ในคลัง
+        await fetch(`https://easy-service.prakasitj.com/spare_parts_engineer/editSparePartsEngineer`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: existingSparePart.spare_part_engineer_id,
+            spare_part_id: transaction.spare_part_id,
+            quantity: existingSparePart.quantity + transaction.quantity,
+            user_id: transaction.user_id,
+          }),
+        });
+      } else {
+        // เพิ่มอะไหล่ใหม่ในคลัง
+        await fetch(`https://easy-service.prakasitj.com/spare_parts_engineer/insertSparePartsEngineer`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            spare_part_id: transaction.spare_part_id,
+            quantity: transaction.quantity,
+            user_id: transaction.user_id,
+          }),
+        });
+      }
+  
+      // อัปเดตสถานะ Transaction
+      const statusUpdate = 3;
+      const updateResponse = await fetch(
+        `https://easy-service.prakasitj.com/transactionLogs/updateStatusTransactionLog`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...transaction,
+            status: statusUpdate,
+          }),
+        }
+      );
+  
+      if (!updateResponse.ok) {
         alert("Failed to accept transaction");
         return;
       }
-
+  
       setTransactions((prev) =>
         prev.map((t) => (t.id === transactionId ? { ...t, status: statusUpdate } : t))
       );
-
+  
       alert("อัพเดตข้อมูลเรียบร้อย");
     } catch (err) {
       console.error("Error accepting transaction:", err);
     }
   };
-
+  
   const handleReject = async (transactionId: number) => {
     try {
       const transaction = transactions.find((t) => t.id === transactionId);
@@ -142,6 +189,22 @@ export default function TransactionList() {
   
   const sortedTransactions = filteredTransactions.sort((a, b) => b.id - a.id);
 
+  const getStatusName = (status: number) => {
+    switch (status) {
+      case 0:
+        return "รออนุมัติ";
+      case 1:
+        return "รอดำเนินการ";
+      case 2:
+        return "ถูกปฎิเสธ";
+      case 3:
+        return "เสร็จสิ้น(เรียบร้อย)";
+      case 4:
+        return "เสร็จสิ้น(ปฎิเสธ)";
+      default:
+        return "สถานะไม่รู้จัก";
+    }
+  };
   return (
     <>
       <NavBar />
@@ -196,7 +259,7 @@ export default function TransactionList() {
                   <p><strong>Transaction ID:</strong> {transaction.id}</p>
                   <p><strong>Spare Part:</strong> {getSparePartName(transaction.spare_part_id)}</p>
                   <p><strong>Quantity:</strong> {transaction.quantity}</p>
-                  <p><strong>Status:</strong> {transaction.status}</p>
+                  <p><strong>Status:</strong> {getStatusName(transaction.status)}</p>
                   <p><strong>Add Date:</strong> {new Date(transaction.add_date).toLocaleString()}</p>
                 </div>
                 {transaction.status === 1 ? (

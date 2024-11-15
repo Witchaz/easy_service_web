@@ -141,7 +141,22 @@ export default function TransactionList() {
   : transactions;
   
   const sortedTransactions = filteredTransactions.sort((a, b) => b.id - a.id);
-
+  const getStatusName = (status: number) => {
+    switch (status) {
+      case 0:
+        return "รอดำเนินการ";
+      case 1:
+        return "อนุมัติแล้ว";
+      case 2:
+        return "ปฎิเสธ";
+      case 3:
+        return "เสร็จสิ้น(เรียบร้อย)";
+      case 4:
+        return "เสร็จสิ้น(ถูกปฎิเสธ)";
+      default:
+        return "สถานะไม่รู้จัก";
+    }
+  };
   return (
     <>
       <NavBar />
@@ -197,7 +212,7 @@ export default function TransactionList() {
                 <p><strong>Transaction ID:</strong> {transaction.id}</p>
                 <p><strong>Spare Part:</strong> {getSparePartName(transaction.spare_part_id)}</p>
                 <p><strong>Quantity:</strong> {transaction.quantity}</p>
-                <p><strong>Status:</strong> {transaction.status}</p>
+                <p><strong>Status:</strong> {getStatusName(transaction.status)}</p>
                 <p><strong>Add Date:</strong> {new Date(transaction.add_date).toLocaleString()}</p>
               </div>
               {transaction.status === 0 ? (
