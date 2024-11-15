@@ -174,6 +174,8 @@ export default function adWorkList() {
   };
 
   const handleNewButtonAction = async (workId: number) => {
+    const confirmed = window.confirm("Are you sure you want to confirm this work?");
+    if (confirmed) {
     const work = works.find((w) => w.id === workId);
     if (!work) {
       alert("Work not found.");
@@ -181,15 +183,35 @@ export default function adWorkList() {
     }
 
     if (work.status === 0) {
-      if (!work.user_id) {
-        alert("กรุณาเลือกช่าง.");
-        return;
-      }
-      
+    if (!work.user_id) {
+      alert("กรุณาเลือกช่าง.");
+      return;
     }
 
-    const confirmed = window.confirm("Are you sure you want to confirm this work?");
-    if (confirmed) {
+    if (!work.machines || work.machines.length === 0) {
+      // Update status to 6 if there are no machines
+      const url = `https://easy-service.prakasitj.com/works/setWorkStatus`;
+      const options = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: workId, status: 6 }),
+      };
+
+      try {
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error("Failed to update work status");
+
+        alert("Work status updated to 6 successfully!");
+        window.location.reload();
+      } catch (error) {
+        console.error("Error updating work status:", error);
+        alert("Failed to update work status.");
+      }
+      return;
+    }
+  }
+
+    
       const url = `https://easy-service.prakasitj.com/works/setWorkStatus`;
       const options = {
         method: "POST",

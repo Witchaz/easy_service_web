@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import NavBar from "app/components/_navBar";
+import NavBar from "app/components/_navBarEngineer";
 import { useNavigate, useLocation } from "react-router-dom";
 
 interface SparePartsRequest {
@@ -81,7 +81,9 @@ export default function engineerSSparePartList() {
                 </div>
               ))
             ) : (
-              <p>No spare part data available</p>
+              <div className="flex items-center justify-center h-full">
+                <p className="text-red-500 text-center">No spare part data available</p>
+              </div>
             )}
           </div>
         )}

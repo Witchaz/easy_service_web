@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import NavBar from "app/components/_navBar";
+import NavBar from "app/components/_navBarEngineer";
 import { useNavigate, useLocation } from "react-router-dom";
 
 interface WorkDetails {
@@ -23,6 +23,11 @@ interface Machine {
   add_date: string;
 }
 
+interface SparePartRequest {
+  price: number;
+  spare_parts_qty: number;
+}
+
 interface AdditionalCost {
   id: number;
   description: string;
@@ -32,7 +37,7 @@ interface AdditionalCost {
   work_id: number;
 }
 
-export default function workEnd() {
+export default function engineerSWork() {
   const navigate = useNavigate();
   const location = useLocation();
   const { workId } = location.state || {};
@@ -41,8 +46,19 @@ export default function workEnd() {
   const [machines, setMachines] = useState<Machine[]>([]);
   const [customerName, setCustomerName] = useState<string>("");
   const [totalAdditionalCost, setTotalAdditionalCost] = useState<number>(0);
-  const [totalRepairCost, setTotalRepairCost] = useState<number>(0); // New state for repair cost
+  const [totalRepairCost, setTotalRepairCost] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
+
+  const getStatusText = (status: number) => {
+    switch (status) {
+      case 1:
+        return "งานที่ต้องไปตรวจ";
+      case 6:
+        return "งานที่ต้องไปติดตั้ง";
+      default:
+        return "สถานะไม่ทราบ";
+    }
+  };
 
   useEffect(() => {
     const fetchWorkDetails = async () => {
@@ -70,7 +86,7 @@ export default function workEnd() {
           const machinesData = await fetchMachinesByWorkID(work.id);
           setMachines(machinesData);
           fetchAdditionalCosts(work.id);
-          calculateTotalRepairCost(machinesData); // Calculate repair cost
+          calculateRepairCost(machinesData);
         } else {
           setError("No work details found");
         }
@@ -161,73 +177,46 @@ export default function workEnd() {
     }
   };
 
-  const calculateTotalRepairCost = async (machines: Machine[]) => {
-    let totalRepairCost = 0;
+  const calculateRepairCost = async (machines: Machine[]) => {
+    try {
+      let totalRepairCost = 0;
 
-    for (const machine of machines) {
-      if (!machine.description.includes("(ไม่ต้องซ่อม)")) {
-        const machineCost = await fetchRepairCost(machine.id);
+      for (const machine of machines) {
+        if (machine.description.includes("(ไม่ต้องซ่อม)")) {
+          continue;
+        }
+        const url = `https://easy-service.prakasitj.com/Spare_parts_requests/getListInRequest/${machine.id}`;
+        const options = { method: "GET" };
+        
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error("Failed to fetch spare parts for machine");
+
+        const data: SparePartRequest[] = await response.json();
+        
+        const machineCost = data.reduce((sum, part) => sum + part.price * part.spare_parts_qty, 0);
         totalRepairCost += machineCost;
       }
-    }
-
-    setTotalRepairCost(totalRepairCost);
-  };
-
-  const fetchRepairCost = async (machineId: number): Promise<number> => {
-    const url = `https://easy-service.prakasitj.com/Spare_parts_requests/getListInRequest/${machineId}`;
-    const options = { method: "GET" };
-
-    try {
-      const response = await fetch(url, options);
-      if (!response.ok) throw new Error("Failed to fetch spare parts data");
-
-      const data = await response.json();
-      return data.reduce(
-        (total: number, part: { price: number; spare_parts_qty: number }) =>
-          total + part.price * part.spare_parts_qty,
-        0
-      );
+      
+      setTotalRepairCost(totalRepairCost);
     } catch (error) {
-      console.error("Error fetching repair cost:", error);
-      return 0;
+      console.error("Error calculating repair cost:", error);
     }
   };
 
   const handleBack = () => {
-    navigate("/allWorkEnd");
+    navigate("/workListDoEngineer");
   };
 
   const handleEdit = (field: string) => {
-    if (field === "Power Supply") {
-      navigate("/workEndPowerSupply", { state: { workId } });
-    } else if (field === "AN Cost") {
-      navigate("/workEndAnList", { state: { workId } });
+    if (field === "An Cost") {
+      navigate("/engineerAnDoList", { state: { workId } });
     }
+    
   };
 
   if (error) {
     return <p className="text-red-500 text-center">{error}</p>;
   }
-
-  const getStatusText = (status: number) => {
-    switch (status) {
-      case 0:
-        return "งานที่รอการเลือกช่างให้ไปตรวจ";
-      case 1:
-        return "งานที่ช่างกำลังตรวจสอบ";
-      case 2:
-        return "งานที่รอการยืนยันให้ไปซ่อม";
-      case 3:
-        return "งานที่ช่างกำลังซ่อม";
-      case 4:
-        return "งานที่เสร็จสิ้น";
-      case 5:
-        return "งานที่ถูกยกเลิก";
-      default:
-        return "สถานะไม่ทราบ";
-    }
-  };
 
   return (
     <>
@@ -257,11 +246,10 @@ export default function workEnd() {
             <p><strong>สถานะการทำงาน:</strong> {getStatusText(workDetails.status)}</p>
 
             <div className="flex flex-col gap-2 mt-4 items-start">
-              <button onClick={() => handleEdit("Power Supply")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                View Power Supply
-              </button>
-              <button onClick={() => handleEdit("AN Cost")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                View AN Cost
+              
+                   
+              <button onClick={() => handleEdit("An Cost")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
+                View An Cost
               </button>
             </div>
           </div>

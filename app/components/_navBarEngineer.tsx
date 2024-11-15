@@ -21,6 +21,9 @@ function NavBar() {
             <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/workListSEngineer")}>
               งานทั้งหมดที่ต้องไปซ่อม
             </a>
+            <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/workListDoEngineer")}>
+              งานทั้งหมดที่ต้องไปติดตั้ง
+            </a>
             <a className="font-bold hover:text-primary" onClick={() => handleNavigate("/request")}>
               เบิกของ
             </a>

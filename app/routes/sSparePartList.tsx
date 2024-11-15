@@ -81,7 +81,9 @@ export default function sSparePartList() {
                 </div>
               ))
             ) : (
-              <p>No spare part data available</p>
+              <div className="flex items-center justify-center h-full">
+                <p className="text-red-500 text-center">No spare part data available</p>
+              </div>
             )}
           </div>
         )}

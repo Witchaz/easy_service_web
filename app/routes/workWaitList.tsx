@@ -115,7 +115,7 @@ export default function workWaitList() {
 
   useEffect(() => {
     const fetchWorks = async () => {
-      const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/1,3`;
+      const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/1,3,6`;
 
       try {
         const response = await fetch(url);
@@ -169,6 +169,8 @@ export default function workWaitList() {
         return "งานที่ช่างกำลังซ่อม";
       case 4:
         return "งานที่เสร็จสิ้น";
+      case 6:
+        return "งานที่ช่างกำลังทำ";
       default:
         return "สถานะไม่ทราบ";
     }

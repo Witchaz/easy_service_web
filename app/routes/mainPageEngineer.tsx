@@ -43,6 +43,12 @@ export default function Main() {
             งานทั้งหมดที่ต้องไปซ่อม
           </button>
           <button
+            className="bg-purple-500 text-black py-2 px-4 rounded-lg hover:bg-purple-600 w-full"
+            onClick={() => handleNavigation("/workListDoEngineer")}
+          >
+            งานทั้งหมดที่ต้องไปติดตั้ง
+          </button>
+          <button
             className="bg-gray-500 text-black py-2 px-4 rounded-lg hover:bg-gray-600 w-full"
             onClick={() => handleNavigation("/request")}
           >

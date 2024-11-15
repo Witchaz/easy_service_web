@@ -87,7 +87,9 @@ export default function workWaitPowerSupplyList() {
                 </div>
               ))
             ) : (
-              <p>No machine data available</p>
+              <div className="flex items-center justify-center h-full">
+                  <p className="text-red-500 text-center">No machine data available</p>
+                </div>
             )}
           </div>
         )}
