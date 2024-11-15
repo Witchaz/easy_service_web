@@ -75,7 +75,7 @@ export default function EditProfile() {
     if (!formData) return;
 
     const newErrors: Partial<User> = {};
-    if (!formData.username) newErrors.username = "Username is required.";
+    
     if (!formData.name) newErrors.name = "Name is required.";
     if (!formData.surname) newErrors.surname = "Surname is required.";
     if (!formData.address) newErrors.address = "Address is required.";
@@ -120,18 +120,7 @@ export default function EditProfile() {
         onSubmit={handleSubmit}
         className="bg-white p-6 rounded-lg shadow-md w-full max-w-2xl"
       >
-        <div className="mb-4">
-          <label>Username *</label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            className="border rounded w-full py-2 px-3"
-            placeholder="Enter username"
-          />
-          {errors.username && <p className="text-red-500 text-sm">{errors.username}</p>}
-        </div>
+        
         <div className="mb-4">
           <label>Name *</label>
           <input

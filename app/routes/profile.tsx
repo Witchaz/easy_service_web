@@ -87,7 +87,7 @@ export default function Profile() {
         <h2 className="text-center text-2xl font-semibold text-lime-600 mb-6">โปรไฟล์ผู้ใช้</h2>
 
         <div className="bg-white p-6 rounded-lg shadow-md w-[800px] max-w-full mb-6">
-          <p><strong>รหัสผู้ใช้:</strong> {userData.id}</p>
+          
           <p><strong>ชื่อผู้ใช้:</strong> {userData.username}</p>
           <p><strong>ชื่อ:</strong> {userData.name}</p>
           <p><strong>นามสกุล:</strong> {userData.surname}</p>
