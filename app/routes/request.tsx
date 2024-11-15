@@ -103,7 +103,9 @@ export default function SparePartsList() {
   
     navigate("/requestList"); // Navigate to requestList for preview
   };
-  
+  const handleRemoveClick = () => {
+    localStorage.removeItem("selectedSpareParts");  // เคลียร์ข้อมูลใน localStorage
+  };
   return (
     <>
       <NavBar />
@@ -170,7 +172,7 @@ export default function SparePartsList() {
           </div>
           <div className="flex justify-center space-x-10 mt-8">
             <a href="/mainPageEngineer">
-              <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600">Back</button>
+              <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600" onClick={handleRemoveClick}>Back</button>
             </a>
             <button className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600" onClick={handleAdd}>
               Next
