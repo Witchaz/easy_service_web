@@ -56,6 +56,10 @@ export default function EngineerDetailsSpareParts() {
       alert("จำนวนอะไหล่ต้องมากกว่า 0");
       return;
     }
+    else if (sparePartsQty > 100) {
+      alert("จำนวนอะไหล่ต้องน้อยกว่า 100");
+      return;
+    }
 
     const url = 'https://easy-service.prakasitj.com/Spare_parts_requests/insertNewSparePartsRequest';
     const options = {

@@ -21,23 +21,25 @@ const NewCustomer: React.FC = () => {
         credit_limit: 0,  
     });
 
-    const [errors, setErrors] = useState<Partial<FormData>>({});
+    const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
     const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
+
         setFormData(prevState => ({
             ...prevState,
-            [name]: name === "credit_limit" ? Number(value) : value,
+            [name]: name === "credit_limit" ? parseFloat(value) : value, // Convert to number for `credit_limit`
         }));
+
         setErrors(prevErrors => ({
             ...prevErrors,
             [name]: "",
         }));
     };
 
-    const validateForm = (): Partial<FormData> => {
-        const newErrors: Partial<FormData> = {};
+    const validateForm = (): Partial<Record<keyof FormData, string>> => {
+        const newErrors: Partial<Record<keyof FormData, string>> = {};
 
         if (!formData.name) newErrors.name = "Name/Company is required.";
         if (!formData.tel) {
@@ -52,6 +54,9 @@ const NewCustomer: React.FC = () => {
             newErrors.tax_id = "Customer TAX must be a 13-digit number.";
         }
         if (!formData.province) newErrors.province = "Province is required.";
+        if (formData.credit_limit < 0) {
+            newErrors.credit_limit = "Credit Limit must be greater than or equal to 0.";
+        }
 
         return newErrors;
     };
@@ -59,36 +64,30 @@ const NewCustomer: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formErrors = validateForm();
-        if (formData.credit_limit >= 0) {
-            
 
-            if (Object.keys(formErrors).length > 0) {
-                setErrors(formErrors);
-                return;
-            }
-
-            try {
-                const response = await fetch("https://easy-service.prakasitj.com/customers/addNewCustomer", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(formData),
-                });
-            
-                if (response.ok) {
-                    alert("Customer added successfully.");
-                    navigate("/customerList");
-                } else {
-                    alert("Failed to add customer.");
-                }
-            } catch (error) {
-                console.error("Error adding customer:", error);
-                alert("An error occurred. Please try again.");
-            }
+        if (Object.keys(formErrors).length > 0) {
+            setErrors(formErrors);
+            return;
         }
-        else {
-            alert("credit_limit >= 0.");
+
+        try {
+            const response = await fetch("https://easy-service.prakasitj.com/customers/addNewCustomer", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+        
+            if (response.ok) {
+                alert("Customer added successfully.");
+                navigate("/customerList");
+            } else {
+                alert("Failed to add customer.");
+            }
+        } catch (error) {
+            console.error("Error adding customer:", error);
+            alert("An error occurred. Please try again.");
         }
     };
 
@@ -122,10 +121,13 @@ const NewCustomer: React.FC = () => {
                         <input
                             type="number"
                             name="credit_limit"
-                            value={formData.credit_limit}
+                            value={formData.credit_limit.toString()} // Convert `number` to `string` for input
                             onChange={handleChange}
                             className="border rounded w-full py-2 px-3"
                         />
+                        {errors.credit_limit && (
+                            <p className="text-red-500 text-sm">{errors.credit_limit}</p>
+                        )}
                     </div>
                     <div className="flex justify-between">
                         <button type="button" className="bg-red-500 text-white py-2 px-4 rounded" onClick={handleBack}>
