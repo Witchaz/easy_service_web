@@ -57,6 +57,9 @@ const NewCustomer: React.FC = () => {
         if (formData.credit_limit < 0) {
             newErrors.credit_limit = "Credit Limit must be greater than or equal to 0.";
         }
+        if (formData.credit_limit > 10000000) {
+            newErrors.credit_limit = "Credit limit must be less than or equal to 10000000.";
+        }
 
         return newErrors;
     };

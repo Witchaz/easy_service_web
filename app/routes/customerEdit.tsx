@@ -90,6 +90,7 @@ export default function CustomerEdit() {
         if (!customer.tax_id || customer.tax_id.length !== 13) errors.tax_id = "หมายเลขประจำตัวผู้เสียภาษีต้องมี 13 หลัก";
         if (!customer.province) errors.province = "จังหวัด ต้องไม่ว่าง";
         if (customer.credit_limit <= 0) errors.credit_limit = "Credit limit ต้องมากกว่า 0";
+        if (customer.credit_limit > 10000000) errors.credit_limit = "Credit limit ต้องน้อยกว่า 10000000";
 
         setFormErrors(errors);
         return Object.keys(errors).length === 0; // ถ้าตรวจสอบไม่มีข้อผิดพลาด

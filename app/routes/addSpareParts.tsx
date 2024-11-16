@@ -41,7 +41,7 @@ export default function AddSpareparts() {
         const newErrors = {
             name: !formSparepartsData.name,
             description: !formSparepartsData.description,
-            price: formSparepartsData.price < 0,
+            price: formSparepartsData.price < 0 || formSparepartsData.price > 1000000,
             unit: !formSparepartsData.unit,
         };
 
@@ -122,7 +122,11 @@ export default function AddSpareparts() {
                                 onChange={handleChange}
                                 className="border rounded w-full py-2 px-3"
                             />
-                            {errors.price && <p className="text-red-500 text-sm">Price must be 0 or greater.</p>}
+                            {errors.price && formSparepartsData.price <= 0 && (
+                                <p className="text-red-500 text-sm">Price must be greater than 0.</p>)}
+                            {errors.price && formSparepartsData.price > 1000000 && (
+                                <p className="text-red-500 text-sm">Price must not exceed 1,000,000.</p>)}
+
                         </div>
 
                         <div className="mb-4">
