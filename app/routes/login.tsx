@@ -86,12 +86,7 @@ export default function Login() {
             Login
           </button>
         </div>
-        <div className="flex justify-center">
-          Don't have an account? 
-          <a href="/create_id">
-            <div style={{ color: 'red', marginLeft: '4px' }}>create account</div>
-          </a>
-        </div>
+        
       </div>
     </>
   );
