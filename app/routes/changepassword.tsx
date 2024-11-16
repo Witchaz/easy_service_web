@@ -79,6 +79,11 @@ export default function ChangePassword() {
       return;
     }
 
+     const confirmed = window.confirm("Are you sure you want to change the password?");
+      if (!confirmed) {
+       return;
+      }
+
     try {
       const url = "https://easy-service.prakasitj.com/user/editUser";
       const options = {

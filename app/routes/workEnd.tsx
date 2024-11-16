@@ -261,7 +261,7 @@ export default function workEnd() {
                 View Power Supply
               </button>
               <button onClick={() => handleEdit("AN Cost")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                View AN Cost
+                View Additional Costs​
               </button>
             </div>
           </div>

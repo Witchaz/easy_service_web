@@ -267,7 +267,7 @@ export default function adWork() {
                 Edit Engineer
               </button>
               <button onClick={() => handleEdit("AN Cost")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                Edit AN Cost
+                Edit Edit Additional Costs
               </button>
             </div>
           </div>

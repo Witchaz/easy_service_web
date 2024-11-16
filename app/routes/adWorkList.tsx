@@ -186,10 +186,14 @@ export default function adWorkList() {
     if (!work.user_id) {
       alert("กรุณาเลือกช่าง.");
       return;
-    }
+      }
+    
 
-    if (!work.machines || work.machines.length === 0) {
-      // Update status to 6 if there are no machines
+    if (!work.machines || work.machines.length === 0 ) {
+      if (work.additionalCost === 0) {
+        alert("กรุณาเพิ่มค่าใช้จ่ายอื่น หรือ เครื่อง");
+        return;
+      }
       const url = `https://easy-service.prakasitj.com/works/setWorkStatus`;
       const options = {
         method: "POST",

@@ -249,7 +249,7 @@ export default function engineerSWork() {
               
                    
               <button onClick={() => handleEdit("An Cost")} className="bg-lime-500 text-white py-1 px-3 rounded-lg hover:bg-lime-600">
-                View An Cost
+                View Additional Costs​
               </button>
             </div>
           </div>
