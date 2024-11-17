@@ -23,6 +23,7 @@ interface LoaderData {
   total: number;
   q: string;
   page: number;
+  workCounts: { [userId: number]: number };
 }
 
 const getUsers = async (searchTerm: string): Promise<Array<User>> => {
@@ -31,9 +32,29 @@ const getUsers = async (searchTerm: string): Promise<Array<User>> => {
 
   return users
     .filter(user => user.role !== "admin") // Exclude admin users
-    .filter(user => 
+    .filter(user =>
       searchTerm ? user.name.toLowerCase().includes(searchTerm.toLowerCase()) : true
     );
+};
+
+const getWorkCounts = async (): Promise<{ [userId: number]: number }> => {
+  const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/1,3,6`;
+  const options = { method: "GET" };
+
+  try {
+    const response = await fetch(url, options);
+    const works = await response.json();
+
+    const workCounts: { [userId: number]: number } = {};
+    works.forEach((work: { user_id: number }) => {
+      workCounts[work.user_id] = (workCounts[work.user_id] || 0) + 1;
+    });
+
+    return workCounts;
+  } catch (error) {
+    console.error("Error fetching works:", error);
+    return {};
+  }
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -45,11 +66,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
   const paginatedUsers = users.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  return json({ users: paginatedUsers, total: users.length, q, page });
+  const workCounts = await getWorkCounts();
+
+  return json({ users: paginatedUsers, total: users.length, q, page, workCounts });
 };
 
 export default function SelectEngineer() {
-  const { users, total, q, page } = useLoaderData<LoaderData>();
+  const { users, total, q, page, workCounts } = useLoaderData<LoaderData>();
   const submit = useSubmit();
   const navigate = useNavigate();
   const location = useLocation();
@@ -130,7 +153,7 @@ export default function SelectEngineer() {
                 <th className="p-2">Surname</th>
                 <th className="p-2">Address</th>
                 <th className="p-2">Province</th>
-                <th className="p-2">Role</th>
+                <th className="p-2">Work Count</th>
                 <th className="p-2">Add Date</th>
               </tr>
             </thead>
@@ -150,8 +173,9 @@ export default function SelectEngineer() {
                   <td className="p-2">{user.surname}</td>
                   <td className="p-2">{user.address}</td>
                   <td className="p-2">{user.province}</td>
-                  <td className="p-2">{user.role}</td>
+                  <td className="p-2">{workCounts[user.id] || 0}</td>
                   <td className="p-2">{new Date(user.add_date).toLocaleDateString()}</td>
+                  
                 </tr>
               ))}
             </tbody>

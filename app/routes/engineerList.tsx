@@ -2,9 +2,9 @@ import { json, LoaderFunctionArgs } from "@remix-run/node";
 import { Form, Link, useLoaderData, useSubmit } from "@remix-run/react";
 import { useEffect, useState } from "react";
 import NavBar from "app/components/_navBar";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
-const ITEMS_PER_PAGE = 6; 
+const ITEMS_PER_PAGE = 6;
 
 interface User {
   id: number;
@@ -23,65 +23,73 @@ interface LoaderData {
   total: number;
   q: string;
   page: number;
+  workCounts: { [userId: number]: number };
 }
 
 const getUsers = async (searchTerm: string): Promise<Array<User>> => {
-    const response = await fetch("https://easy-service.prakasitj.com/user/getUserList");
-    const users: User[] = await response.json();
+  const response = await fetch("https://easy-service.prakasitj.com/user/getUserList");
+  const users: User[] = await response.json();
 
-    if (searchTerm) {
-      return users.filter(user => user.name.toLowerCase().includes(searchTerm.toLowerCase()));
-    }
-    return users;
+  const filteredUsers = users.filter(user => user.role === "user");
+
+  if (searchTerm) {
+    return filteredUsers.filter(user =>
+      user.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
+  return filteredUsers;
+};
+
+const getWorksByStatus = async (status: string): Promise<{ [userId: number]: number }> => {
+  const url = `https://easy-service.prakasitj.com/works/getWorksListByStatus/${status}`;
+  const options = { method: "GET" };
+
+  try {
+    const response = await fetch(url, options);
+    const works = await response.json();
+
+    // Group works by `user_id` and count them
+    const workCounts: { [userId: number]: number } = {};
+    works.forEach((work: { user_id: number }) => {
+      workCounts[work.user_id] = (workCounts[work.user_id] || 0) + 1;
+    });
+
+    return workCounts;
+  } catch (error) {
+    console.error("Error fetching works by status:", error);
+    return {};
+  }
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const q = url.searchParams.get("q") || "";
   const page = parseInt(url.searchParams.get("page") || "1", 10);
-  
-  const users = await getUsers(q); 
+
+  const users = await getUsers(q);
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
   const paginatedUsers = users.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  
-  return json({ users: paginatedUsers, total: users.length, q, page });
+
+  // Fetch work counts for a specific status
+  const workCounts = await getWorksByStatus("1,3,6"); // Replace with desired status
+
+  return json({ users: paginatedUsers, total: users.length, q, page, workCounts });
 };
 
-export default function engineerList() {
-  const { users, total, q, page } = useLoaderData<LoaderData>(); 
+export default function EngineerList() {
+  const { users, total, q, page, workCounts } = useLoaderData<LoaderData>();
   const submit = useSubmit();
   const navigate = useNavigate();
-  
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   useEffect(() => {
     const searchField = document.getElementById("q");
     if (searchField instanceof HTMLInputElement) {
-        searchField.value = q || "";
+      searchField.value = q || "";
     }
   }, [q]);
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
-  
-  const handleSelectEdit = () => {
-    if (selectedUserId) {
-      navigate(`/editEngineer/${selectedUserId}`); // ส่ง id ไปยังหน้า editEngineer
-    } else {
-      alert("กรุณาเลือกผู้ใช้ก่อน");
-    }
-  };
-  
-  const handleSelect = () => {
-  if (selectedUserId) {
-    navigate("/engineerSparePart", { state: { userId: selectedUserId } });
-  } else {
-    alert("กรุณาเลือกผู้ใช้ก่อน");
-  }
-};
-
-  const handleAdd = () => {
-    navigate("/addEngineer");
-  };
 
   return (
     <>
@@ -99,7 +107,7 @@ export default function engineerList() {
               className="border border-gray-300 rounded-lg p-2 w-1/3"
             />
           </Form>
-          
+
           <table className="table-auto w-full text-left">
             <thead className="text-gray-600">
               <tr>
@@ -108,28 +116,32 @@ export default function engineerList() {
                 <th className="p-2">Surname</th>
                 <th className="p-2">Address</th>
                 <th className="p-2">Province</th>
-                <th className="p-2">Role</th>
+                
+                <th className="p-2">Work Count</th>
                 <th className="p-2">Add Date</th>
+                
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
+              {users.map(user => (
                 <tr key={user.id} className="border-t">
                   <td className="p-2">
                     <input
                       type="radio"
                       name="user"
-                      value={user.id} // ใช้ id เป็นค่า value
-                      onChange={() => setSelectedUserId(user.id)} // ตั้งค่า selectedUserId
-                      checked={selectedUserId === user.id} 
+                      value={user.id}
+                      onChange={() => setSelectedUserId(user.id)}
+                      checked={selectedUserId === user.id}
                     />
                   </td>
                   <td className="p-2">{user.name}</td>
                   <td className="p-2">{user.surname}</td>
                   <td className="p-2">{user.address}</td>
                   <td className="p-2">{user.province}</td>
-                  <td className="p-2">{user.role}</td>
+                  
+                  <td className="p-2">{workCounts[user.id] || 0}</td>
                   <td className="p-2">{new Date(user.add_date).toLocaleDateString()}</td>
+                  
                 </tr>
               ))}
             </tbody>
@@ -153,14 +165,14 @@ export default function engineerList() {
             <a href="/mainPage">
               <button className="bg-black text-white py-2 px-6 rounded-lg hover:bg-gray-600">Back</button>
             </a>
-            <button className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600" onClick={handleAdd}>
-                Add
+            <button className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600" onClick={() => navigate("/addEngineer")}>
+              Add
             </button>
-            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelectEdit}>
-                Select Edit
+            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={() => selectedUserId && navigate(`/editEngineer/${selectedUserId}`)}>
+              Select Edit
             </button>
-            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={handleSelect} >
-                Select 
+            <button className="bg-lime-500 text-white py-2 px-6 rounded-lg hover:bg-lime-600" onClick={() => selectedUserId && navigate("/engineerSparePart", { state: { userId: selectedUserId } })}>
+              Select
             </button>
           </div>
         </div>

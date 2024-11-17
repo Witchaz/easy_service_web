@@ -124,15 +124,25 @@ export default function MachineDetails() {
 
                         <div className="mb-4">
                             <label className="block text-sm font-semibold mb-2">Warranty</label>
-                            <input 
-                                type="checkbox" 
-                                name="warranty"
-                                checked={formMachineData.warranty}
-                                onChange={handleChange}
-                                className="appearance-none w-8 h-8 border-2 border-red-500 rounded-md checked:bg-lime-500 checked:border-lime-500 focus:outline-none mr-2"
-                            />
-                            <span>{formMachineData.warranty ? "Yes" : "No"}</span>
+                            <div className="flex space-x-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormMachineData({ ...formMachineData, warranty: true })}
+                                    className={`w-20 h-10 rounded-md font-semibold ${formMachineData.warranty ? "bg-lime-500 text-white" : "bg-gray-200 text-gray-700"} border`}
+                                >
+                                    Yes
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setFormMachineData({ ...formMachineData, warranty: false })}
+                                    className={`w-20 h-10 rounded-md font-semibold ${!formMachineData.warranty ? "bg-lime-500 text-white" : "bg-gray-200 text-gray-700"} border`}
+                                >
+                                    No
+                                </button>
+                            </div>
+                            <span className="block mt-2">{formMachineData.warranty ? "Warranty: Yes" : "Warranty: No"}</span>
                         </div>
+
                         
                         <div className="mt-6 flex justify-between">
                             <button type="button" className="bg-black text-white shrink border-white border-2 hover:bg-gray-800 p-2 rounded-lg"
