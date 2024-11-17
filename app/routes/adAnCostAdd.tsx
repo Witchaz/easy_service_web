@@ -42,8 +42,8 @@ export default function adAnCostAdd() {
         const newErrors = {
             description: !formExpensesData.description,
             unit: !formExpensesData.unit,
-            cost: formExpensesData.cost <= 0,
-            amount: formExpensesData.amount <= 0,
+            cost: formExpensesData.cost <= 0 || formExpensesData.cost >= 10000000,
+            amount: formExpensesData.amount <= 0 || formExpensesData.amount >= 10000,
         };
 
         setErrors(newErrors);
@@ -123,7 +123,13 @@ export default function adAnCostAdd() {
                                 onChange={handleChange}
                                 className="border rounded w-full py-2 px-3"
                             />
-                            {errors.cost && <p className="text-red-500 text-sm">Please enter a valid cost.</p>}
+                            {errors.cost && formExpensesData.cost < 0 && (
+                                <p className="text-red-500 text-sm">Cost must be greater than or equal to 0.</p>
+                            )}
+                            {errors.cost && formExpensesData.cost >= 10000000 && (
+                                <p className="text-red-500 text-sm">Cost must be less than 10,000,000.</p>
+                            )}
+
                         </div>
 
                         <div className="mb-4">
@@ -135,7 +141,10 @@ export default function adAnCostAdd() {
                                 onChange={handleChange}
                                 className="border rounded w-full py-2 px-3"
                             />
-                            {errors.amount && <p className="text-red-500 text-sm">Please enter a valid amount.</p>}
+                            {errors.amount && formExpensesData.amount < 0 && <p className="text-red-500 text-sm">Please enter a valid amount.</p>}
+                            {errors.amount && formExpensesData.amount >= 10000 && (
+                                <p className="text-red-500 text-sm">Amount must be less than 10,000.</p>
+                            )}
                         </div>
 
                         <div className="mt-6 flex justify-between">

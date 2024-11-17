@@ -60,6 +60,10 @@ export default function EngineerDetailsSpareParts() {
       alert("จำนวนอะไหล่ต้องน้อยกว่า 100");
       return;
     }
+    else if (!Number.isInteger(sparePartsQty)) {
+      alert("จำนวนอะไหล่ต้องเป็นตัวเลขจำนวนเต็ม");
+      return;
+    }
 
     const url = 'https://easy-service.prakasitj.com/Spare_parts_requests/insertNewSparePartsRequest';
     const options = {
