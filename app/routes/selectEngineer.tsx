@@ -91,6 +91,16 @@ export default function SelectEngineer() {
 
   const handleSelect = async () => {
     if (selectedUserId !== null) {
+      const workCount = workCounts[selectedUserId] || 0;
+      if (workCount >= 5) {
+      const confirmSelection = window.confirm(
+        `The selected engineer has ${workCount} works assigned. Are you sure you want to assign this work to them?`
+      );
+
+      if (!confirmSelection) {
+        return; // Exit if user cancels
+      }
+    }
       try {
         const url = "https://easy-service.prakasitj.com/works/editResponsiblePerson";
         const options = {
