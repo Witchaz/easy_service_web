@@ -36,7 +36,11 @@ export default function RequestList() {
         user_id: id, 
         fromuser_id: 7,
       };
-
+      
+      if (!Number.isInteger(part.qty)) {
+        alert(`จำนวนของอะไหล่ ${part.name} ต้องเป็นจำนวนเต็ม`);
+        return;
+      }
       if (part.qty <= 0 ) {
         alert(`จำนวนของอะไหล่ ${part.name} ต้องมากกว่า 0`);
         return;
