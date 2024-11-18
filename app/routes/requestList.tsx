@@ -45,7 +45,7 @@ export default function RequestList() {
         alert(`จำนวนของอะไหล่ ${part.name} ต้องมากกว่า 0`);
         return;
       }
-      if (part.qty > 1000) {
+      if (part.qty > 100) {
         alert(`จำนวนของอะไหล่ ${part.name} ต้องไม่เกิน 1000`);
         return;
       }
