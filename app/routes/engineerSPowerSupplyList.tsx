@@ -37,8 +37,12 @@ export default function engineerSPowerSupplyList() {
           throw new Error(`Failed to fetch machines. Response status: ${response.status}`);
         }
 
-        const data = await response.json();
+        let data = await response.json();
         console.log("Fetched machine data:", data);
+
+        // Filter out machines where description contains "(ไม่ต้องซ่อม)"
+        data = data.filter((machine: Machine) => !machine.description.includes("(ไม่ต้องซ่อม)"));
+
         setMachines(data);
       } catch (error) {
         console.error("Error fetching machines:", error);

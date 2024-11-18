@@ -138,28 +138,32 @@ export default function engineerSWork() {
   };
 
   const fetchMachinesByWorkID = async (workId: number): Promise<Machine[]> => {
-    const url = `https://easy-service.prakasitj.com/Requests/getListBywork_id/${workId}`;
-    const options = { method: "GET" };
+  const url = `https://easy-service.prakasitj.com/Requests/getListBywork_id/${workId}`;
+  const options = { method: "GET" };
 
-    try {
-      const response = await fetch(url, options);
-      if (!response.ok) throw new Error("Failed to fetch machines");
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) throw new Error("Failed to fetch machines");
 
-      const data = await response.json();
-      return data.map((machine: any) => ({
-        id: machine.id,
-        model: machine.model,
-        sn: machine.sn,
-        warranty: machine.warranty,
-        rated: machine.rated,
-        description: machine.description,
-        add_date: machine.add_date,
-      }));
-    } catch (error) {
-      console.error("Error fetching machines:", error);
-      return [];
-    }
-  };
+    const data = await response.json();
+
+    // Filter out machines where the description contains "(ไม่ต้องซ่อม)"
+    const filteredMachines = data.filter((machine: any) => !machine.description.includes("(ไม่ต้องซ่อม)"));
+
+    return filteredMachines.map((machine: any) => ({
+      id: machine.id,
+      model: machine.model,
+      sn: machine.sn,
+      warranty: machine.warranty,
+      rated: machine.rated,
+      description: machine.description,
+      add_date: machine.add_date,
+    }));
+  } catch (error) {
+    console.error("Error fetching machines:", error);
+    return [];
+  }
+};
 
   const fetchAdditionalCosts = async (workId: number) => {
     const url = `https://easy-service.prakasitj.com/additionalcosts/getFromWorkId/${workId}`;
